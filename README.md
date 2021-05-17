@@ -19,6 +19,13 @@ usage: thriftcheck [options] [file ...]
   -v	enable verbose (debugging) output
   ```
 
+Messages are reported to standard output using a familiar parseable format:
+
+```
+file.thrift:1:1:error: "py" namespace must match "^idl\\." (namespace.pattern)
+file.thrift:3:1:error: unable to find include path for 'bar.thrift' (includes)
+```
+
 ## Available Checks
 
 ### `enum.size`
