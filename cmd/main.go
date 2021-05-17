@@ -44,7 +44,6 @@ func (i *Includes) Set(value string) error {
 }
 
 var configFile = flag.String("c", "thriftcheck.toml", "configuration file path")
-var helpFlag = flag.Bool("h", false, "print usage information")
 var listFlag = flag.Bool("l", false, "list all available checks")
 var verboseFlag = flag.Bool("v", false, "enable verbose (debugging) output")
 
@@ -74,12 +73,11 @@ func main() {
 
 	// Parse command line flags
 	flag.Var(&includes, "I", "include path (can be specified multiple times)")
-	flag.Parse()
-	if *helpFlag {
-		fmt.Fprintf(flag.CommandLine.Output(), "usage: %s [options] [file ...]\n", os.Args[0])
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(), "usage: thriftcheck [options] [file ...]\n")
 		flag.PrintDefaults()
-		os.Exit(0)
 	}
+	flag.Parse()
 
 	// Load the (optional) configuration file
 	var cfg Config
