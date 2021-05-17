@@ -28,7 +28,7 @@ type Config struct {
 		Error   int `fig:"error"`
 	}
 	Namespace struct {
-		Prefixes map[string]string `fig:"prefixes"`
+		Patterns map[string]string `fig:"patterns"`
 	}
 }
 
@@ -92,7 +92,7 @@ func main() {
 	// Build the set of checks we'll use for the linter
 	checks := &thriftcheck.Checks{
 		checks.CheckIncludes(cfg.Includes),
-		checks.CheckNamespacePrefix(cfg.Namespace.Prefixes),
+		checks.CheckNamespacePattern(cfg.Namespace.Patterns),
 		checks.CheckEnumSize(cfg.Enum.Warning, cfg.Enum.Error),
 	}
 	if *listFlag {

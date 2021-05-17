@@ -43,14 +43,14 @@ includes = [
 ]
 ```
 
-### `namespace.prefix`
+### `namespace.pattern`
 
-This check ensures that a namespace declaration has a specific prefix. It can
-be configured one a per-language basis.
+This check ensures that a namespace's name matches a regular expression
+pattern. The pattern can be configured one a per-language basis.
 
 ```toml
-[[namespace.prefixes]]
-py = "idl."
+[[namespace.patterns]]
+py = "^idl\\."
 ```
 
 ## Custom Checks
