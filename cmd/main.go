@@ -24,8 +24,10 @@ type Config struct {
 	}
 	Includes []string `fig:"includes"`
 	Enum     struct {
-		Warning int `fig:"warning"`
-		Error   int `fig:"error"`
+		Size struct {
+			Warning int `fig:"warning"`
+			Error   int `fig:"error"`
+		}
 	}
 	Namespace struct {
 		Patterns map[string]string `fig:"patterns"`
@@ -93,7 +95,7 @@ func main() {
 	checks := &thriftcheck.Checks{
 		checks.CheckIncludes(cfg.Includes),
 		checks.CheckNamespacePattern(cfg.Namespace.Patterns),
-		checks.CheckEnumSize(cfg.Enum.Warning, cfg.Enum.Error),
+		checks.CheckEnumSize(cfg.Enum.Size.Warning, cfg.Enum.Size.Error),
 	}
 	if *listFlag {
 		fmt.Println(strings.Join(checks.SortedKeys(), "\n"))

@@ -34,7 +34,7 @@ This check warns or errors if an enumeration's element size grows beyond a
 limit.
 
 ```toml
-[enum]
+[enum.size]
 warning = 500
 error = 1000
 ```
@@ -43,6 +43,11 @@ error = 1000
 
 This check ensures that each `include`'d file can be located in the set of
 given include paths.
+
+Relative paths are resolved relative to the current working directory. The
+list of `includes` specified in the configuration file is used by default,
+but if any paths are specified on the command line using the `-I` option,
+they will be used instead.
 
 ```toml
 includes = [
