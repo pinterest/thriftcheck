@@ -1,10 +1,20 @@
 package thriftcheck
 
 import (
+	"io/ioutil"
+	"log"
 	"testing"
 
 	"go.uber.org/thriftrw/ast"
 )
+
+func TestWithLogger(t *testing.T) {
+	logger := log.New(ioutil.Discard, "", 0)
+	linter := NewLinter(Checks{}, WithLogger(logger))
+	if linter.logger != logger {
+		t.Errorf("expected logger to be %v, got %v", logger, linter.logger)
+	}
+}
 
 func TestOverrideableChecksLookup(t *testing.T) {
 	root := &Checks{Check{key: "root"}}
