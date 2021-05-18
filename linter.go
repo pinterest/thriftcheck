@@ -1,6 +1,7 @@
 package thriftcheck
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"strings"
@@ -42,7 +43,7 @@ func (l *Linter) Lint(filenames []string) (Messages, error) {
 	for _, filename := range filenames {
 		program, err := l.parse(filename)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%s: %w", filename, err)
 		}
 
 		messages = append(messages, l.lint(filename, program)...)
