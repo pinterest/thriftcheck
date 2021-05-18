@@ -14,7 +14,10 @@ var nodeInterface = reflect.TypeOf((*ast.Node)(nil)).Elem()
 type VisitorFunc func(ast.Walker, ast.Node) VisitorFunc
 
 func (f VisitorFunc) Visit(w ast.Walker, n ast.Node) ast.Visitor {
-	return f(w, n)
+	if f != nil {
+		return f(w, n)
+	}
+	return nil
 }
 
 // Annotations returns an ast.Node's Annotations.
