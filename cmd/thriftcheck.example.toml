@@ -1,0 +1,24 @@
+# Example ThriftCheck Configuration File
+
+# List of paths that will be be used for `include` directives. Relative paths
+# are resolved relative to the current working directory.
+#
+# Note that if  any -I options are specified on the command line, they will
+# be used instead of this configuration value.
+includes = [
+    'shared',
+]
+
+# Lists of checks to explicitly enable or disable. If a prefix is given (e.g.
+# "namespace"), all checks matching that prefix will be matched.
+[checks]
+enabled = []
+disabled = []
+
+[[namespace.patterns]]
+py = "^idl\\."
+
+[enum]
+[enum.size]
+warning = 500
+error = 1000
