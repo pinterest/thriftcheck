@@ -33,7 +33,7 @@ func NewLinter(checks Checks, options ...Option) *Linter {
 	for _, option := range options {
 		option(l)
 	}
-	l.logger.Printf("checks: %s\n", strings.Join(checks.SortedKeys(), ", "))
+	l.logger.Printf("checks: %s\n", strings.Join(checks.SortedNames(), ", "))
 	return l
 }
 
@@ -99,7 +99,7 @@ func (l *Linter) lint(n ast.Node, filename string) (messages Messages) {
 	}
 
 	ast.Walk(visitor, n)
-	return ctx.messages
+	return ctx.Messages
 }
 
 // Stores Checks overrides that apply to a node and all of its children.

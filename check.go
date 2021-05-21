@@ -11,14 +11,14 @@ import (
 )
 
 type Check struct {
-	key string
-	fn  interface{}
+	Name string
+	fn   interface{}
 }
 
 type Checks []Check
 
 // NewCheck creates a new Check.
-func NewCheck(key string, fn interface{}) Check {
+func NewCheck(name string, fn interface{}) Check {
 	if fn == nil {
 		panic("check function must be a Func; got nil")
 	}
@@ -39,7 +39,7 @@ func NewCheck(key string, fn interface{}) Check {
 		}
 	}
 
-	return Check{key: key, fn: fn}
+	return Check{Name: name, fn: fn}
 }
 
 // Call the check function if its arguments end with the current node in the
@@ -99,27 +99,27 @@ func (c *Check) Call(ctx *C, nodes ...ast.Node) bool {
 		return false
 	}
 
-	ctx.check = c.key
+	ctx.Check = c.Name
 	reflect.ValueOf(c.fn).Call(args)
 	return true
 }
 
-// SortedKeys returns a sorted list of the checks' keys.
-func (c Checks) SortedKeys() []string {
+// SortedKeys returns a sorted list of the checks' names.
+func (c Checks) SortedNames() []string {
 	keys := make([]string, 0, len(c))
 	for _, check := range c {
-		keys = append(keys, check.key)
+		keys = append(keys, check.Name)
 	}
 	sort.Strings(keys)
 	return keys
 }
 
-// With returns a copy with only those checks whose keys match the given prefixes.
+// With returns a copy with only those checks whose names match the given prefixes.
 func (c Checks) With(prefixes []string) *Checks {
 	checks := make(Checks, 0)
 	for _, check := range c {
 		for _, prefix := range prefixes {
-			if check.key == prefix || strings.HasPrefix(check.key, prefix+".") {
+			if check.Name == prefix || strings.HasPrefix(check.Name, prefix+".") {
 				checks = append(checks, check)
 			}
 		}
@@ -127,13 +127,13 @@ func (c Checks) With(prefixes []string) *Checks {
 	return &checks
 }
 
-// Without returns a copy without those checks whose keys match the given prefixes.
+// Without returns a copy without those checks whose names match the given prefixes.
 func (c Checks) Without(prefixes []string) *Checks {
 	checks := make(Checks, 0)
 next:
 	for _, check := range c {
 		for _, prefix := range prefixes {
-			if check.key == prefix || strings.HasPrefix(check.key, prefix+".") {
+			if check.Name == prefix || strings.HasPrefix(check.Name, prefix+".") {
 				continue next
 			}
 		}
@@ -146,16 +146,16 @@ next:
 type C struct {
 	Logger   *log.Logger
 	Filename string
-	messages Messages
-	check    string
+	Check    string
+	Messages Messages
 }
 
 func (c *C) Warningf(node ast.Node, message string, args ...interface{}) {
-	m := &Message{Filename: c.Filename, Node: node, Check: c.check, Severity: Warning, Message: fmt.Sprintf(message, args...)}
-	c.messages = append(c.messages, m)
+	m := &Message{Filename: c.Filename, Node: node, Check: c.Check, Severity: Warning, Message: fmt.Sprintf(message, args...)}
+	c.Messages = append(c.Messages, m)
 }
 
 func (c *C) Errorf(node ast.Node, message string, args ...interface{}) {
-	m := &Message{Filename: c.Filename, Node: node, Check: c.check, Severity: Error, Message: fmt.Sprintf(message, args...)}
-	c.messages = append(c.messages, m)
+	m := &Message{Filename: c.Filename, Node: node, Check: c.Check, Severity: Error, Message: fmt.Sprintf(message, args...)}
+	c.Messages = append(c.Messages, m)
 }

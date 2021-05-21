@@ -102,7 +102,7 @@ func main() {
 		checks.CheckEnumSize(cfg.Enum.Size.Warning, cfg.Enum.Size.Error),
 	}
 	if *listFlag {
-		fmt.Println(strings.Join(checks.SortedKeys(), "\n"))
+		fmt.Println(strings.Join(checks.SortedNames(), "\n"))
 		os.Exit(0)
 	}
 	if len(cfg.Checks.Disabled) > 0 {

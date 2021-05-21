@@ -84,14 +84,14 @@ func TestWithWithout(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		keys := checks.SortedKeys()
+		keys := checks.SortedNames()
 
-		w := checks.With(tt.prefixes).SortedKeys()
+		w := checks.With(tt.prefixes).SortedNames()
 		if !reflect.DeepEqual(w, tt.with) {
 			t.Errorf("%s with %s expected %s, got %s", keys, tt.prefixes, tt.with, w)
 		}
 
-		wo := checks.Without(tt.prefixes).SortedKeys()
+		wo := checks.Without(tt.prefixes).SortedNames()
 		if !reflect.DeepEqual(wo, tt.without) {
 			t.Errorf("%s without %s expected %s, got %s", keys, tt.prefixes, tt.without, wo)
 		}
@@ -99,17 +99,17 @@ func TestWithWithout(t *testing.T) {
 }
 
 func TestC(t *testing.T) {
-	c := &C{Filename: "test.thrift", check: "check"}
+	c := &C{Filename: "test.thrift", Check: "check"}
 	node := &ast.Struct{}
 	c.Warningf(node, "Warning")
 	c.Errorf(node, "Error")
 
 	expected := Messages{
-		&Message{Filename: c.Filename, Node: node, Check: c.check, Severity: Warning, Message: "Warning"},
-		&Message{Filename: c.Filename, Node: node, Check: c.check, Severity: Error, Message: "Error"},
+		&Message{Filename: c.Filename, Node: node, Check: c.Check, Severity: Warning, Message: "Warning"},
+		&Message{Filename: c.Filename, Node: node, Check: c.Check, Severity: Error, Message: "Error"},
 	}
 
-	if !reflect.DeepEqual(expected, c.messages) {
-		t.Errorf("expected %s, got %s", expected, c.messages)
+	if !reflect.DeepEqual(expected, c.Messages) {
+		t.Errorf("expected %s, got %s", expected, c.Messages)
 	}
 }
