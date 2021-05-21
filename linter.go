@@ -92,7 +92,7 @@ func (l *Linter) lint(n ast.Node, filename string) (messages Messages) {
 
 		// Run all of the checks that match this part of the tree.
 		for _, check := range *checks {
-			check.Call(ctx, nodes)
+			check.Call(ctx, nodes...)
 		}
 
 		return visitor

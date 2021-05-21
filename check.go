@@ -70,9 +70,9 @@ func NewCheck(key string, fn interface{}) Check {
 //		f(*C, *ast.Program, ast.Node)
 //		f(*C, parent, node ast.Node)
 //
-func (c *Check) Call(ctx *C, nodes []ast.Node) bool {
+func (c *Check) Call(ctx *C, nodes ...ast.Node) bool {
 	if len(nodes) < 1 {
-		panic("expected at least one hode")
+		panic("expected at least one node")
 	}
 
 	f := reflect.TypeOf(c.fn)

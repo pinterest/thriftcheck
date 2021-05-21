@@ -49,7 +49,7 @@ func TestCall(t *testing.T) {
 		NewCheck("", func(c *C, s *ast.Struct, f *ast.Field) {}),
 	}
 	for _, check := range called {
-		if !check.Call(&C{}, nodes) {
+		if !check.Call(&C{}, nodes...) {
 			t.Errorf("expected call: %#v", check.fn)
 		}
 	}
@@ -60,7 +60,7 @@ func TestCall(t *testing.T) {
 		NewCheck("", func(c *C, s *ast.Program, f *ast.Field) {}),
 	}
 	for _, check := range notcalled {
-		if check.Call(&C{}, nodes) {
+		if check.Call(&C{}, nodes...) {
 			t.Errorf("unexpected call: %#v", check.fn)
 		}
 	}
