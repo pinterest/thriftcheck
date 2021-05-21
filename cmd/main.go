@@ -95,9 +95,11 @@ func main() {
 
 	// Build the set of checks we'll use for the linter
 	checks := &thriftcheck.Checks{
-		checks.CheckIncludes(cfg.Includes),
-		checks.CheckNamespacePattern(cfg.Checks.Namespace.Patterns),
 		checks.CheckEnumSize(cfg.Checks.Enum.Size.Warning, cfg.Checks.Enum.Size.Error),
+		checks.CheckIncludes(cfg.Includes),
+		checks.CheckMapKeyType(),
+		checks.CheckNamespacePattern(cfg.Checks.Namespace.Patterns),
+		checks.CheckSetValueType(),
 	}
 	if *listFlag {
 		fmt.Println(strings.Join(checks.SortedNames(), "\n"))

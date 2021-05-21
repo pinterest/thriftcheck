@@ -17,7 +17,7 @@ usage: thriftcheck [options] [file ...]
     	configuration file path (default "thriftcheck.toml")
   -l	list all available checks
   -v	enable verbose (debugging) output
-  ```
+```
 
 Messages are reported to standard output using a familiar parseable format:
 
@@ -55,6 +55,10 @@ includes = [
 ]
 ```
 
+### `map.key.type`
+
+This check ensures that only primitive types are used for `map<>` keys.
+
 ### `namespace.patterns`
 
 This check ensures that a namespace's name matches a regular expression
@@ -64,6 +68,10 @@ pattern. The pattern can be configured one a per-language basis.
 [[namespace.patterns]]
 py = "^idl\\."
 ```
+
+### `set.value.type`
+
+This check ensures that only primitive types are used for `set<>` values.
 
 ## Custom Checks
 
