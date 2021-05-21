@@ -46,7 +46,7 @@ func (l *Linter) Lint(filenames []string) (Messages, error) {
 			return nil, fmt.Errorf("%s: %w", filename, err)
 		}
 
-		messages = append(messages, l.lint(filename, program)...)
+		messages = append(messages, l.lint(program, filename)...)
 	}
 
 	return messages, nil
@@ -60,7 +60,7 @@ func (l *Linter) parse(filename string) (*ast.Program, error) {
 	return idl.Parse(s)
 }
 
-func (l *Linter) lint(filename string, program *ast.Program) (messages Messages) {
+func (l *Linter) lint(n ast.Node, filename string) (messages Messages) {
 	l.logger.Printf("linting %s\n", filename)
 
 	ctx := &C{Filename: filename, Logger: l.logger}
@@ -78,7 +78,13 @@ func (l *Linter) lint(filename string, program *ast.Program) (messages Messages)
 					if annotation.Value == "" {
 						return nil
 					}
-					checks = checks.Without(strings.Fields(annotation.Value))
+
+					values := strings.Split(annotation.Value, ",")
+					for i := range values {
+						values[i] = strings.TrimSpace(values[i])
+					}
+
+					checks = checks.Without(values)
 					activeChecks.add(n, checks)
 				}
 			}
@@ -92,7 +98,7 @@ func (l *Linter) lint(filename string, program *ast.Program) (messages Messages)
 		return visitor
 	}
 
-	ast.Walk(visitor, program)
+	ast.Walk(visitor, n)
 	return ctx.messages
 }
 

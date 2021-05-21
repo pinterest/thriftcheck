@@ -88,6 +88,23 @@ additional checks.
 
 [ast-node]: https://pkg.go.dev/go.uber.org/thriftrw/ast#Node
 
+## `nolint` Annotations
+
+You can disable one or more checks on a per-node basis using `nolint`
+annotations. `nolint` annotations apply to the current node and all of its
+descendents. The annotation's value can be empty, in which case linting is
+entirely disabled, or it can be set to a comma-separated list of checks to
+disable.
+
+```thrift
+enum State {
+	STOPPED = 1
+	RUNNING = 2
+	PASSED = 3
+	FAILED = 4
+} (nolint = "enum.size")
+```
+
 ## License
 
 This software is released under the terms of the [Apache 2.0 License](LICENSE).

@@ -130,11 +130,11 @@ func (c Checks) With(prefixes []string) *Checks {
 // Without returns a copy without those checks whose keys match the given prefixes.
 func (c Checks) Without(prefixes []string) *Checks {
 	checks := make(Checks, 0)
-top:
+next:
 	for _, check := range c {
 		for _, prefix := range prefixes {
 			if check.key == prefix || strings.HasPrefix(check.key, prefix+".") {
-				continue top
+				continue next
 			}
 		}
 		checks = append(checks, check)
