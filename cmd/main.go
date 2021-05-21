@@ -82,10 +82,6 @@ func main() {
 		flag.PrintDefaults()
 	}
 	flag.Parse()
-	if len(flag.Args()) == 0 {
-		flag.Usage()
-		os.Exit(0)
-	}
 
 	// Load the (optional) configuration file
 	var cfg Config
@@ -112,6 +108,10 @@ func main() {
 	}
 	if len(cfg.Checks.Enabled) > 0 {
 		checks = checks.With(cfg.Checks.Enabled)
+	}
+	if len(flag.Args()) == 0 {
+		flag.Usage()
+		os.Exit(0)
 	}
 
 	// Build the set of linter options
