@@ -88,6 +88,6 @@ additional checks.
 
 [ast-node]: https://pkg.go.dev/go.uber.org/thriftrw/ast#Node
 
-# License
+## License
 
 This software is released under the terms of the [Apache 2.0 License](LICENSE).
