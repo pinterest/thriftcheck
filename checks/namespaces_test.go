@@ -1,11 +1,8 @@
 package checks_test
 
 import (
-	"io/ioutil"
-	"log"
 	"testing"
 
-	"github.com/pinterest/thriftcheck"
 	"github.com/pinterest/thriftcheck/checks"
 	"go.uber.org/thriftrw/ast"
 )
@@ -32,7 +29,7 @@ func TestCheckNamespacePattern(t *testing.T) {
 	})
 
 	for _, tt := range tests {
-		c := &thriftcheck.C{Logger: log.New(ioutil.Discard, "", 0), Filename: "t.thrift", Check: check.Name}
+		c := newC(&check)
 		check.Call(c, tt.node)
 		assertMessageStrings(t, tt.node, tt.want, c.Messages)
 	}
