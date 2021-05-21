@@ -18,19 +18,21 @@ type Options struct {
 }
 
 type Config struct {
-	Checks struct {
+	Includes []string `fig:"includes"`
+	Checks   struct {
 		Enabled  []string `fig:"enabled"`
 		Disabled []string `fix:"disabled"`
-	}
-	Includes []string `fig:"includes"`
-	Enum     struct {
-		Size struct {
-			Warning int `fig:"warning"`
-			Error   int `fig:"error"`
+
+		Enum struct {
+			Size struct {
+				Warning int `fig:"warning"`
+				Error   int `fig:"error"`
+			}
 		}
-	}
-	Namespace struct {
-		Patterns map[string]string `fig:"patterns"`
+
+		Namespace struct {
+			Patterns map[string]string `fig:"patterns"`
+		}
 	}
 }
 
@@ -98,8 +100,8 @@ func main() {
 	// Build the set of checks we'll use for the linter
 	checks := &thriftcheck.Checks{
 		checks.CheckIncludes(cfg.Includes),
-		checks.CheckNamespacePattern(cfg.Namespace.Patterns),
-		checks.CheckEnumSize(cfg.Enum.Size.Warning, cfg.Enum.Size.Error),
+		checks.CheckNamespacePattern(cfg.Checks.Namespace.Patterns),
+		checks.CheckEnumSize(cfg.Checks.Enum.Size.Warning, cfg.Checks.Enum.Size.Error),
 	}
 	if *listFlag {
 		fmt.Println(strings.Join(checks.SortedNames(), "\n"))

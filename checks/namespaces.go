@@ -13,7 +13,7 @@ func CheckNamespacePattern(patterns map[string]string) thriftcheck.Check {
 		regexps[scope] = regexp.MustCompile(pattern)
 	}
 
-	return thriftcheck.NewCheck("namespace.pattern", func(c *thriftcheck.C, ns *ast.Namespace) {
+	return thriftcheck.NewCheck("namespace.patterns", func(c *thriftcheck.C, ns *ast.Namespace) {
 		if re, ok := regexps[ns.Scope]; ok && !re.Match([]byte(ns.Name)) {
 			c.Errorf(ns, "%q namespace must match %q", ns.Scope, re)
 		}

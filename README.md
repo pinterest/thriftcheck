@@ -55,7 +55,7 @@ includes = [
 ]
 ```
 
-### `namespace.pattern`
+### `namespace.patterns`
 
 This check ensures that a namespace's name matches a regular expression
 pattern. The pattern can be configured one a per-language basis.

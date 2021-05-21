@@ -15,10 +15,13 @@ includes = [
 enabled = []
 disabled = []
 
-[[namespace.patterns]]
+# Configuration values for specific checks:
+
+[checks.namespace]
+[[checks.namespace.patterns]]
 py = "^idl\\."
 
-[enum]
-[enum.size]
+[checks.enum]
+[checks.enum.size]
 warning = 500
 error = 1000
