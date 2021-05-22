@@ -2,8 +2,10 @@ package thriftcheck
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 
 	"go.uber.org/thriftrw/ast"
@@ -37,27 +39,41 @@ func NewLinter(checks Checks, options ...Option) *Linter {
 	return l
 }
 
-func (l *Linter) Lint(filenames []string) (Messages, error) {
+// Lint lints a single input file.
+func (l *Linter) Lint(r io.Reader, filename string) (Messages, error) {
+	b, err := io.ReadAll(r)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", filename, err)
+	}
+
+	program, err := idl.Parse(b)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", filename, err)
+	}
+
+	return l.lint(program, filename), nil
+}
+
+// LintFiles lints multiple files. Each is opened, parsed, and linted in
+// order, and the aggregate result is returned.
+func (l *Linter) LintFiles(filenames []string) (Messages, error) {
 	messages := Messages{}
 
 	for _, filename := range filenames {
-		program, err := l.parse(filename)
+		f, err := os.Open(filename)
 		if err != nil {
-			return nil, fmt.Errorf("%s: %w", filename, err)
+			return messages, fmt.Errorf("%s: %w", filename, err)
 		}
 
-		messages = append(messages, l.lint(program, filename)...)
+		m, err := l.Lint(f, filename)
+		if err != nil {
+			return messages, fmt.Errorf("%s: %w", filename, err)
+		}
+
+		messages = append(messages, m...)
 	}
 
 	return messages, nil
-}
-
-func (l *Linter) parse(filename string) (*ast.Program, error) {
-	s, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-	return idl.Parse(s)
 }
 
 func (l *Linter) lint(n ast.Node, filename string) (messages Messages) {

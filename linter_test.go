@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 	"reflect"
+	"strings"
 	"testing"
 
 	"go.uber.org/thriftrw/ast"
@@ -14,6 +15,26 @@ func TestWithLogger(t *testing.T) {
 	linter := NewLinter(Checks{}, WithLogger(logger))
 	if linter.logger != logger {
 		t.Errorf("expected logger to be %v, got %v", logger, linter.logger)
+	}
+}
+
+func TestLint(t *testing.T) {
+	linter := NewLinter(Checks{
+		NewCheck("check", func(c *C, n ast.Node) { c.Errorf(n, "") }),
+	})
+
+	s := strings.NewReader(`
+	struct Test {
+		1: string field
+	}
+	`)
+
+	msgs, err := linter.Lint(s, "t.thrift")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(msgs) != 4 {
+		t.Errorf("expected a 4 messages; got %v", msgs)
 	}
 }
 

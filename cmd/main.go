@@ -125,7 +125,7 @@ func main() {
 
 	// Create the linter and run it over the input files
 	linter := thriftcheck.NewLinter(*checks, options...)
-	messages, err := linter.Lint(flag.Args())
+	messages, err := linter.LintFiles(flag.Args())
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1 << uint(thriftcheck.Error))
