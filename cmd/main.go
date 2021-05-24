@@ -13,10 +13,6 @@ import (
 	"github.com/pinterest/thriftcheck/checks"
 )
 
-type Options struct {
-	ConfigFile string
-}
-
 type Config struct {
 	Includes []string `fig:"includes"`
 	Checks   struct {
