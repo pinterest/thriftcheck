@@ -72,6 +72,13 @@ func loadConfig(cfg *Config) error {
 	return nil
 }
 
+func lint(l *thriftcheck.Linter, filenames []string) (thriftcheck.Messages, error) {
+	if len(filenames) == 1 && filenames[0] == "-" {
+		return l.Lint(os.Stdin, "<stdin>")
+	}
+	return l.LintFiles(filenames)
+}
+
 func main() {
 	var includes Includes
 
@@ -125,7 +132,7 @@ func main() {
 
 	// Create the linter and run it over the input files
 	linter := thriftcheck.NewLinter(*checks, options...)
-	messages, err := linter.LintFiles(flag.Args())
+	messages, err := lint(linter, flag.Args())
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1 << uint(thriftcheck.Error))
