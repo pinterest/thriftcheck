@@ -11,12 +11,16 @@ the command line:
 
 ```sh
 usage: thriftcheck [options] [file ...]
-  -I value
+  -I, --include value
     	include path (can be specified multiple times)
-  -c string
+  -c, --config string
     	configuration file path (default "thriftcheck.toml")
-  -l	list all available checks
-  -v	enable verbose (debugging) output
+  -h, --help
+    	show command help
+  -l, --list
+    	list all available checks
+  -v, --verbose
+    	enable verbose (debugging) output
 ```
 
 Messages are reported to standard output using a familiar parseable format:

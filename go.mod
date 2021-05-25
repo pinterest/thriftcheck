@@ -10,4 +10,5 @@ require (
 	go.uber.org/thriftrw v1.27.0
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	rsc.io/getopt v0.0.0-20170811000552-20be20937449
 )

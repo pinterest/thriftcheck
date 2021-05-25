@@ -11,6 +11,7 @@ import (
 	"github.com/kkyr/fig"
 	"github.com/pinterest/thriftcheck"
 	"github.com/pinterest/thriftcheck/checks"
+	"rsc.io/getopt"
 )
 
 // Config represents all of the configurable values.
@@ -46,9 +47,27 @@ func (i *Includes) Set(value string) error {
 	return nil
 }
 
-var configFile = flag.String("c", "thriftcheck.toml", "configuration file path")
-var listFlag = flag.Bool("l", false, "list all available checks")
-var verboseFlag = flag.Bool("v", false, "enable verbose (debugging) output")
+var (
+	includes    Includes
+	configFile  = flag.String("c", "thriftcheck.toml", "configuration file path")
+	helpFlag    = flag.Bool("h", false, "show command help")
+	listFlag    = flag.Bool("l", false, "list all available checks")
+	verboseFlag = flag.Bool("v", false, "enable verbose (debugging) output")
+)
+
+func init() {
+	flag.Var(&includes, "I", "include path (can be specified multiple times)")
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(), "usage: thriftcheck [options] [file ...]\n")
+		getopt.PrintDefaults()
+	}
+	getopt.Aliases(
+		"I", "include",
+		"c", "config",
+		"h", "help",
+		"l", "list",
+		"v", "verbose")
+}
 
 func isFlagSet(name string) bool {
 	set := false
@@ -79,15 +98,12 @@ func lint(l *thriftcheck.Linter, filenames []string) (thriftcheck.Messages, erro
 }
 
 func main() {
-	var includes Includes
-
 	// Parse command line flags
-	flag.Var(&includes, "I", "include path (can be specified multiple times)")
-	flag.Usage = func() {
-		fmt.Fprintf(flag.CommandLine.Output(), "usage: thriftcheck [options] [file ...]\n")
-		flag.PrintDefaults()
+	getopt.Parse()
+	if *helpFlag {
+		flag.Usage()
+		os.Exit(0)
 	}
-	flag.Parse()
 
 	// Load the (optional) configuration file
 	var cfg Config
@@ -95,7 +111,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1 << uint(thriftcheck.Error))
 	}
-	if isFlagSet("I") {
+	if len(includes) > 0 {
 		cfg.Includes = includes
 	}
 
