@@ -23,6 +23,12 @@ usage: thriftcheck [options] [file ...]
     	enable verbose (debugging) output
 ```
 
+You can lint from standard input by passing `-` as the sole filename.
+
+```sh
+$ thriftlint - < filename.thrift
+```
+
 Messages are reported to standard output using a familiar parseable format:
 
 ```
