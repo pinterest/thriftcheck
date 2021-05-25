@@ -9,7 +9,7 @@ command line tool (`thriftcheck`).
 `thriftcheck` is a configuration-driven tool for linting Thrift IDL files from
 the command line:
 
-```sh
+```
 usage: thriftcheck [options] [file ...]
   -I, --include value
     	include path (can be specified multiple times)
