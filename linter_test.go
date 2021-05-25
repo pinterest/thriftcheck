@@ -20,21 +20,37 @@ func TestWithLogger(t *testing.T) {
 
 func TestLint(t *testing.T) {
 	linter := NewLinter(Checks{
-		NewCheck("check", func(c *C, n ast.Node) { c.Errorf(n, "") }),
+		NewCheck("field", func(c *C, f *ast.Field) { c.Errorf(f, "field") }),
+		NewCheck("enumitem", func(c *C, f *ast.EnumItem) { c.Errorf(f, "enumitem") }),
 	})
 
 	s := strings.NewReader(`
-	struct Test {
-		1: string field
-	}
+		struct TestStruct {
+			1: string field1
+			2: bool field2
+		}
+
+		enum TestEnum {
+			ONE = 1
+			TWO = 2
+		}
 	`)
 
 	msgs, err := linter.Lint(s, "t.thrift")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if len(msgs) != 4 {
-		t.Errorf("expected a 4 messages; got %v", msgs)
+
+	counts := make(map[string]int)
+	for _, m := range msgs {
+		counts[m.Check] += 1
+	}
+
+	if counts["field"] != 2 {
+		t.Errorf("expected 2 fields; got %v", counts)
+	}
+	if counts["enumitem"] != 2 {
+		t.Errorf("expected 2 enumitems; got %v", counts)
 	}
 }
 
