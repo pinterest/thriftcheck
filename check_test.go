@@ -20,7 +20,7 @@ func TestNewCheck(t *testing.T) {
 	}
 
 	shouldPanic := func(f func()) {
-		defer func() { recover() }()
+		defer func() { _ = recover() }()
 		f()
 		t.Errorf("should have panicked")
 	}

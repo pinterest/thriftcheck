@@ -43,7 +43,7 @@ func NewLinter(checks Checks, options ...Option) *Linter {
 
 // Lint lints a single input file.
 func (l *Linter) Lint(r io.Reader, filename string) (Messages, error) {
-	b, err := io.ReadAll(r)
+	b, err := ioutil.ReadAll(r)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", filename, err)
 	}

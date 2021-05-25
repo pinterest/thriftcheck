@@ -7,6 +7,20 @@ on:
     branches: [ main ]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: ["1.16.x"]
+    steps:
+      - uses: actions/checkout@v2
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: latest
+          only-new-issues: false
+          skip-go-installation: true
+
   build:
     runs-on: ubuntu-latest
     strategy:
@@ -25,9 +39,6 @@ jobs:
         restore-keys: ${{ runner.os }}-go-
     - name: Dependencies
       run: go mod download
-    - name: Lint
-      run: |
-        go vet ./...
     - name: Build
       run: go build -v ./...
     - name: Test
