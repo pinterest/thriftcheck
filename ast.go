@@ -13,6 +13,7 @@ var nodeInterface = reflect.TypeOf((*ast.Node)(nil)).Elem()
 // value.
 type VisitorFunc func(ast.Walker, ast.Node) VisitorFunc
 
+// Visit the given node and its descendants.
 func (f VisitorFunc) Visit(w ast.Walker, n ast.Node) ast.Visitor {
 	if f != nil {
 		return f(w, n)

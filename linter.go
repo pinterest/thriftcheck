@@ -12,11 +12,13 @@ import (
 	"go.uber.org/thriftrw/idl"
 )
 
+// Linter is a configured Thrift linter.
 type Linter struct {
 	checks Checks
 	logger *log.Logger
 }
 
+// Option represents a Linter option.
 type Option func(*Linter)
 
 // WithLogger is an Option that sets the logger object used by the linter.

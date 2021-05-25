@@ -43,7 +43,7 @@ func TestLint(t *testing.T) {
 
 	counts := make(map[string]int)
 	for _, m := range msgs {
-		counts[m.Check] += 1
+		counts[m.Check]++
 	}
 
 	if counts["field"] != 2 {

@@ -9,6 +9,8 @@ import (
 	"go.uber.org/thriftrw/ast"
 )
 
+// CheckIncludes returns a thriftcheck.Check that verifies that all of the
+// files `include`'d by a Thrift file can be found in the includes paths.
 func CheckIncludes(includes []string) thriftcheck.Check {
 	return thriftcheck.NewCheck("includes", func(c *thriftcheck.C, i *ast.Include) {
 		// Always check the file's directory first to match `thrift`s behavior.

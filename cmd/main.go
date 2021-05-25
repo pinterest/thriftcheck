@@ -13,6 +13,7 @@ import (
 	"github.com/pinterest/thriftcheck/checks"
 )
 
+// Config represents all of the configurable values.
 type Config struct {
 	Includes []string `fig:"includes"`
 	Checks   struct {
@@ -32,12 +33,14 @@ type Config struct {
 	}
 }
 
+// Includes accumlates include path strings for a repeated command line flag.
 type Includes []string
 
 func (i *Includes) String() string {
 	return strings.Join(*i, " ")
 }
 
+// Set adds a new value using a flag.Var-compatible interface.
 func (i *Includes) Set(value string) error {
 	*i = append(*i, value)
 	return nil

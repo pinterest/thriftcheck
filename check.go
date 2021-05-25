@@ -10,11 +10,13 @@ import (
 	"go.uber.org/thriftrw/ast"
 )
 
+// Check is a named check function.
 type Check struct {
 	Name string
 	fn   interface{}
 }
 
+// Checks is a list of checks.
 type Checks []Check
 
 // NewCheck creates a new Check.
@@ -104,7 +106,7 @@ func (c *Check) Call(ctx *C, nodes ...ast.Node) bool {
 	return true
 }
 
-// SortedKeys returns a sorted list of the checks' names.
+// SortedNames returns a sorted list of the checks' names.
 func (c Checks) SortedNames() []string {
 	keys := make([]string, 0, len(c))
 	for _, check := range c {
@@ -150,11 +152,13 @@ type C struct {
 	Messages Messages
 }
 
+// Warningf records a new message for the given node with Warning severity.
 func (c *C) Warningf(node ast.Node, message string, args ...interface{}) {
 	m := &Message{Filename: c.Filename, Node: node, Check: c.Check, Severity: Warning, Message: fmt.Sprintf(message, args...)}
 	c.Messages = append(c.Messages, m)
 }
 
+// Errorf records a new message for the given node with Error severity.
 func (c *C) Errorf(node ast.Node, message string, args ...interface{}) {
 	m := &Message{Filename: c.Filename, Node: node, Check: c.Check, Severity: Error, Message: fmt.Sprintf(message, args...)}
 	c.Messages = append(c.Messages, m)
