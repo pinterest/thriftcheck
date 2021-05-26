@@ -32,6 +32,14 @@ func TestWithLogger(t *testing.T) {
 	}
 }
 
+func TestWithIncludes(t *testing.T) {
+	includes := []string{"a", "b"}
+	linter := NewLinter(Checks{}, WithIncludes(includes))
+	if !reflect.DeepEqual(linter.includes, includes) {
+		t.Errorf("expected includes to be %v, got %v", includes, linter.includes)
+	}
+}
+
 func TestLint(t *testing.T) {
 	linter := NewLinter(Checks{
 		NewCheck("node", func(c *C, n ast.Node) { c.Errorf(n, "node") }),

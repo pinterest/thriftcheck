@@ -132,7 +132,7 @@ func main() {
 	// Build the set of checks we'll use for the linter
 	checks := &thriftcheck.Checks{
 		checks.CheckEnumSize(cfg.Checks.Enum.Size.Warning, cfg.Checks.Enum.Size.Error),
-		checks.CheckIncludes(cfg.Includes),
+		checks.CheckIncludes(),
 		checks.CheckMapKeyType(),
 		checks.CheckNamespacePattern(cfg.Checks.Namespace.Patterns),
 		checks.CheckSetValueType(),
@@ -153,7 +153,9 @@ func main() {
 	}
 
 	// Build the set of linter options
-	options := []thriftcheck.Option{}
+	options := []thriftcheck.Option{
+		thriftcheck.WithIncludes(cfg.Includes),
+	}
 	if *verboseFlag {
 		logger := log.New(os.Stderr, "", log.Ltime|log.Lmicroseconds|log.Lshortfile)
 		options = append(options, thriftcheck.WithLogger(logger))

@@ -28,17 +28,25 @@ import (
 
 // Linter is a configured Thrift linter.
 type Linter struct {
-	checks Checks
-	logger *log.Logger
+	checks   Checks
+	logger   *log.Logger
+	includes []string
 }
 
 // Option represents a Linter option.
 type Option func(*Linter)
 
-// WithLogger is an Option that sets the logger object used by the linter.
+// WithLogger is an Option that sets the log.Logger object used by the linter.
 func WithLogger(logger *log.Logger) Option {
 	return func(l *Linter) {
 		l.logger = logger
+	}
+}
+
+// WithIncludes is an Option that adds Thrift include paths to the linter.
+func WithIncludes(includes []string) Option {
+	return func(l *Linter) {
+		l.includes = includes
 	}
 }
 
@@ -95,7 +103,11 @@ func (l *Linter) LintFiles(filenames []string) (Messages, error) {
 func (l *Linter) lint(n ast.Node, filename string) (messages Messages) {
 	l.logger.Printf("linting %s\n", filename)
 
-	ctx := &C{Filename: filename, Logger: l.logger}
+	ctx := &C{
+		Filename: filename,
+		Includes: l.includes,
+		Logger:   l.logger,
+	}
 	activeChecks := overridableChecks{root: &l.checks}
 
 	var visitor VisitorFunc

@@ -162,6 +162,7 @@ next:
 type C struct {
 	Logger   *log.Logger
 	Filename string
+	Includes []string
 	Check    string
 	Messages Messages
 }
