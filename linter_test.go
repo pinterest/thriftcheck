@@ -92,7 +92,7 @@ func TestNoLint(t *testing.T) {
 
 	type test struct {
 		desc   string
-		node   ast.Node
+		node   *ast.Program
 		checks map[ast.Node][]string
 	}
 
@@ -103,7 +103,7 @@ func TestNoLint(t *testing.T) {
 			n := &ast.Struct{Annotations: []*ast.Annotation{a}, Fields: []*ast.Field{f}}
 
 			tt.desc = "struct nolint"
-			tt.node = n
+			tt.node = &ast.Program{Definitions: []ast.Definition{n}}
 			tt.checks = map[ast.Node][]string{}
 			return
 		}(),
@@ -113,7 +113,7 @@ func TestNoLint(t *testing.T) {
 			n := &ast.Struct{Annotations: []*ast.Annotation{a}, Fields: []*ast.Field{f}}
 
 			tt.desc = "struct nolint:check"
-			tt.node = n
+			tt.node = &ast.Program{Definitions: []ast.Definition{n}}
 			tt.checks = map[ast.Node][]string{}
 			return
 		}(),
@@ -123,7 +123,7 @@ func TestNoLint(t *testing.T) {
 			n := &ast.Struct{Annotations: []*ast.Annotation{a}, Fields: []*ast.Field{f}}
 
 			tt.desc = "struct nolint:check.warn"
-			tt.node = n
+			tt.node = &ast.Program{Definitions: []ast.Definition{n}}
 			tt.checks = map[ast.Node][]string{
 				a: {"check.error"},
 				f: {"check.error"},
@@ -137,7 +137,7 @@ func TestNoLint(t *testing.T) {
 			n := &ast.Struct{Annotations: []*ast.Annotation{a}, Fields: []*ast.Field{f}}
 
 			tt.desc = "struct nolint:check.warn,check.error"
-			tt.node = n
+			tt.node = &ast.Program{Definitions: []ast.Definition{n}}
 			tt.checks = map[ast.Node][]string{}
 			return
 		}(),
@@ -147,7 +147,7 @@ func TestNoLint(t *testing.T) {
 			n := &ast.Struct{Fields: []*ast.Field{f}}
 
 			tt.desc = "field nolint"
-			tt.node = n
+			tt.node = &ast.Program{Definitions: []ast.Definition{n}}
 			tt.checks = map[ast.Node][]string{
 				n: {"check.warn", "check.error"},
 			}
@@ -159,7 +159,7 @@ func TestNoLint(t *testing.T) {
 			n := &ast.Struct{Fields: []*ast.Field{f}}
 
 			tt.desc = "field nolint:check"
-			tt.node = n
+			tt.node = &ast.Program{Definitions: []ast.Definition{n}}
 			tt.checks = map[ast.Node][]string{
 				n: {"check.warn", "check.error"},
 			}
@@ -171,7 +171,7 @@ func TestNoLint(t *testing.T) {
 			n := &ast.Struct{Fields: []*ast.Field{f}}
 
 			tt.desc = "field nolint:check.warn"
-			tt.node = n
+			tt.node = &ast.Program{Definitions: []ast.Definition{n}}
 			tt.checks = map[ast.Node][]string{
 				a: {"check.error"},
 				f: {"check.error"},
@@ -185,7 +185,7 @@ func TestNoLint(t *testing.T) {
 			n := &ast.Struct{Fields: []*ast.Field{f}}
 
 			tt.desc = "field nolint:check.warn,check.error"
-			tt.node = n
+			tt.node = &ast.Program{Definitions: []ast.Definition{n}}
 			tt.checks = map[ast.Node][]string{
 				n: {"check.warn", "check.error"},
 			}
@@ -197,7 +197,9 @@ func TestNoLint(t *testing.T) {
 		t.Run(tt.desc, func(t *testing.T) {
 			actual := map[ast.Node][]string{}
 			for _, m := range linter.lint(tt.node, "filename.thrift") {
-				actual[m.Node] = append(actual[m.Node], m.Check)
+				if _, ok := m.Node.(*ast.Program); !ok {
+					actual[m.Node] = append(actual[m.Node], m.Check)
+				}
 			}
 			if !reflect.DeepEqual(actual, tt.checks) {
 				t.Errorf("expected %#v, got %#v", tt.checks, actual)

@@ -100,7 +100,7 @@ func (l *Linter) LintFiles(filenames []string) (Messages, error) {
 	return messages, nil
 }
 
-func (l *Linter) lint(n ast.Node, filename string) (messages Messages) {
+func (l *Linter) lint(program *ast.Program, filename string) (messages Messages) {
 	l.logger.Printf("linting %s\n", filename)
 
 	ctx := &C{
@@ -142,7 +142,7 @@ func (l *Linter) lint(n ast.Node, filename string) (messages Messages) {
 		return visitor
 	}
 
-	ast.Walk(visitor, n)
+	ast.Walk(visitor, program)
 	return ctx.Messages
 }
 
