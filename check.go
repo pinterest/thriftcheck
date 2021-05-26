@@ -94,7 +94,7 @@ func (c *Check) Call(ctx *C, nodes ...ast.Node) bool {
 	f := reflect.TypeOf(c.fn)
 
 	// Ensure that the current node is compatible with the last argument.
-	if !reflect.TypeOf(nodes[0]).ConvertibleTo(f.In(f.NumIn() - 1)) {
+	if !reflect.TypeOf(nodes[0]).AssignableTo(f.In(f.NumIn() - 1)) {
 		return false
 	}
 
@@ -105,7 +105,7 @@ func (c *Check) Call(ctx *C, nodes ...ast.Node) bool {
 	args := []reflect.Value{reflect.ValueOf(ctx)}
 	for i := 1; i < f.NumIn() && i <= len(nodes); i++ {
 		node := nodes[f.NumIn()-i-1]
-		if arg := reflect.ValueOf(node); arg.Type().ConvertibleTo(f.In(i)) {
+		if arg := reflect.ValueOf(node); arg.Type().AssignableTo(f.In(i)) {
 			args = append(args, arg)
 		}
 	}

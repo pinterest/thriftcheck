@@ -34,6 +34,7 @@ func TestWithLogger(t *testing.T) {
 
 func TestLint(t *testing.T) {
 	linter := NewLinter(Checks{
+		NewCheck("node", func(c *C, n ast.Node) { c.Errorf(n, "node") }),
 		NewCheck("field", func(c *C, f *ast.Field) { c.Errorf(f, "field") }),
 		NewCheck("enumitem", func(c *C, f *ast.EnumItem) { c.Errorf(f, "enumitem") }),
 	})
@@ -60,6 +61,9 @@ func TestLint(t *testing.T) {
 		counts[m.Check]++
 	}
 
+	if counts["node"] != 9 {
+		t.Errorf("expected 9 node; got %v", counts)
+	}
 	if counts["field"] != 2 {
 		t.Errorf("expected 2 fields; got %v", counts)
 	}
