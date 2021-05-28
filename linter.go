@@ -143,14 +143,16 @@ func (l *Linter) lint(program *ast.Program, filename string) (messages Messages)
 // Stores Checks overrides that apply to a node and all of its children.
 type overridableChecks struct {
 	root      *Checks
-	overrides map[ast.Node]*Checks
+	overrides []override
+}
+
+type override struct {
+	node   ast.Node
+	checks *Checks
 }
 
 func (oc *overridableChecks) add(node ast.Node, checks *Checks) {
-	if oc.overrides == nil {
-		oc.overrides = make(map[ast.Node]*Checks)
-	}
-	oc.overrides[node] = checks
+	oc.overrides = append(oc.overrides, override{node: node, checks: checks})
 }
 
 func (oc *overridableChecks) lookup(ancestors []ast.Node) *Checks {
@@ -166,8 +168,10 @@ func (oc *overridableChecks) lookup(ancestors []ast.Node) *Checks {
 	// this loop, but we can fall back to the root if there's a logic error.
 	if oc.overrides != nil {
 		for _, node := range ancestors {
-			if checks, ok := oc.overrides[node]; ok {
-				return checks
+			for _, o := range oc.overrides {
+				if o.node == node {
+					return o.checks
+				}
 			}
 		}
 	}

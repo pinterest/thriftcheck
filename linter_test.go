@@ -215,10 +215,8 @@ func TestOverrideableChecksLookup(t *testing.T) {
 	fnode := &ast.Field{}
 	schecks := &Checks{Check{Name: "s"}}
 
-	checks := overridableChecks{
-		root:      root,
-		overrides: map[ast.Node]*Checks{snode: schecks},
-	}
+	checks := overridableChecks{root: root}
+	checks.add(snode, schecks)
 
 	tests := []struct {
 		nodes    []ast.Node
