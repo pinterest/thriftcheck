@@ -23,7 +23,17 @@ import (
 // types are used for `map<>` keys.
 func CheckMapKeyType() thriftcheck.Check {
 	return thriftcheck.NewCheck("map.key.type", func(c *thriftcheck.C, mt ast.MapType) {
-		if _, ok := mt.KeyType.(ast.BaseType); !ok {
+		switch t := mt.KeyType.(type) {
+		case ast.BaseType:
+			break
+		case ast.TypeReference:
+			switch c.Resolve(t).(type) {
+			case ast.BaseType, *ast.Enum, *ast.Typedef:
+				break
+			default:
+				c.Errorf(mt, "map key must be a primitive type")
+			}
+		default:
 			c.Errorf(mt, "map key must be a primitive type")
 		}
 	})

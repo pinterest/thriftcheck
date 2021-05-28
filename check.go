@@ -17,6 +17,7 @@ package thriftcheck
 import (
 	"fmt"
 	"log"
+	"path/filepath"
 	"reflect"
 	"sort"
 	"strings"
@@ -159,11 +160,12 @@ next:
 	return &checks
 }
 
-// C is type passed to all check functions to provide context.
+// C is a type passed to all check functions to provide context.
 type C struct {
 	Logger   *log.Logger
 	Filename string
 	Includes []string
+	Program  *ast.Program
 	Check    string
 	Messages Messages
 }
@@ -178,4 +180,13 @@ func (c *C) Warningf(node ast.Node, message string, args ...interface{}) {
 func (c *C) Errorf(node ast.Node, message string, args ...interface{}) {
 	m := &Message{Filename: c.Filename, Node: node, Check: c.Check, Severity: Error, Message: fmt.Sprintf(message, args...)}
 	c.Messages = append(c.Messages, m)
+}
+
+// Resolve resolves a type reference.
+func (c *C) Resolve(ref ast.TypeReference) ast.Node {
+	dirs := append([]string{filepath.Dir(c.Filename)}, c.Includes...)
+	if n, err := Resolve(ref, c.Program, dirs); err == nil {
+		return n
+	}
+	return nil
 }

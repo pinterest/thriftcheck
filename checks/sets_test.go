@@ -23,6 +23,7 @@ import (
 
 func TestCheckSetValueType(t *testing.T) {
 	tests := []struct {
+		prog *ast.Program
 		node ast.SetType
 		want []string
 	}{
@@ -36,12 +37,27 @@ func TestCheckSetValueType(t *testing.T) {
 				`t.thrift:0:1:error: set value must be a primitive type (set.value.type)`,
 			},
 		},
+		{
+			prog: &ast.Program{},
+			node: ast.SetType{ValueType: ast.TypeReference{Name: "Enum"}},
+			want: []string{
+				`t.thrift:0:1:error: set value must be a primitive type (set.value.type)`,
+			},
+		},
+		{
+			prog: &ast.Program{Definitions: []ast.Definition{
+				&ast.Enum{Name: "Enum"},
+			}},
+			node: ast.SetType{ValueType: ast.TypeReference{Name: "Enum"}},
+			want: []string{},
+		},
 	}
 
 	check := checks.CheckSetValueType()
 
 	for _, tt := range tests {
 		c := newC(&check)
+		c.Program = tt.prog
 		check.Call(c, tt.node)
 		assertMessageStrings(t, tt.node, tt.want, c.Messages)
 	}

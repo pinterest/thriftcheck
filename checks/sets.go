@@ -23,7 +23,17 @@ import (
 // types are used for `set<>` values.
 func CheckSetValueType() thriftcheck.Check {
 	return thriftcheck.NewCheck("set.value.type", func(c *thriftcheck.C, st ast.SetType) {
-		if _, ok := st.ValueType.(ast.BaseType); !ok {
+		switch t := st.ValueType.(type) {
+		case ast.BaseType:
+			break
+		case ast.TypeReference:
+			switch c.Resolve(t).(type) {
+			case ast.BaseType, *ast.Enum, *ast.Typedef:
+				break
+			default:
+				c.Errorf(st, "set value must be a primitive type")
+			}
+		default:
 			c.Errorf(st, "set value must be a primitive type")
 		}
 	})

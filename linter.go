@@ -97,9 +97,10 @@ func (l *Linter) lint(program *ast.Program, filename string) (messages Messages)
 	l.logger.Printf("linting %s\n", filename)
 
 	ctx := &C{
+		Logger:   l.logger,
 		Filename: filename,
 		Includes: l.includes,
-		Logger:   l.logger,
+		Program:  program,
 	}
 	activeChecks := overridableChecks{root: &l.checks}
 

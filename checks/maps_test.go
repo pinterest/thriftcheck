@@ -23,6 +23,7 @@ import (
 
 func TestCheckMapKeyType(t *testing.T) {
 	tests := []struct {
+		prog *ast.Program
 		node ast.MapType
 		want []string
 	}{
@@ -42,12 +43,31 @@ func TestCheckMapKeyType(t *testing.T) {
 				`t.thrift:0:1:error: map key must be a primitive type (map.key.type)`,
 			},
 		},
+		{
+			prog: &ast.Program{},
+			node: ast.MapType{
+				KeyType:   ast.TypeReference{Name: "Enum"},
+				ValueType: ast.BaseType{ID: ast.StringTypeID}},
+			want: []string{
+				`t.thrift:0:1:error: map key must be a primitive type (map.key.type)`,
+			},
+		},
+		{
+			prog: &ast.Program{Definitions: []ast.Definition{
+				&ast.Enum{Name: "Enum"},
+			}},
+			node: ast.MapType{
+				KeyType:   ast.TypeReference{Name: "Enum"},
+				ValueType: ast.BaseType{ID: ast.StringTypeID}},
+			want: []string{},
+		},
 	}
 
 	check := checks.CheckMapKeyType()
 
 	for _, tt := range tests {
 		c := newC(&check)
+		c.Program = tt.prog
 		check.Call(c, tt.node)
 		assertMessageStrings(t, tt.node, tt.want, c.Messages)
 	}
