@@ -137,6 +137,7 @@ func (c Checks) With(prefixes []string) *Checks {
 		for _, prefix := range prefixes {
 			if check.Name == prefix || strings.HasPrefix(check.Name, prefix+".") {
 				checks = append(checks, check)
+				break
 			}
 		}
 	}

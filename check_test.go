@@ -80,7 +80,7 @@ func TestCall(t *testing.T) {
 	}
 }
 
-func TestWithWithout(t *testing.T) {
+func TestFilters(t *testing.T) {
 	checks := Checks{
 		NewCheck("a", func(c *C, n ast.Node) {}),
 		NewCheck("a.b", func(c *C, n ast.Node) {}),
@@ -95,6 +95,8 @@ func TestWithWithout(t *testing.T) {
 		{[]string{"a.b"}, []string{"a.b"}, []string{"a", "c"}},
 		{[]string{"c"}, []string{"c"}, []string{"a", "a.b"}},
 		{[]string{"d"}, []string{}, []string{"a", "a.b", "c"}},
+		{[]string{"a", "c"}, []string{"a", "a.b", "c"}, []string{}},
+		{[]string{"a", "a.b"}, []string{"a", "a.b"}, []string{"c"}},
 	}
 
 	for _, tt := range tests {
