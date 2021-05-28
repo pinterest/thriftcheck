@@ -23,7 +23,6 @@ import (
 	"strings"
 
 	"go.uber.org/thriftrw/ast"
-	"go.uber.org/thriftrw/idl"
 )
 
 // Linter is a configured Thrift linter.
@@ -65,16 +64,10 @@ func NewLinter(checks Checks, options ...Option) *Linter {
 
 // Lint lints a single input file.
 func (l *Linter) Lint(r io.Reader, filename string) (Messages, error) {
-	b, err := ioutil.ReadAll(r)
+	program, err := Parse(r)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", filename, err)
 	}
-
-	program, err := idl.Parse(b)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", filename, err)
-	}
-
 	return l.lint(program, filename), nil
 }
 
