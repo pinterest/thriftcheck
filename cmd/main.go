@@ -67,7 +67,7 @@ var (
 	includes    Includes
 	configFile  = flag.String("c", "thriftcheck.toml", "configuration file path")
 	helpFlag    = flag.Bool("h", false, "show command help")
-	listFlag    = flag.Bool("l", false, "list all available checks")
+	listFlag    = flag.Bool("l", false, "list all available checks and exit")
 	verboseFlag = flag.Bool("v", false, "enable verbose (debugging) output")
 	versionFlag = flag.Bool("version", false, "print the version and exit")
 )

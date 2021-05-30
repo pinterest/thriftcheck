@@ -18,9 +18,11 @@ usage: thriftcheck [options] [file ...]
   -h, --help
     	show command help
   -l, --list
-    	list all available checks
+    	list all available checks and exit
   -v, --verbose
     	enable verbose (debugging) output
+  --version
+    	print the version and exit
 ```
 
 You can lint from standard input by passing `-` as the sole filename.
