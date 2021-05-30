@@ -62,14 +62,15 @@ func (i *Includes) Set(value string) error {
 }
 
 var (
-	version     = "dev"
-	revision    = "dev"
-	includes    Includes
-	configFile  = flag.String("c", "thriftcheck.toml", "configuration file path")
-	helpFlag    = flag.Bool("h", false, "show command help")
-	listFlag    = flag.Bool("l", false, "list all available checks and exit")
-	verboseFlag = flag.Bool("v", false, "enable verbose (debugging) output")
-	versionFlag = flag.Bool("version", false, "print the version and exit")
+	version       = "dev"
+	revision      = "dev"
+	includes      Includes
+	configFile    = flag.String("c", "thriftcheck.toml", "configuration file path")
+	helpFlag      = flag.Bool("h", false, "show command help")
+	listFlag      = flag.Bool("l", false, "list all available checks and exit")
+	stdinFilename = flag.String("stdin-filename", "stdin", "filename used when piping from stdin")
+	verboseFlag   = flag.Bool("v", false, "enable verbose (debugging) output")
+	versionFlag   = flag.Bool("version", false, "print the version and exit")
 )
 
 func init() {
@@ -109,7 +110,7 @@ func loadConfig(cfg *Config) error {
 
 func lint(l *thriftcheck.Linter, filenames []string) (thriftcheck.Messages, error) {
 	if len(filenames) == 1 && filenames[0] == "-" {
-		return l.Lint(os.Stdin, "<stdin>")
+		return l.Lint(os.Stdin, *stdinFilename)
 	}
 	return l.LintFiles(filenames)
 }

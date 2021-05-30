@@ -19,16 +19,19 @@ usage: thriftcheck [options] [file ...]
     	show command help
   -l, --list
     	list all available checks and exit
+  --stdin-filename string
+    	filename used when piping from stdin (default "stdin")
   -v, --verbose
     	enable verbose (debugging) output
   --version
     	print the version and exit
 ```
 
-You can lint from standard input by passing `-` as the sole filename.
+You can lint from standard input by passing `-` as the sole filename. You can
+also use `--stdin-name` to customize the filename used in output messages.
 
 ```sh
-$ thriftlint - < filename.thrift
+$ thriftlint --stdin-name filename.thrift - < filename.thrift
 ```
 
 Messages are reported to standard output using a familiar parseable format:
