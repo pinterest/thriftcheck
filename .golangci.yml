@@ -1,0 +1,8 @@
+linters:
+  enable:
+    - goimports
+    - ifshort
+    - nilerr
+    - unconvert
+    - unparam
+    - wastedassign
