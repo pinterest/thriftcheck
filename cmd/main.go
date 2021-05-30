@@ -62,11 +62,14 @@ func (i *Includes) Set(value string) error {
 }
 
 var (
+	version     = "dev"
+	revision    = "dev"
 	includes    Includes
 	configFile  = flag.String("c", "thriftcheck.toml", "configuration file path")
 	helpFlag    = flag.Bool("h", false, "show command help")
 	listFlag    = flag.Bool("l", false, "list all available checks")
 	verboseFlag = flag.Bool("v", false, "enable verbose (debugging) output")
+	versionFlag = flag.Bool("version", false, "print the version and exit")
 )
 
 func init() {
@@ -116,6 +119,10 @@ func main() {
 	getopt.Parse()
 	if *helpFlag {
 		flag.Usage()
+		os.Exit(0)
+	}
+	if *versionFlag {
+		fmt.Fprintf(flag.CommandLine.Output(), "thriftcheck %s (%s)\n", version, revision)
 		os.Exit(0)
 	}
 

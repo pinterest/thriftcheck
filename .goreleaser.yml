@@ -1,0 +1,43 @@
+project_name: thriftcheck
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: thriftcheck
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    main: ./cmd/
+    ldflags:
+      - "-s -w -X main.version={{ .Version }} -X main.revision={{ .ShortCommit }}"
+
+archives:
+  - format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    replacements:
+      darwin: macos
+
+snapshot:
+  name_template: "{{ .Tag }}-dev"
+
+release:
+  github:
+    owner: pinterest
+    name: thriftcheck
+  prerelease: auto
+  name_template: '{{ .Tag }}'
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^.github:'
+      - README.md
