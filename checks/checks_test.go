@@ -33,6 +33,8 @@ func newC(check *thriftcheck.Check) *thriftcheck.C {
 }
 
 func assertMessageStrings(t *testing.T, n ast.Node, expect []string, msgs thriftcheck.Messages) {
+	t.Helper()
+
 	strings := make([]string, len(msgs))
 	for i, m := range msgs {
 		strings[i] = m.String()
