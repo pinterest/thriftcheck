@@ -18,7 +18,7 @@ jobs:
         uses: golangci/golangci-lint-action@v2
         with:
           version: latest
-          only-new-issues: false
+          only-new-issues: true
           skip-go-installation: true
 
   build:
