@@ -190,3 +190,12 @@ func (c *C) Resolve(ref ast.TypeReference) ast.Node {
 	}
 	return nil
 }
+
+// ResolveType resolves a type reference to its target type.
+func (c *C) ResolveType(ref ast.TypeReference) ast.Node {
+	dirs := append([]string{filepath.Dir(c.Filename)}, c.Includes...)
+	if n, err := ResolveType(ref, c.Program, dirs); err == nil {
+		return n
+	}
+	return nil
+}

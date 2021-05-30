@@ -47,12 +47,41 @@ func Annotations(node ast.Node) []*ast.Annotation {
 	return nil
 }
 
-// Resolve resolves an ast.TypeReference to its target node (often an ast.Type).
+// Resolve resolves an ast.TypeReference to its target node.
+//
 // The target can either be in the current program's scope or it can refer to
 // an included file using dot notation. Included files must exist in one of the
 // given search directories.
 func Resolve(ref ast.TypeReference, program *ast.Program, dirs []string) (ast.Node, error) {
-	n, err := resolveTypeReference(ref.Name, program.Definitions, dirs)
+	defs := program.Definitions
+	name := ref.Name
+
+	if strings.Contains(name, ".") {
+		parts := strings.SplitN(name, ".", 2)
+		program, err := ParseFile(parts[0]+".thrift", dirs)
+		if err != nil {
+			return nil, err
+		}
+
+		defs = program.Definitions
+		name = parts[1]
+	}
+
+	for _, def := range defs {
+		if def.Info().Name == name {
+			return def, nil
+		}
+	}
+
+	return nil, fmt.Errorf("%q could not be resolved", ref.Name)
+}
+
+// ResolveType calls Resolve and goes one step further by attempting to
+// resolve the target node's own type. This is useful when the reference
+// points to an ast.Typedef or ast.Constant, for example, and the caller
+// is primarily intererested in the target's ast.Type.
+func ResolveType(ref ast.TypeReference, program *ast.Program, dirs []string) (ast.Node, error) {
+	n, err := Resolve(ref, program, dirs)
 	if err != nil {
 		return nil, err
 	}
@@ -67,23 +96,4 @@ func Resolve(ref ast.TypeReference, program *ast.Program, dirs []string) (ast.No
 	default:
 		return n, nil
 	}
-}
-
-func resolveTypeReference(name string, defs []ast.Definition, dirs []string) (ast.Node, error) {
-	if strings.Contains(name, ".") {
-		parts := strings.SplitN(name, ".", 2)
-		program, err := ParseFile(parts[0]+".thrift", dirs)
-		if err != nil {
-			return nil, err
-		}
-		return resolveTypeReference(parts[1], program.Definitions, dirs)
-	}
-
-	for _, def := range defs {
-		if def.Info().Name == name {
-			return def, nil
-		}
-	}
-
-	return nil, fmt.Errorf("%q could not be resolved", name)
 }

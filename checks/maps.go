@@ -27,7 +27,7 @@ func CheckMapKeyType() thriftcheck.Check {
 		case ast.BaseType:
 			break
 		case ast.TypeReference:
-			switch c.Resolve(t).(type) {
+			switch c.ResolveType(t).(type) {
 			case ast.BaseType, *ast.Enum, *ast.Typedef:
 				break
 			default:
