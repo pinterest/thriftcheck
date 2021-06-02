@@ -121,6 +121,10 @@ func (c *Check) Call(ctx *C, nodes ...ast.Node) bool {
 	return true
 }
 
+func (c Checks) String() string {
+	return strings.Join(c.SortedNames(), " ")
+}
+
 // SortedNames returns a sorted list of the checks' names.
 func (c Checks) SortedNames() []string {
 	keys := make([]string, 0, len(c))
