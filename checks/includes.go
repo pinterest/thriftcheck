@@ -39,7 +39,7 @@ func CheckIncludeExists() thriftcheck.Check {
 			}
 		}
 		if !found {
-			c.Errorf(i, "unable to find include path for '%s'", i.Path)
+			c.Errorf(i, "unable to find include path for %q", i.Path)
 		}
 	})
 }
