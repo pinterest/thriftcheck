@@ -54,7 +54,7 @@ warning = 500
 error = 1000
 ```
 
-### `includes`
+### `include.exists`
 
 This check ensures that each `include`'d file can be located in the set of
 given include paths.
