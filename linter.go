@@ -59,6 +59,7 @@ func NewLinter(checks Checks, options ...Option) *Linter {
 		option(l)
 	}
 	l.logger.Printf("checks: %s\n", checks)
+	l.logger.Printf("includes: %s\n", strings.Join(l.includes, " "))
 	return l
 }
 
