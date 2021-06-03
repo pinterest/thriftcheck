@@ -17,11 +17,15 @@ disabled = []
 
 # Configuration values for specific checks:
 
-[checks.namespace]
-[[checks.namespace.patterns]]
-py = "^idl\\."
-
 [checks.enum]
 [checks.enum.size]
 warning = 500
 error = 1000
+
+[checks.include]
+[[checks.include.restricted]]
+".*" = "(huge|massive).thrift"
+
+[checks.namespace]
+[[checks.namespace.patterns]]
+py = "^idl\\."
