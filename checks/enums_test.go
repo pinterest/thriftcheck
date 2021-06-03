@@ -33,13 +33,13 @@ func TestCheckEnumSize(t *testing.T) {
 		{
 			node: &ast.Enum{Name: "enum", Items: []*ast.EnumItem{{}, {}}},
 			want: []string{
-				`t.thrift:0:1:warning: enumeration 'enum' has more than 1 items (enum.size)`,
+				`t.thrift:0:1:warning: enumeration "enum" has more than 1 items (enum.size)`,
 			},
 		},
 		{
 			node: &ast.Enum{Name: "enum", Items: []*ast.EnumItem{{}, {}, {}}},
 			want: []string{
-				`t.thrift:0:1:error: enumeration 'enum' has more than 2 items (enum.size)`,
+				`t.thrift:0:1:error: enumeration "enum" has more than 2 items (enum.size)`,
 			},
 		},
 	}
