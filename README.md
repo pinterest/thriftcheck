@@ -70,6 +70,19 @@ includes = [
 ]
 ```
 
+### `include.restricted`
+
+This check restricts some files from being imported by other files using a
+map of regular expressions: the key matches the *including* filename and the
+value matches the *included* filename. When both match, the `include` is
+flagged as "restricted" and an error is reported.
+
+```toml
+[checks.include]
+[[checks.include.restricted]]
+".*" = "(huge|massive).thrift"
+```
+
 ### `map.key.type`
 
 This check ensures that only primitive types are used for `map<>` keys.

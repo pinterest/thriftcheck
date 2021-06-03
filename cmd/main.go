@@ -42,6 +42,10 @@ type Config struct {
 			}
 		}
 
+		Include struct {
+			Restricted map[string]string `fig:"restricted"`
+		}
+
 		Namespace struct {
 			Patterns map[string]string `fig:"patterns"`
 		}
@@ -141,6 +145,7 @@ func main() {
 	checks := &thriftcheck.Checks{
 		checks.CheckEnumSize(cfg.Checks.Enum.Size.Warning, cfg.Checks.Enum.Size.Error),
 		checks.CheckIncludeExists(),
+		checks.CheckIncludeRestricted(cfg.Checks.Include.Restricted),
 		checks.CheckMapKeyType(),
 		checks.CheckNamespacePattern(cfg.Checks.Namespace.Patterns),
 		checks.CheckSetValueType(),
