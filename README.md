@@ -15,6 +15,8 @@ usage: thriftcheck [options] [file ...]
     	include path (can be specified multiple times)
   -c, --config string
     	configuration file path (default "thriftcheck.toml")
+  --errors-only
+    	only report errors (not warnings)
   -h, --help
     	show command help
   -l, --list

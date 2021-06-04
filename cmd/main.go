@@ -70,6 +70,7 @@ var (
 	revision      = "dev"
 	includes      Includes
 	configFile    = flag.String("c", "thriftcheck.toml", "configuration file path")
+	errorsOnly    = flag.Bool("errors-only", false, "only report errors (not warnings)")
 	helpFlag      = flag.Bool("h", false, "show command help")
 	listFlag      = flag.Bool("l", false, "list all available checks and exit")
 	stdinFilename = flag.String("stdin-filename", "stdin", "filename used when piping from stdin")
@@ -185,6 +186,9 @@ func main() {
 	// Print any messages reported by the linter
 	status := 0
 	for _, m := range messages {
+		if *errorsOnly && m.Severity != thriftcheck.Error {
+			continue
+		}
 		fmt.Println(m)
 		status |= 1 << uint(m.Severity)
 	}
