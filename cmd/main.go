@@ -52,15 +52,15 @@ type Config struct {
 	}
 }
 
-// Includes accumlates include path strings for a repeated command line flag.
-type Includes []string
+// Strings accumlates strings for a repeated command line flag.
+type Strings []string
 
-func (i *Includes) String() string {
+func (i *Strings) String() string {
 	return strings.Join(*i, " ")
 }
 
 // Set adds a new value using a flag.Var-compatible interface.
-func (i *Includes) Set(value string) error {
+func (i *Strings) Set(value string) error {
 	*i = append(*i, value)
 	return nil
 }
@@ -68,7 +68,7 @@ func (i *Includes) Set(value string) error {
 var (
 	version       = "dev"
 	revision      = "dev"
-	includes      Includes
+	includes      Strings
 	configFile    = flag.String("c", ".thriftcheck.toml", "configuration file path")
 	errorsOnly    = flag.Bool("errors-only", false, "only report errors (not warnings)")
 	helpFlag      = flag.Bool("h", false, "show command help")
