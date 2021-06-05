@@ -61,7 +61,15 @@ default [TOML](https://toml.io/) syntax.
 [`example.toml`](cmd/example.toml) is an example configuration file that you
 can use as a starting point.
 
-## Available Checks
+## Checks
+
+The full list of available checks can printed using the `--list` command line
+option. By default, all checks are enabled.
+
+You can enable or disable checks using the configuration file's top-level
+`enabled` and `disabled` lists. The list of `disabled` checks is subtracted
+from the full list first, and then the resulting list is filtered by the list
+of `enabled` checks. Either list can be empty (the default).
 
 ### `enum.size`
 
