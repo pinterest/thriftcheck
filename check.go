@@ -174,6 +174,11 @@ type C struct {
 	Messages Messages
 }
 
+// Logf prints a formatted message to the verbose output logger.
+func (c *C) Logf(message string, args ...interface{}) {
+	c.Logger.Printf(message, args...)
+}
+
 // Warningf records a new message for the given node with Warning severity.
 func (c *C) Warningf(node ast.Node, message string, args ...interface{}) {
 	m := &Message{Filename: c.Filename, Node: node, Check: c.Check, Severity: Warning, Message: fmt.Sprintf(message, args...)}
