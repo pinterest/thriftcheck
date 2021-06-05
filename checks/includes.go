@@ -45,20 +45,20 @@ func CheckIncludeExists() thriftcheck.Check {
 }
 
 // CheckIncludeRestricted returns a thriftcheck.Check that restricts some files
-// from being imported by other  files using a map of regular expressions: the
-// key matches the including filename and the value matches the included
-// filename. When both match, the `include` is flagged as "restricted" and an
-// error is reported.
+// from being imported by other  files using a map of patterns: the key is a
+// file name pattern that matches the including filename and the value is a
+// regular expression that matches the included filename. When both match, the
+// `include` is flagged as "restricted" and an error is reported.
 func CheckIncludeRestricted(patterns map[string]string) thriftcheck.Check {
-	regexps := make(map[*regexp.Regexp]*regexp.Regexp, len(patterns))
+	regexps := make(map[string]*regexp.Regexp, len(patterns))
 	for fpat, ipat := range patterns {
-		regexps[regexp.MustCompile(fpat)] = regexp.MustCompile(ipat)
+		regexps[fpat] = regexp.MustCompile(ipat)
 	}
 
 	return thriftcheck.NewCheck("include.restricted", func(c *thriftcheck.C, i *ast.Include) {
-		for fre, ire := range regexps {
-			if fre.MatchString(c.Filename) && ire.MatchString(i.Path) {
-				c.Logger.Printf("%q (%s) matches %q (%s)\n", c.Filename, fre, i.Path, ire)
+		for fpat, ire := range regexps {
+			if ok, _ := filepath.Match(fpat, c.Filename); ok && ire.MatchString(i.Path) {
+				c.Logger.Printf("%q (%s) matches %q (%s)\n", c.Filename, fpat, i.Path, ire)
 				c.Errorf(i, "%q is a restricted import", i.Path)
 				return
 			}
