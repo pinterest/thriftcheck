@@ -14,7 +14,7 @@ usage: thriftcheck [options] [file ...]
   -I, --include value
     	include path (can be specified multiple times)
   -c, --config string
-    	configuration file path (default "thriftcheck.toml")
+    	configuration file path (default ".thriftcheck.toml")
   --errors-only
     	only report errors (not warnings)
   -h, --help
@@ -52,14 +52,14 @@ or errors (**2**). Otherwise, exit code **0** is returned.
 ## Configuration
 
 Many checks are configurable via the configuration file. This file is named
-`thriftcheck.toml` and loaded from the current directory by default, but you
-can use the `--config` command line option to use a different file. If you
+`.thriftcheck.toml` and is loaded from the current directory by default, but
+you can use the `--config` command line option to use a different file. If you
 prefer, you can use a JSON- or YAML-formatted file instead by using a `.json`
 or `.yaml` file extension, respectively. The examples used below use the
 default [TOML](https://toml.io/) syntax.
 
-[`thriftcheck.example.toml`](cmd/thriftcheck.example.toml) is an example
-configuration file that you can use as a starting point.
+[`example.toml`](cmd/example.toml) is an example configuration file that you
+can use as a starting point.
 
 ## Available Checks
 

@@ -69,7 +69,7 @@ var (
 	version       = "dev"
 	revision      = "dev"
 	includes      Includes
-	configFile    = flag.String("c", "thriftcheck.toml", "configuration file path")
+	configFile    = flag.String("c", ".thriftcheck.toml", "configuration file path")
 	errorsOnly    = flag.Bool("errors-only", false, "only report errors (not warnings)")
 	helpFlag      = flag.Bool("h", false, "show command help")
 	listFlag      = flag.Bool("l", false, "list all available checks and exit")
