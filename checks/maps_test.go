@@ -22,11 +22,7 @@ import (
 )
 
 func TestCheckMapKeyType(t *testing.T) {
-	tests := []struct {
-		prog *ast.Program
-		node ast.MapType
-		want []string
-	}{
+	tests := []Test{
 		{
 			node: ast.MapType{
 				KeyType:   ast.BaseType{ID: ast.StringTypeID},
@@ -64,11 +60,5 @@ func TestCheckMapKeyType(t *testing.T) {
 	}
 
 	check := checks.CheckMapKeyType()
-
-	for _, tt := range tests {
-		c := newC(&check)
-		c.Program = tt.prog
-		check.Call(c, tt.node)
-		assertMessageStrings(t, tt.node, tt.want, c.Messages)
-	}
+	RunTests(t, &check, tests)
 }

@@ -22,11 +22,7 @@ import (
 )
 
 func TestCheckIncludeRestricted(t *testing.T) {
-	tests := []struct {
-		name string
-		node *ast.Include
-		want []string
-	}{
+	tests := []Test{
 		{
 			name: "a.thrift",
 			node: &ast.Include{Path: "good.thrift"},
@@ -66,11 +62,5 @@ func TestCheckIncludeRestricted(t *testing.T) {
 		"*":        `bad.thrift`,
 		"a.thrift": `abad.thrift`,
 	})
-
-	for _, tt := range tests {
-		c := newC(&check)
-		c.Filename = tt.name
-		check.Call(c, tt.node)
-		assertMessageStrings(t, tt.node, tt.want, c.Messages)
-	}
+	RunTests(t, &check, tests)
 }

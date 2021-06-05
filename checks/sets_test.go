@@ -22,11 +22,7 @@ import (
 )
 
 func TestCheckSetValueType(t *testing.T) {
-	tests := []struct {
-		prog *ast.Program
-		node ast.SetType
-		want []string
-	}{
+	tests := []Test{
 		{
 			node: ast.SetType{ValueType: ast.BaseType{ID: ast.StringTypeID}},
 			want: []string{},
@@ -54,11 +50,5 @@ func TestCheckSetValueType(t *testing.T) {
 	}
 
 	check := checks.CheckSetValueType()
-
-	for _, tt := range tests {
-		c := newC(&check)
-		c.Program = tt.prog
-		check.Call(c, tt.node)
-		assertMessageStrings(t, tt.node, tt.want, c.Messages)
-	}
+	RunTests(t, &check, tests)
 }

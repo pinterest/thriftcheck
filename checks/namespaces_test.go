@@ -22,10 +22,7 @@ import (
 )
 
 func TestCheckNamespacePattern(t *testing.T) {
-	tests := []struct {
-		node *ast.Namespace
-		want []string
-	}{
+	tests := []Test{
 		{
 			node: &ast.Namespace{Scope: "java", Name: "com.pinterest.idl.test"},
 			want: []string{},
@@ -41,10 +38,5 @@ func TestCheckNamespacePattern(t *testing.T) {
 	check := checks.CheckNamespacePattern(map[string]string{
 		"java": `^com\.pinterest\.idl\.`,
 	})
-
-	for _, tt := range tests {
-		c := newC(&check)
-		check.Call(c, tt.node)
-		assertMessageStrings(t, tt.node, tt.want, c.Messages)
-	}
+	RunTests(t, &check, tests)
 }

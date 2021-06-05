@@ -24,23 +24,35 @@ import (
 	"go.uber.org/thriftrw/ast"
 )
 
-func newC(check *thriftcheck.Check) *thriftcheck.C {
-	return &thriftcheck.C{
-		Logger:   log.New(ioutil.Discard, "", 0),
-		Filename: "t.thrift",
-		Check:    check.Name,
-	}
+type Test struct {
+	name string
+	prog *ast.Program
+	node ast.Node
+	want []string
 }
 
-func assertMessageStrings(t *testing.T, n ast.Node, expect []string, msgs thriftcheck.Messages) {
+func RunTests(t *testing.T, check *thriftcheck.Check, tests []Test) {
 	t.Helper()
 
-	strings := make([]string, len(msgs))
-	for i, m := range msgs {
-		strings[i] = m.String()
-	}
+	for _, tt := range tests {
+		c := &thriftcheck.C{
+			Logger:   log.New(ioutil.Discard, "", 0),
+			Filename: tt.name,
+			Program:  tt.prog,
+			Check:    check.Name,
+		}
+		if c.Filename == "" {
+			c.Filename = "t.thrift"
+		}
 
-	if !reflect.DeepEqual(strings, expect) {
-		t.Errorf("%#v:\n- %v\n+ %v", n, expect, strings)
+		check.Call(c, tt.node)
+
+		strings := make([]string, len(c.Messages))
+		for i, m := range c.Messages {
+			strings[i] = m.String()
+		}
+		if !reflect.DeepEqual(strings, tt.want) {
+			t.Errorf("%#v:\n- %v\n+ %v", tt.node, tt.want, strings)
+		}
 	}
 }
