@@ -22,10 +22,7 @@ import (
 )
 
 func TestCheckFieldIDMissing(t *testing.T) {
-	tests := []struct {
-		node *ast.Field
-		want []string
-	}{
+	tests := []Test{
 		{
 			node: &ast.Field{ID: 1},
 			want: []string{},
@@ -39,19 +36,11 @@ func TestCheckFieldIDMissing(t *testing.T) {
 	}
 
 	check := checks.CheckFieldIDMissing()
-
-	for _, tt := range tests {
-		c := newC(&check)
-		check.Call(c, tt.node)
-		assertMessageStrings(t, tt.node, tt.want, c.Messages)
-	}
+	RunTests(t, &check, tests)
 }
 
 func TestCheckFieldIDNegative(t *testing.T) {
-	tests := []struct {
-		node *ast.Field
-		want []string
-	}{
+	tests := []Test{
 		{
 			node: &ast.Field{ID: 1, Name: "Field"},
 			want: []string{},
@@ -69,10 +58,5 @@ func TestCheckFieldIDNegative(t *testing.T) {
 	}
 
 	check := checks.CheckFieldIDNegative()
-
-	for _, tt := range tests {
-		c := newC(&check)
-		check.Call(c, tt.node)
-		assertMessageStrings(t, tt.node, tt.want, c.Messages)
-	}
+	RunTests(t, &check, tests)
 }

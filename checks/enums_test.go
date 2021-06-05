@@ -22,10 +22,7 @@ import (
 )
 
 func TestCheckEnumSize(t *testing.T) {
-	tests := []struct {
-		node *ast.Enum
-		want []string
-	}{
+	tests := []Test{
 		{
 			node: &ast.Enum{Name: "enum"},
 			want: []string{},
@@ -45,10 +42,5 @@ func TestCheckEnumSize(t *testing.T) {
 	}
 
 	check := checks.CheckEnumSize(1, 2)
-
-	for _, tt := range tests {
-		c := newC(&check)
-		check.Call(c, tt.node)
-		assertMessageStrings(t, tt.node, tt.want, c.Messages)
-	}
+	RunTests(t, &check, tests)
 }
