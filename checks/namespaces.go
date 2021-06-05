@@ -24,7 +24,7 @@ import (
 // CheckNamespacePattern returns a thriftcheck.Check that ensures that a
 // namespace's name matches a regular expression pattern. The pattern can
 // be configured one a per-language basis.
-func CheckNamespacePattern(patterns map[string]string) thriftcheck.Check {
+func CheckNamespacePattern(patterns map[string]string) *thriftcheck.Check {
 	regexps := make(map[string]*regexp.Regexp, len(patterns))
 	for scope, pattern := range patterns {
 		regexps[scope] = regexp.MustCompile(pattern)

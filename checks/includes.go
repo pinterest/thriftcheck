@@ -26,7 +26,7 @@ import (
 
 // CheckIncludePath returns a thriftcheck.Check that verifies that all of the
 // files `include`'d by a Thrift file can be found in the includes paths.
-func CheckIncludePath() thriftcheck.Check {
+func CheckIncludePath() *thriftcheck.Check {
 	return thriftcheck.NewCheck("include.path", func(c *thriftcheck.C, i *ast.Include) {
 		// Always check the file's directory first to match `thrift`s behavior.
 		dirs := append([]string{filepath.Dir(c.Filename)}, c.Includes...)
@@ -49,7 +49,7 @@ func CheckIncludePath() thriftcheck.Check {
 // file name pattern that matches the including filename and the value is a
 // regular expression that matches the included filename. When both match, the
 // `include` is flagged as "restricted" and an error is reported.
-func CheckIncludeRestricted(patterns map[string]string) thriftcheck.Check {
+func CheckIncludeRestricted(patterns map[string]string) *thriftcheck.Check {
 	regexps := make(map[string]*regexp.Regexp, len(patterns))
 	for fpat, ipat := range patterns {
 		regexps[fpat] = regexp.MustCompile(ipat)

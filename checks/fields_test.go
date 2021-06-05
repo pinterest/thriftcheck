@@ -36,7 +36,7 @@ func TestCheckFieldIDMissing(t *testing.T) {
 	}
 
 	check := checks.CheckFieldIDMissing()
-	RunTests(t, &check, tests)
+	RunTests(t, check, tests)
 }
 
 func TestCheckFieldIDNegative(t *testing.T) {
@@ -58,5 +58,5 @@ func TestCheckFieldIDNegative(t *testing.T) {
 	}
 
 	check := checks.CheckFieldIDNegative()
-	RunTests(t, &check, tests)
+	RunTests(t, check, tests)
 }

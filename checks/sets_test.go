@@ -50,5 +50,5 @@ func TestCheckSetValueType(t *testing.T) {
 	}
 
 	check := checks.CheckSetValueType()
-	RunTests(t, &check, tests)
+	RunTests(t, check, tests)
 }

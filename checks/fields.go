@@ -20,7 +20,7 @@ import (
 )
 
 // CheckFieldIDMissing reports an error if a field's ID is missing.
-func CheckFieldIDMissing() thriftcheck.Check {
+func CheckFieldIDMissing() *thriftcheck.Check {
 	return thriftcheck.NewCheck("field.id.missing", func(c *thriftcheck.C, f *ast.Field) {
 		if f.IDUnset {
 			c.Errorf(f, "field ID for %q is missing", f.Name)
@@ -29,7 +29,7 @@ func CheckFieldIDMissing() thriftcheck.Check {
 }
 
 // CheckFieldIDNegative reports an error if a field's ID is negative.
-func CheckFieldIDNegative() thriftcheck.Check {
+func CheckFieldIDNegative() *thriftcheck.Check {
 	return thriftcheck.NewCheck("field.id.negative", func(c *thriftcheck.C, f *ast.Field) {
 		if f.ID < 0 {
 			c.Errorf(f, "field ID for %q (%d) is negative", f.Name, f.ID)

@@ -62,5 +62,5 @@ func TestCheckIncludeRestricted(t *testing.T) {
 		"*":        `bad.thrift`,
 		"a.thrift": `abad.thrift`,
 	})
-	RunTests(t, &check, tests)
+	RunTests(t, check, tests)
 }

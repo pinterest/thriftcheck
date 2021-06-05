@@ -60,5 +60,5 @@ func TestCheckMapKeyType(t *testing.T) {
 	}
 
 	check := checks.CheckMapKeyType()
-	RunTests(t, &check, tests)
+	RunTests(t, check, tests)
 }
