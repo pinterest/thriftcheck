@@ -40,7 +40,7 @@ Messages are reported to standard output using a familiar parseable format:
 
 ```
 file.thrift:1:1:error: "py" namespace must match "^idl\\." (namespace.pattern)
-file.thrift:3:1:error: unable to find include path for 'bar.thrift' (includes)
+file.thrift:3:1:error: unable to find include path for "bar.thrift" (include.path)
 ```
 
 If you only want errors (and not warnings) to be reported, you can use the
@@ -74,7 +74,7 @@ warning = 500
 error = 1000
 ```
 
-### `include.exists`
+### `include.path`
 
 This check ensures that each `include`'d file can be located in the set of
 given include paths.

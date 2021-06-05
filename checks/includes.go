@@ -24,10 +24,10 @@ import (
 	"go.uber.org/thriftrw/ast"
 )
 
-// CheckIncludeExists returns a thriftcheck.Check that verifies that all of the
+// CheckIncludePath returns a thriftcheck.Check that verifies that all of the
 // files `include`'d by a Thrift file can be found in the includes paths.
-func CheckIncludeExists() thriftcheck.Check {
-	return thriftcheck.NewCheck("include.exists", func(c *thriftcheck.C, i *ast.Include) {
+func CheckIncludePath() thriftcheck.Check {
+	return thriftcheck.NewCheck("include.path", func(c *thriftcheck.C, i *ast.Include) {
 		// Always check the file's directory first to match `thrift`s behavior.
 		dirs := append([]string{filepath.Dir(c.Filename)}, c.Includes...)
 
