@@ -43,6 +43,12 @@ file.thrift:1:1:error: "py" namespace must match "^idl\\." (namespace.pattern)
 file.thrift:3:1:error: unable to find include path for 'bar.thrift' (includes)
 ```
 
+If you only want errors (and not warnings) to be reported, you can use the
+`--errors-only` command line option.
+
+`thriftcheck`'s exit code indicates whether it reported any warnings (**1**)
+or errors (**2**). Otherwise, exit code **0** is returned.
+
 ## Configuration
 
 Many checks are configurable via the configuration file. This file is named
