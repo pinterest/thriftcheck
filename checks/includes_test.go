@@ -63,7 +63,7 @@ func TestCheckIncludeRestricted(t *testing.T) {
 	}
 
 	check := checks.CheckIncludeRestricted(map[string]string{
-		".*":       `bad.thrift`,
+		"*":        `bad.thrift`,
 		"a.thrift": `abad.thrift`,
 	})
 
