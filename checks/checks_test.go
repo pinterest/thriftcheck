@@ -15,8 +15,6 @@
 package checks_test
 
 import (
-	"io/ioutil"
-	"log"
 	"reflect"
 	"testing"
 
@@ -36,7 +34,6 @@ func RunTests(t *testing.T, check *thriftcheck.Check, tests []Test) {
 
 	for _, tt := range tests {
 		c := &thriftcheck.C{
-			Logger:   log.New(ioutil.Discard, "", 0),
 			Filename: tt.name,
 			Program:  tt.prog,
 			Check:    check.Name,

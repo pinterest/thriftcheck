@@ -166,17 +166,19 @@ next:
 
 // C is a type passed to all check functions to provide context.
 type C struct {
-	Logger   *log.Logger
 	Filename string
 	Includes []string
 	Program  *ast.Program
 	Check    string
 	Messages Messages
+	logger   *log.Logger
 }
 
 // Logf prints a formatted message to the verbose output logger.
 func (c *C) Logf(message string, args ...interface{}) {
-	c.Logger.Printf(message, args...)
+	if c.logger != nil {
+		c.logger.Printf(message, args...)
+	}
 }
 
 // Warningf records a new message for the given node with Warning severity.
