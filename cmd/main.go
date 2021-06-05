@@ -163,10 +163,6 @@ func main() {
 	if len(cfg.Checks.Enabled) > 0 {
 		checks = checks.With(cfg.Checks.Enabled)
 	}
-	if len(flag.Args()) == 0 {
-		flag.Usage()
-		os.Exit(0)
-	}
 
 	// Build the set of linter options
 	options := []thriftcheck.Option{
@@ -175,6 +171,11 @@ func main() {
 	if *verboseFlag {
 		logger := log.New(os.Stderr, "", log.Ltime|log.Lmicroseconds|log.Lshortfile)
 		options = append(options, thriftcheck.WithLogger(logger))
+	}
+
+	if len(flag.Args()) == 0 {
+		flag.Usage()
+		os.Exit(0)
 	}
 
 	// Create the linter and run it over the input files
