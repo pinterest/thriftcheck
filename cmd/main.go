@@ -145,6 +145,8 @@ func main() {
 	// Build the set of checks we'll use for the linter
 	checks := &thriftcheck.Checks{
 		checks.CheckEnumSize(cfg.Checks.Enum.Size.Warning, cfg.Checks.Enum.Size.Error),
+		checks.CheckFieldIDMissing(),
+		checks.CheckFieldIDNegative(),
 		checks.CheckIncludePath(),
 		checks.CheckIncludeRestricted(cfg.Checks.Include.Restricted),
 		checks.CheckMapKeyType(),

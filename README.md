@@ -74,6 +74,15 @@ warning = 500
 error = 1000
 ```
 
+### `field.id.missing`
+
+This check reports an error if a field's ID is missing (using the legacy
+implicit/auto-assigning syntax).
+
+### `field.id.negative`
+
+This check reports an error if a field's ID is negative.
+
 ### `include.path`
 
 This check ensures that each `include`'d file can be located in the set of
