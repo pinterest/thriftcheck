@@ -121,8 +121,8 @@ func TestC(t *testing.T) {
 	c.Errorf(node, "Error")
 
 	expected := Messages{
-		&Message{Filename: c.Filename, Node: node, Check: c.Check, Severity: Warning, Message: "Warning"},
-		&Message{Filename: c.Filename, Node: node, Check: c.Check, Severity: Error, Message: "Error"},
+		Message{Filename: c.Filename, Node: node, Check: c.Check, Severity: Warning, Message: "Warning"},
+		Message{Filename: c.Filename, Node: node, Check: c.Check, Severity: Error, Message: "Error"},
 	}
 
 	if !reflect.DeepEqual(expected, c.Messages) {

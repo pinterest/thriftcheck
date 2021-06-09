@@ -47,9 +47,9 @@ type Message struct {
 	Message  string
 }
 
-func (m *Message) String() string {
+func (m Message) String() string {
 	return fmt.Sprintf("%s:%d:%d:%s: %s (%s)", m.Filename, m.Line, 1, m.Severity, m.Message, m.Check)
 }
 
 // Messages is a list of messages.
-type Messages []*Message
+type Messages []Message

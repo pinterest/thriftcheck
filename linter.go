@@ -73,7 +73,7 @@ func (l *Linter) Lint(r io.Reader, filename string) (Messages, error) {
 		if errors.As(err, &parseError) {
 			msgs := make(Messages, len(parseError.Lines))
 			for i, line := range parseError.Lines {
-				msgs[i] = &Message{
+				msgs[i] = Message{
 					Filename: filename,
 					Check:    "parse",
 					Severity: Error,
