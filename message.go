@@ -40,19 +40,15 @@ func (s Severity) String() string {
 // Message is a message produced by a Check.
 type Message struct {
 	Filename string
+	Line     int
 	Node     ast.Node
 	Check    string
 	Severity Severity
 	Message  string
 }
 
-// Line returns the line number of this message's AST node.
-func (m *Message) Line() int {
-	return ast.LineNumber(m.Node)
-}
-
 func (m *Message) String() string {
-	return fmt.Sprintf("%s:%d:%d:%s: %s (%s)", m.Filename, m.Line(), 1, m.Severity, m.Message, m.Check)
+	return fmt.Sprintf("%s:%d:%d:%s: %s (%s)", m.Filename, m.Line, 1, m.Severity, m.Message, m.Check)
 }
 
 // Messages is a list of messages.
