@@ -16,23 +16,20 @@ package thriftcheck
 
 import (
 	"testing"
-
-	"go.uber.org/thriftrw/ast"
 )
 
 func TestMessageString(t *testing.T) {
-	node := &ast.Struct{}
 	tests := []struct {
 		m *Message
 		s string
 	}{
 		{
-			&Message{Filename: "a.thrift", Node: node, Check: "check", Severity: Warning, Message: "Warning"},
-			"a.thrift:0:1:warning: Warning (check)",
+			&Message{Filename: "a.thrift", Line: 5, Check: "check", Severity: Warning, Message: "Warning"},
+			"a.thrift:5:1:warning: Warning (check)",
 		},
 		{
-			&Message{Filename: "a.thrift", Node: node, Check: "check", Severity: Error, Message: "Error"},
-			"a.thrift:0:1:error: Error (check)",
+			&Message{Filename: "a.thrift", Line: 5, Check: "check", Severity: Error, Message: "Error"},
+			"a.thrift:5:1:error: Error (check)",
 		},
 	}
 
