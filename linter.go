@@ -15,6 +15,7 @@
 package thriftcheck
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -23,6 +24,7 @@ import (
 	"strings"
 
 	"go.uber.org/thriftrw/ast"
+	"go.uber.org/thriftrw/idl"
 )
 
 // Linter is a configured Thrift linter.
@@ -67,6 +69,19 @@ func NewLinter(checks Checks, options ...Option) *Linter {
 func (l *Linter) Lint(r io.Reader, filename string) (Messages, error) {
 	program, err := Parse(r)
 	if err != nil {
+		var parseError *idl.ParseError
+		if errors.As(err, &parseError) {
+			msgs := make(Messages, len(parseError.Lines))
+			for i, line := range parseError.Lines {
+				msgs[i] = &Message{
+					Filename: filename,
+					Check:    "parse",
+					Severity: Error,
+					Message:  line.Err.Error(),
+				}
+			}
+			return msgs, nil
+		}
 		return nil, fmt.Errorf("%s: %w", filename, err)
 	}
 	return l.lint(program, filename), nil
@@ -75,23 +90,23 @@ func (l *Linter) Lint(r io.Reader, filename string) (Messages, error) {
 // LintFiles lints multiple files. Each is opened, parsed, and linted in
 // order, and the aggregate result is returned.
 func (l *Linter) LintFiles(filenames []string) (Messages, error) {
-	messages := Messages{}
+	msgs := Messages{}
 
 	for _, filename := range filenames {
 		f, err := os.Open(filename)
 		if err != nil {
-			return messages, fmt.Errorf("%s: %w", filename, err)
+			return msgs, fmt.Errorf("%s: %w", filename, err)
 		}
 
 		m, err := l.Lint(f, filename)
 		if err != nil {
-			return messages, fmt.Errorf("%s: %w", filename, err)
+			return msgs, err
 		}
 
-		messages = append(messages, m...)
+		msgs = append(msgs, m...)
 	}
 
-	return messages, nil
+	return msgs, nil
 }
 
 func (l *Linter) lint(program *ast.Program, filename string) (messages Messages) {
