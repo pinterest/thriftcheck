@@ -80,6 +80,42 @@ func TestLint(t *testing.T) {
 	}
 }
 
+func TestParseError(t *testing.T) {
+	tests := []struct {
+		s    string
+		want []string
+	}{
+		{
+			s: `namespace`,
+			want: []string{
+				`t.thrift:0:1:error: syntax error: unexpected $end, expecting IDENTIFIER or '*' (parse)`,
+			},
+		},
+		{
+			s: `struct S {}}`,
+			want: []string{
+				`t.thrift:0:1:error: syntax error: unexpected '}' (parse)`,
+			},
+		},
+	}
+
+	linter := NewLinter(Checks{})
+	for _, tt := range tests {
+		msgs, err := linter.Lint(strings.NewReader(tt.s), "t.thrift")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		strings := make([]string, len(msgs))
+		for i, m := range msgs {
+			strings[i] = m.String()
+		}
+		if !reflect.DeepEqual(strings, tt.want) {
+			t.Errorf("%s:\n- %v\n+ %v", tt.s, tt.want, strings)
+		}
+	}
+}
+
 func TestNoLint(t *testing.T) {
 	linter := NewLinter(Checks{
 		NewCheck("check.warn", func(c *C, n ast.Node) { c.Warningf(n, "") }),
