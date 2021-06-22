@@ -88,13 +88,13 @@ func TestParseError(t *testing.T) {
 		{
 			s: `namespace`,
 			want: []string{
-				`t.thrift:0:1:error: syntax error: unexpected $end, expecting IDENTIFIER or '*' (parse)`,
+				`t.thrift:1:1:error: syntax error: unexpected $end, expecting IDENTIFIER or '*' (parse)`,
 			},
 		},
 		{
 			s: `struct S {}}`,
 			want: []string{
-				`t.thrift:0:1:error: syntax error: unexpected '}' (parse)`,
+				`t.thrift:1:1:error: syntax error: unexpected '}' (parse)`,
 			},
 		},
 	}
