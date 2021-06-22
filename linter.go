@@ -71,13 +71,13 @@ func (l *Linter) Lint(r io.Reader, filename string) (Messages, error) {
 	if err != nil {
 		var parseError *idl.ParseError
 		if errors.As(err, &parseError) {
-			msgs := make(Messages, len(parseError.Lines))
-			for i, line := range parseError.Lines {
+			msgs := make(Messages, len(parseError.Errors))
+			for i, err := range parseError.Errors {
 				msgs[i] = Message{
 					Filename: filename,
 					Check:    "parse",
 					Severity: Error,
-					Message:  line.Err.Error(),
+					Message:  err.Err.Error(),
 				}
 			}
 			return msgs, nil
