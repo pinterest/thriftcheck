@@ -176,11 +176,11 @@ type C struct {
 	parseInfo *idl.Info
 }
 
-func (c *C) pos(n ast.Node) idl.Position {
+func (c *C) pos(n ast.Node) ast.Position {
 	if c.parseInfo != nil {
 		return c.parseInfo.Pos(n)
 	}
-	return idl.Position{Line: ast.LineNumber(n)}
+	return ast.Position{Line: ast.LineNumber(n)}
 }
 
 // Logf prints a formatted message to the verbose output logger.
