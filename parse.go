@@ -26,21 +26,24 @@ import (
 )
 
 // Parse parses Thrift document content.
-func Parse(r io.Reader) (*ast.Program, error) {
+func Parse(r io.Reader) (*ast.Program, *idl.Info, error) {
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return idl.Parse(b)
+
+	cfg := idl.Config{Info: &idl.Info{}}
+	prog, err := cfg.Parse(b)
+	return prog, cfg.Info, err
 }
 
 // ParseFile parses a Thrift file. The filename must appear in one of the
 // given directories.
-func ParseFile(filename string, dirs []string) (*ast.Program, error) {
+func ParseFile(filename string, dirs []string) (*ast.Program, *idl.Info, error) {
 	for _, dir := range dirs {
 		if f, err := os.Open(path.Join(dir, filename)); err == nil {
 			return Parse(f)
 		}
 	}
-	return nil, fmt.Errorf("%s not found in %s", filename, dirs)
+	return nil, nil, fmt.Errorf("%s not found in %s", filename, dirs)
 }
