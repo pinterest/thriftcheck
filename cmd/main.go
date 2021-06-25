@@ -149,6 +149,7 @@ func main() {
 		checks.CheckFieldIDNegative(),
 		checks.CheckIncludePath(),
 		checks.CheckIncludeRestricted(cfg.Checks.Include.Restricted),
+		checks.CheckInteger64bit(),
 		checks.CheckMapKeyType(),
 		checks.CheckNamespacePattern(cfg.Checks.Namespace.Patterns),
 		checks.CheckSetValueType(),

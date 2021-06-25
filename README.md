@@ -121,6 +121,11 @@ error is reported.
 "*" = "(huge|massive).thrift"
 ```
 
+### `int.64bit`
+
+This check warns when an integer constant exceeds the 32-bit number range.
+Some languages (e.g. JavaScript) don't support 64-bit integers.
+
 ### `map.key.type`
 
 This check ensures that only primitive types are used for `map<>` keys.
