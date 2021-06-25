@@ -58,7 +58,7 @@ func Resolve(ref ast.TypeReference, program *ast.Program, dirs []string) (ast.No
 
 	if strings.Contains(name, ".") {
 		parts := strings.SplitN(name, ".", 2)
-		program, err := ParseFile(parts[0]+".thrift", dirs)
+		program, _, err := ParseFile(parts[0]+".thrift", dirs)
 		if err != nil {
 			return nil, err
 		}

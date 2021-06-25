@@ -232,7 +232,7 @@ func TestNoLint(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
 			actual := map[ast.Node][]string{}
-			for _, m := range linter.lint(tt.node, "filename.thrift") {
+			for _, m := range linter.lint(tt.node, "filename.thrift", nil) {
 				if _, ok := m.Node.(*ast.Program); !ok {
 					actual[m.Node] = append(actual[m.Node], m.Check)
 				}

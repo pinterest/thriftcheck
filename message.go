@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"go.uber.org/thriftrw/ast"
+	"go.uber.org/thriftrw/idl"
 )
 
 // Severity represents the severity level of a message.
@@ -40,7 +41,7 @@ func (s Severity) String() string {
 // Message is a message produced by a Check.
 type Message struct {
 	Filename string
-	Line     int
+	Pos      idl.Position
 	Node     ast.Node
 	Check    string
 	Severity Severity
@@ -48,7 +49,7 @@ type Message struct {
 }
 
 func (m Message) String() string {
-	return fmt.Sprintf("%s:%d:%d:%s: %s (%s)", m.Filename, m.Line, 1, m.Severity, m.Message, m.Check)
+	return fmt.Sprintf("%s:%d:%d:%s: %s (%s)", m.Filename, m.Pos.Line, 1, m.Severity, m.Message, m.Check)
 }
 
 // Messages is a list of messages.

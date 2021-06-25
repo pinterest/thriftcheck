@@ -16,6 +16,8 @@ package thriftcheck
 
 import (
 	"testing"
+
+	"go.uber.org/thriftrw/idl"
 )
 
 func TestMessageString(t *testing.T) {
@@ -24,11 +26,11 @@ func TestMessageString(t *testing.T) {
 		s string
 	}{
 		{
-			&Message{Filename: "a.thrift", Line: 5, Check: "check", Severity: Warning, Message: "Warning"},
+			&Message{Filename: "a.thrift", Pos: idl.Position{Line: 5}, Check: "check", Severity: Warning, Message: "Warning"},
 			"a.thrift:5:1:warning: Warning (check)",
 		},
 		{
-			&Message{Filename: "a.thrift", Line: 5, Check: "check", Severity: Error, Message: "Error"},
+			&Message{Filename: "a.thrift", Pos: idl.Position{Line: 5}, Check: "check", Severity: Error, Message: "Error"},
 			"a.thrift:5:1:error: Error (check)",
 		},
 	}

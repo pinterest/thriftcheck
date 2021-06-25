@@ -67,7 +67,7 @@ func NewLinter(checks Checks, options ...Option) *Linter {
 
 // Lint lints a single input file.
 func (l *Linter) Lint(r io.Reader, filename string) (Messages, error) {
-	program, err := Parse(r)
+	program, info, err := Parse(r)
 	if err != nil {
 		var parseError *idl.ParseError
 		if errors.As(err, &parseError) {
@@ -75,7 +75,7 @@ func (l *Linter) Lint(r io.Reader, filename string) (Messages, error) {
 			for i, err := range parseError.Errors {
 				msgs[i] = Message{
 					Filename: filename,
-					Line:     err.Pos.Line,
+					Pos:      err.Pos,
 					Check:    "parse",
 					Severity: Error,
 					Message:  err.Err.Error(),
@@ -85,7 +85,7 @@ func (l *Linter) Lint(r io.Reader, filename string) (Messages, error) {
 		}
 		return nil, fmt.Errorf("%s: %w", filename, err)
 	}
-	return l.lint(program, filename), nil
+	return l.lint(program, filename, info), nil
 }
 
 // LintFiles lints multiple files. Each is opened, parsed, and linted in
@@ -110,14 +110,15 @@ func (l *Linter) LintFiles(filenames []string) (Messages, error) {
 	return msgs, nil
 }
 
-func (l *Linter) lint(program *ast.Program, filename string) (messages Messages) {
+func (l *Linter) lint(program *ast.Program, filename string, parseInfo *idl.Info) (messages Messages) {
 	l.logger.Printf("linting %s\n", filename)
 
 	ctx := &C{
-		Filename: filename,
-		Includes: l.includes,
-		Program:  program,
-		logger:   l.logger,
+		Filename:  filename,
+		Includes:  l.includes,
+		Program:   program,
+		logger:    l.logger,
+		parseInfo: parseInfo,
 	}
 	activeChecks := overridableChecks{root: &l.checks}
 

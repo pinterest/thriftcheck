@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"go.uber.org/thriftrw/ast"
+	"go.uber.org/thriftrw/idl"
 )
 
 // Check is a named check function.
@@ -166,12 +167,20 @@ next:
 
 // C is a type passed to all check functions to provide context.
 type C struct {
-	Filename string
-	Includes []string
-	Program  *ast.Program
-	Check    string
-	Messages Messages
-	logger   *log.Logger
+	Filename  string
+	Includes  []string
+	Program   *ast.Program
+	Check     string
+	Messages  Messages
+	logger    *log.Logger
+	parseInfo *idl.Info
+}
+
+func (c *C) pos(n ast.Node) idl.Position {
+	if c.parseInfo != nil {
+		return c.parseInfo.Pos(n)
+	}
+	return idl.Position{Line: ast.LineNumber(n)}
 }
 
 // Logf prints a formatted message to the verbose output logger.
@@ -183,13 +192,13 @@ func (c *C) Logf(message string, args ...interface{}) {
 
 // Warningf records a new message for the given node with Warning severity.
 func (c *C) Warningf(node ast.Node, message string, args ...interface{}) {
-	m := Message{Filename: c.Filename, Line: ast.LineNumber(node), Node: node, Check: c.Check, Severity: Warning, Message: fmt.Sprintf(message, args...)}
+	m := Message{Filename: c.Filename, Pos: c.pos(node), Node: node, Check: c.Check, Severity: Warning, Message: fmt.Sprintf(message, args...)}
 	c.Messages = append(c.Messages, m)
 }
 
 // Errorf records a new message for the given node with Error severity.
 func (c *C) Errorf(node ast.Node, message string, args ...interface{}) {
-	m := Message{Filename: c.Filename, Line: ast.LineNumber(node), Node: node, Check: c.Check, Severity: Error, Message: fmt.Sprintf(message, args...)}
+	m := Message{Filename: c.Filename, Pos: c.pos(node), Node: node, Check: c.Check, Severity: Error, Message: fmt.Sprintf(message, args...)}
 	c.Messages = append(c.Messages, m)
 }
 
