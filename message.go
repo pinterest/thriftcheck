@@ -48,7 +48,11 @@ type Message struct {
 }
 
 func (m Message) String() string {
-	return fmt.Sprintf("%s:%d:%d:%s: %s (%s)", m.Filename, m.Pos.Line, 1, m.Severity, m.Message, m.Check)
+	col := m.Pos.Column
+	if col == 0 {
+		col = 1
+	}
+	return fmt.Sprintf("%s:%d:%d:%s: %s (%s)", m.Filename, m.Pos.Line, col, m.Severity, m.Message, m.Check)
 }
 
 // Messages is a list of messages.

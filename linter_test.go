@@ -94,7 +94,7 @@ func TestParseError(t *testing.T) {
 		{
 			s: `struct S {}}`,
 			want: []string{
-				`t.thrift:1:1:error: syntax error: unexpected '}' (parse)`,
+				`t.thrift:1:12:error: syntax error: unexpected '}' (parse)`,
 			},
 		},
 	}
