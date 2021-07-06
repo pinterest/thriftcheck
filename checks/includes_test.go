@@ -56,11 +56,31 @@ func TestCheckIncludeRestricted(t *testing.T) {
 				`b.thrift:0:1:error: "abad.thrift" is a restricted import (include.restricted)`,
 			},
 		},
+		{
+			name: "nested/a.thrift",
+			node: &ast.Include{Path: "good.thrift"},
+			want: []string{},
+		},
+		{
+			name: "nested/a.thrift",
+			node: &ast.Include{Path: "bad.thrift"},
+			want: []string{
+				`nested/a.thrift:0:1:error: "bad.thrift" is a restricted import (include.restricted)`,
+			},
+		},
+		{
+			name: "nested/a.thrift",
+			node: &ast.Include{Path: "inner.thrift"},
+			want: []string{
+				`nested/a.thrift:0:1:error: "inner.thrift" is a restricted import (include.restricted)`,
+			},
+		},
 	}
 
 	check := checks.CheckIncludeRestricted(map[string]string{
-		"*":        `bad.thrift`,
-		"a.thrift": `abad.thrift`,
+		"*":               `bad.thrift`,
+		"a.thrift":        `abad.thrift`,
+		"nested/*.thrift": `inner.thrift`,
 	})
 	RunTests(t, check, tests)
 }
