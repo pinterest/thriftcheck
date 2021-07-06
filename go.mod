@@ -3,6 +3,7 @@ module github.com/pinterest/thriftcheck
 go 1.16
 
 require (
+	github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964
 	github.com/kkyr/fig v0.2.0
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/pelletier/go-toml v1.9.1 // indirect

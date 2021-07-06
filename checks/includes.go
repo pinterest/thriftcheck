@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"regexp"
 
+	"github.com/danwakefield/fnmatch"
 	"github.com/pinterest/thriftcheck"
 	"go.uber.org/thriftrw/ast"
 )
@@ -57,7 +58,7 @@ func CheckIncludeRestricted(patterns map[string]string) *thriftcheck.Check {
 
 	return thriftcheck.NewCheck("include.restricted", func(c *thriftcheck.C, i *ast.Include) {
 		for fpat, ire := range regexps {
-			if ok, _ := filepath.Match(fpat, c.Filename); ok && ire.MatchString(i.Path) {
+			if fnmatch.Match(fpat, c.Filename, fnmatch.FNM_NOESCAPE) && ire.MatchString(i.Path) {
 				c.Logf("%q (%s) matches %q (%s)\n", c.Filename, fpat, i.Path, ire)
 				c.Errorf(i, "%q is a restricted import", i.Path)
 				return
