@@ -137,7 +137,7 @@ func (c Checks) SortedNames() []string {
 }
 
 // With returns a copy with only those checks whose names match the given prefixes.
-func (c Checks) With(prefixes []string) *Checks {
+func (c Checks) With(prefixes []string) Checks {
 	checks := make(Checks, 0)
 	for _, check := range c {
 		for _, prefix := range prefixes {
@@ -147,11 +147,11 @@ func (c Checks) With(prefixes []string) *Checks {
 			}
 		}
 	}
-	return &checks
+	return checks
 }
 
 // Without returns a copy without those checks whose names match the given prefixes.
-func (c Checks) Without(prefixes []string) *Checks {
+func (c Checks) Without(prefixes []string) Checks {
 	checks := make(Checks, 0)
 next:
 	for _, check := range c {
@@ -162,7 +162,7 @@ next:
 		}
 		checks = append(checks, check)
 	}
-	return &checks
+	return checks
 }
 
 // C is a type passed to all check functions to provide context.

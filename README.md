@@ -20,7 +20,7 @@ usage: thriftcheck [options] [file ...]
   -h, --help
     	show command help
   -l, --list
-    	list all available checks and exit
+    	list all available checks with their status and exit
   --stdin-filename string
     	filename used when piping from stdin (default "stdin")
   -v, --verbose
