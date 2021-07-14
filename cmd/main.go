@@ -72,7 +72,7 @@ var (
 	configFile    = flag.String("c", ".thriftcheck.toml", "configuration file path")
 	errorsOnly    = flag.Bool("errors-only", false, "only report errors (not warnings)")
 	helpFlag      = flag.Bool("h", false, "show command help")
-	listFlag      = flag.Bool("l", false, "list all available checks and exit")
+	listFlag      = flag.Bool("l", false, "list all available checks with their status and exit")
 	stdinFilename = flag.String("stdin-filename", "stdin", "filename used when piping from stdin")
 	verboseFlag   = flag.Bool("v", false, "enable verbose (debugging) output")
 	versionFlag   = flag.Bool("version", false, "print the version and exit")
@@ -143,7 +143,7 @@ func main() {
 	}
 
 	// Build the set of checks we'll use for the linter
-	checks := &thriftcheck.Checks{
+	allChecks := thriftcheck.Checks{
 		checks.CheckEnumSize(cfg.Checks.Enum.Size.Warning, cfg.Checks.Enum.Size.Error),
 		checks.CheckFieldIDMissing(),
 		checks.CheckFieldIDNegative(),
@@ -154,15 +154,27 @@ func main() {
 		checks.CheckNamespacePattern(cfg.Checks.Namespace.Patterns),
 		checks.CheckSetValueType(),
 	}
-	if *listFlag {
-		fmt.Println(strings.Join(checks.SortedNames(), "\n"))
-		os.Exit(0)
-	}
+
+	checks := allChecks
 	if len(cfg.Checks.Disabled) > 0 {
 		checks = checks.Without(cfg.Checks.Disabled)
 	}
 	if len(cfg.Checks.Enabled) > 0 {
 		checks = checks.With(cfg.Checks.Enabled)
+	}
+	if *listFlag {
+		enabledNames := make(map[string]bool, len(checks))
+		for _, check := range checks {
+			enabledNames[check.Name] = true
+		}
+		for _, name := range allChecks.SortedNames() {
+			status := "disabled"
+			if _, ok := enabledNames[name]; ok {
+				status = "enabled"
+			}
+			fmt.Printf("%-30s %s\n", name, status)
+		}
+		os.Exit(0)
 	}
 
 	// Build the set of linter options
@@ -180,7 +192,7 @@ func main() {
 	}
 
 	// Create the linter and run it over the input files
-	linter := thriftcheck.NewLinter(*checks, options...)
+	linter := thriftcheck.NewLinter(checks, options...)
 	messages, err := lint(linter, flag.Args())
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)

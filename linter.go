@@ -125,7 +125,7 @@ func (l *Linter) lint(program *ast.Program, filename string, parseInfo *idl.Info
 	var visitor VisitorFunc
 	visitor = func(w ast.Walker, n ast.Node) VisitorFunc {
 		nodes := append([]ast.Node{n}, w.Ancestors()...)
-		checks := activeChecks.lookup(nodes[1:])
+		checks := *activeChecks.lookup(nodes[1:])
 
 		// Handle 'nolint' annotations
 		if annotations := Annotations(n); annotations != nil {
@@ -141,13 +141,13 @@ func (l *Linter) lint(program *ast.Program, filename string, parseInfo *idl.Info
 					}
 
 					checks = checks.Without(values)
-					activeChecks.add(n, checks)
+					activeChecks.add(n, &checks)
 				}
 			}
 		}
 
 		// Run all of the checks that match this part of the tree.
-		for _, check := range *checks {
+		for _, check := range checks {
 			check.Call(ctx, nodes...)
 		}
 
