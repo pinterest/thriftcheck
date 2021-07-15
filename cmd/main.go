@@ -169,7 +169,7 @@ func main() {
 		}
 		for _, name := range allChecks.SortedNames() {
 			status := "disabled"
-			if _, ok := enabledNames[name]; ok {
+			if enabledNames[name] {
 				status = "enabled"
 			}
 			fmt.Printf("%-30s %s\n", name, status)
