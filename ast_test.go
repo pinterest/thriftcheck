@@ -27,8 +27,8 @@ func TestAnnotations(t *testing.T) {
 		{Name: "test2", Value: "value2"},
 	}
 	tests := []struct {
-		node     ast.Node
-		expected []*ast.Annotation
+		node ast.Node
+		want []*ast.Annotation
 	}{
 		{&ast.Struct{}, nil},
 		{&ast.Struct{Annotations: annotations}, annotations},
@@ -37,9 +37,27 @@ func TestAnnotations(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		actual := Annotations(tt.node)
-		if !reflect.DeepEqual(actual, tt.expected) {
-			t.Errorf("expected %s but got %s", tt.expected, actual)
+		got := Annotations(tt.node)
+		if !reflect.DeepEqual(got, tt.want) {
+			t.Errorf("expected %s but got %s", tt.want, got)
+		}
+	}
+}
+
+func TestDoc(t *testing.T) {
+	tests := []struct {
+		node ast.Node
+		want string
+	}{
+		{&ast.Struct{}, ""},
+		{&ast.Struct{Doc: ""}, ""},
+		{&ast.Struct{Doc: "String"}, "String"},
+	}
+
+	for _, tt := range tests {
+		got := Doc(tt.node)
+		if got != tt.want {
+			t.Errorf("expected %s but got %s", tt.want, got)
 		}
 	}
 }

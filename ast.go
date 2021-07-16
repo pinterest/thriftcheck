@@ -47,6 +47,16 @@ func Annotations(node ast.Node) []*ast.Annotation {
 	return nil
 }
 
+// Doc returns an ast.Node's Doc string.
+func Doc(node ast.Node) string {
+	if v := reflect.ValueOf(node); v.Kind() == reflect.Ptr {
+		if f := v.Elem().FieldByName("Doc"); f.IsValid() {
+			return f.Interface().(string)
+		}
+	}
+	return ""
+}
+
 // Resolve resolves an ast.TypeReference to its target node.
 //
 // The target can either be in the current program's scope or it can refer to
