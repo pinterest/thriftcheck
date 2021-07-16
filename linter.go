@@ -127,23 +127,13 @@ func (l *Linter) lint(program *ast.Program, filename string, parseInfo *idl.Info
 		nodes := append([]ast.Node{n}, w.Ancestors()...)
 		checks := *activeChecks.lookup(nodes[1:])
 
-		// Handle 'nolint' annotations
-		if annotations := Annotations(n); annotations != nil {
-			for _, annotation := range annotations {
-				if annotation.Name == "nolint" {
-					if annotation.Value == "" {
-						return nil
-					}
-
-					values := strings.Split(annotation.Value, ",")
-					for i := range values {
-						values[i] = strings.TrimSpace(values[i])
-					}
-
-					checks = checks.Without(values)
-					activeChecks.add(n, &checks)
-				}
+		// Handle 'nolint' directives.
+		if names, found := nolint(n); found {
+			if names == nil {
+				return nil
 			}
+			checks = checks.Without(names)
+			activeChecks.add(n, &checks)
 		}
 
 		// Run all of the checks that match this part of the tree.

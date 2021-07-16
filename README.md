@@ -167,13 +167,15 @@ additional checks.
 
 [ast-node]: https://pkg.go.dev/go.uber.org/thriftrw/ast#Node
 
-## `nolint` Annotations
+## `nolint` Directives
 
 You can disable one or more checks on a per-node basis using `nolint`
-annotations. `nolint` annotations apply to the current node and all of its
-descendents. The annotation's value can be empty, in which case linting is
+directives. `nolint` directives apply to the current node and all of its
+descendents. The directives's value can be empty, in which case linting is
 entirely disabled, or it can be set to a comma-separated list of checks to
 disable.
+
+`nolint` directives can be written as Thrift annotations:
 
 ```thrift
 enum State {
@@ -183,6 +185,26 @@ enum State {
 	FAILED = 4
 } (nolint = "enum.size")
 ```
+
+... and as `@nolint` lines in documentation blocks:
+
+```thrift
+/**
+ * States
+ *
+ * @nolint(enum.size)
+ */
+enum State {
+	STOPPED = 1
+	RUNNING = 2
+	PASSED = 3
+	FAILED = 4
+}
+```
+
+The annotation syntax is preferred, but the documentation block syntax is
+useful for those few cases where the target node doesn't support Thrift
+annotations (such as `const` declarations).
 
 ## License
 
