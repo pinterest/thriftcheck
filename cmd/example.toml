@@ -6,7 +6,7 @@
 # Note that if  any -I options are specified on the command line, they will
 # be used instead of this configuration value.
 includes = [
-    'shared',
+    "shared",
 ]
 
 # Lists of checks to explicitly enable or disable. If a prefix is given (e.g.
@@ -25,6 +25,11 @@ error = 1000
 [checks.include]
 [[checks.include.restricted]]
 "*" = "(huge|massive).thrift"
+
+[checks.names]
+reserved = [
+    "template",
+]
 
 [checks.namespace]
 [[checks.namespace.patterns]]
