@@ -130,6 +130,20 @@ Some languages (e.g. JavaScript) don't support 64-bit integers.
 
 This check ensures that only primitive types are used for `map<>` keys.
 
+### `names.reserved`
+
+This checks allows you to extend the [default list of reserved keywords][] with
+additional disallowed names.
+
+```toml
+[checks.names]
+reserved = [
+	"template",
+]
+```
+
+[default list of reserved keywords]: https://github.com/thriftrw/thriftrw-go/blob/0cee03e01be6bbbd45303ca94663c951f0573fd0/idl/internal/lex.rl#L110-L218
+
 ### `namespace.patterns`
 
 This check ensures that a namespace's name matches a regular expression

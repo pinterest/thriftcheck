@@ -46,6 +46,10 @@ type Config struct {
 			Restricted map[string]string `fig:"restricted"`
 		}
 
+		Names struct {
+			Reserved []string `fig:"reserved"`
+		}
+
 		Namespace struct {
 			Patterns map[string]string `fig:"patterns"`
 		}
@@ -151,6 +155,7 @@ func main() {
 		checks.CheckIncludeRestricted(cfg.Checks.Include.Restricted),
 		checks.CheckInteger64bit(),
 		checks.CheckMapKeyType(),
+		checks.CheckNamesReserved(cfg.Checks.Names.Reserved),
 		checks.CheckNamespacePattern(cfg.Checks.Namespace.Patterns),
 		checks.CheckSetValueType(),
 	}
