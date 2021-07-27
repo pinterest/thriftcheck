@@ -44,12 +44,14 @@ func RunTests(t *testing.T, check *thriftcheck.Check, tests []Test) {
 
 		check.Call(c, tt.node)
 
-		strings := make([]string, len(c.Messages))
-		for i, m := range c.Messages {
-			strings[i] = m.String()
-		}
-		if !reflect.DeepEqual(strings, tt.want) {
-			t.Errorf("%#v:\n- %v\n+ %v", tt.node, tt.want, strings)
+		if len(tt.want) > 0 || len(c.Messages) > 0 {
+			strings := make([]string, len(c.Messages))
+			for i, m := range c.Messages {
+				strings[i] = m.String()
+			}
+			if !reflect.DeepEqual(strings, tt.want) {
+				t.Errorf("%#v:\n- %v\n+ %v", tt.node, tt.want, strings)
+			}
 		}
 	}
 }
