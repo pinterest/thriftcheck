@@ -15,9 +15,21 @@
 package checks
 
 import (
+	"reflect"
+
 	"github.com/pinterest/thriftcheck"
 	"go.uber.org/thriftrw/ast"
 )
+
+// Name returns an ast.Node's Name string.
+func nodeName(node ast.Node) string {
+	if v := reflect.ValueOf(node); v.Kind() == reflect.Ptr {
+		if f := v.Elem().FieldByName("Name"); f.IsValid() {
+			return f.Interface().(string)
+		}
+	}
+	return ""
+}
 
 // CheckNamesReserved checks if a node's name is in the list of reserved names.
 func CheckNamesReserved(names []string) *thriftcheck.Check {
@@ -27,7 +39,7 @@ func CheckNamesReserved(names []string) *thriftcheck.Check {
 	}
 
 	return thriftcheck.NewCheck("names.reserved", func(c *thriftcheck.C, n ast.Node) {
-		if name := thriftcheck.Name(n); name != "" && reserved[name] {
+		if name := nodeName(n); name != "" && reserved[name] {
 			c.Errorf(n, "%q is a reserved name", name)
 		}
 	})

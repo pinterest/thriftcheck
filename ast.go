@@ -57,16 +57,6 @@ func Doc(node ast.Node) string {
 	return ""
 }
 
-// Name returns an ast.Node's Name string.
-func Name(node ast.Node) string {
-	if v := reflect.ValueOf(node); v.Kind() == reflect.Ptr {
-		if f := v.Elem().FieldByName("Name"); f.IsValid() {
-			return f.Interface().(string)
-		}
-	}
-	return ""
-}
-
 // Resolve resolves an ast.TypeReference to its target node.
 //
 // The target can either be in the current program's scope or it can refer to
