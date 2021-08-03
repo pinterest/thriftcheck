@@ -19,7 +19,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 
 	"go.uber.org/thriftrw/ast"
 	"go.uber.org/thriftrw/idl"
@@ -40,10 +40,23 @@ func Parse(r io.Reader) (*ast.Program, *idl.Info, error) {
 // ParseFile parses a Thrift file. The filename must appear in one of the
 // given directories.
 func ParseFile(filename string, dirs []string) (*ast.Program, *idl.Info, error) {
+	if filepath.IsAbs(filename) {
+		if f, err := os.Open(filename); err == nil {
+			return Parse(f)
+		}
+		return nil, nil, fmt.Errorf("%s not found", filename)
+	}
+
+	// Check the current directory first to match `thrift`s behavior.
+	if cwd, err := os.Getwd(); err != nil {
+		dirs = append([]string{cwd}, dirs...)
+	}
+
 	for _, dir := range dirs {
-		if f, err := os.Open(path.Join(dir, filename)); err == nil {
+		if f, err := os.Open(filepath.Join(dir, filename)); err == nil {
 			return Parse(f)
 		}
 	}
+
 	return nil, nil, fmt.Errorf("%s not found in %s", filename, dirs)
 }
