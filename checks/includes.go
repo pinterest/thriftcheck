@@ -16,7 +16,6 @@ package checks
 
 import (
 	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 
@@ -29,18 +28,29 @@ import (
 // files `include`'d by a Thrift file can be found in the includes paths.
 func CheckIncludePath() *thriftcheck.Check {
 	return thriftcheck.NewCheck("include.path", func(c *thriftcheck.C, i *ast.Include) {
-		// Always check the file's directory first to match `thrift`s behavior.
-		dirs := append([]string{filepath.Dir(c.Filename)}, c.Includes...)
+		// If the path is absolute, we don't need to check the include paths.
+		if filepath.IsAbs(i.Path) {
+			if _, err := os.Stat(i.Path); err != nil {
+				c.Errorf(i, "unable to read %q", i.Path)
+			}
+			return
+		}
+
+		// Check the current directory first to match `thrift`s behavior.
+		dirs := c.Includes
+		if cwd, err := os.Getwd(); err != nil {
+			dirs = append([]string{cwd}, c.Includes...)
+		}
 
 		found := false
 		for _, dir := range dirs {
-			if _, err := os.Stat(path.Join(dir, i.Path)); err == nil {
+			if _, err := os.Stat(filepath.Join(dir, i.Path)); err == nil {
 				found = true
 				break
 			}
 		}
 		if !found {
-			c.Errorf(i, "unable to find include path for %q", i.Path)
+			c.Errorf(i, "unable to find include file %q", i.Path)
 		}
 	})
 }
