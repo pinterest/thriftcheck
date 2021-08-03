@@ -180,7 +180,8 @@ func (c *C) pos(n ast.Node) ast.Position {
 	if c.parseInfo != nil {
 		return c.parseInfo.Pos(n)
 	}
-	return ast.Position{Line: ast.LineNumber(n)}
+	pos, _ := ast.Pos(n)
+	return pos
 }
 
 // Logf prints a formatted message to the verbose output logger.
