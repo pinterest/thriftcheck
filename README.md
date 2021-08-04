@@ -220,6 +220,10 @@ The annotation syntax is preferred, but the documentation block syntax is
 useful for those few cases where the target node doesn't support Thrift
 annotations (such as `const` declarations).
 
+## Editor Support
+
+* Vim, using [ALE](https://github.com/dense-analysis/ale)
+
 ## License
 
 This software is released under the terms of the [Apache 2.0 License](LICENSE).
