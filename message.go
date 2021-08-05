@@ -24,9 +24,9 @@ import (
 type Severity int
 
 const (
-	// Warning indicates a warning
+	// Warning indicates a warning.
 	Warning Severity = iota
-	// Error indicates an error
+	// Error indicates an error.
 	Error
 )
 
