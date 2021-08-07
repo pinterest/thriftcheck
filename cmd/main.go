@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/kkyr/fig"
@@ -43,7 +44,7 @@ type Config struct {
 		}
 
 		Include struct {
-			Restricted map[string]string `fig:"restricted"`
+			Restricted map[string]*regexp.Regexp `fig:"restricted"`
 		}
 
 		Names struct {
@@ -51,7 +52,7 @@ type Config struct {
 		}
 
 		Namespace struct {
-			Patterns map[string]string `fig:"patterns"`
+			Patterns map[string]*regexp.Regexp `fig:"patterns"`
 		}
 	}
 }

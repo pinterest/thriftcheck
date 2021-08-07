@@ -15,6 +15,7 @@
 package checks_test
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/pinterest/thriftcheck/checks"
@@ -35,8 +36,8 @@ func TestCheckNamespacePattern(t *testing.T) {
 		},
 	}
 
-	check := checks.CheckNamespacePattern(map[string]string{
-		"java": `^com\.pinterest\.idl\.`,
+	check := checks.CheckNamespacePattern(map[string]*regexp.Regexp{
+		"java": regexp.MustCompile(`^com\.pinterest\.idl\.`),
 	})
 	RunTests(t, check, tests)
 }
