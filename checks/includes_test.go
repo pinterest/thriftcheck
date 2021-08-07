@@ -15,6 +15,7 @@
 package checks_test
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/pinterest/thriftcheck/checks"
@@ -77,10 +78,10 @@ func TestCheckIncludeRestricted(t *testing.T) {
 		},
 	}
 
-	check := checks.CheckIncludeRestricted(map[string]string{
-		"*":               `bad.thrift`,
-		"a.thrift":        `abad.thrift`,
-		"nested/*.thrift": `inner.thrift`,
+	check := checks.CheckIncludeRestricted(map[string]*regexp.Regexp{
+		"*":               regexp.MustCompile(`bad.thrift`),
+		"a.thrift":        regexp.MustCompile(`abad.thrift`),
+		"nested/*.thrift": regexp.MustCompile(`inner.thrift`),
 	})
 	RunTests(t, check, tests)
 }

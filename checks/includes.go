@@ -60,14 +60,9 @@ func CheckIncludePath() *thriftcheck.Check {
 // file name pattern that matches the including filename and the value is a
 // regular expression that matches the included filename. When both match, the
 // `include` is flagged as "restricted" and an error is reported.
-func CheckIncludeRestricted(patterns map[string]string) *thriftcheck.Check {
-	regexps := make(map[string]*regexp.Regexp, len(patterns))
-	for fpat, ipat := range patterns {
-		regexps[fpat] = regexp.MustCompile(ipat)
-	}
-
+func CheckIncludeRestricted(patterns map[string]*regexp.Regexp) *thriftcheck.Check {
 	return thriftcheck.NewCheck("include.restricted", func(c *thriftcheck.C, i *ast.Include) {
-		for fpat, ire := range regexps {
+		for fpat, ire := range patterns {
 			if fnmatch.Match(fpat, c.Filename, fnmatch.FNM_NOESCAPE) && ire.MatchString(i.Path) {
 				c.Logf("%q (%s) matches %q (%s)\n", c.Filename, fpat, i.Path, ire)
 				c.Errorf(i, "%q is a restricted import", i.Path)

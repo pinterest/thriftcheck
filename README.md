@@ -55,7 +55,7 @@ Many checks are configurable via the configuration file. This file is named
 `.thriftcheck.toml` and is loaded from the current directory by default, but
 you can use the `--config` command line option to use a different file. If you
 prefer, you can use a JSON- or YAML-formatted file instead by using a `.json`
-or `.yaml` file extension, respectively. The examples used below use the
+or `.yaml` file extension, respectively. The examples shown below use the
 default [TOML](https://toml.io/) syntax.
 
 [`example.toml`](cmd/example.toml) is an example configuration file that you
