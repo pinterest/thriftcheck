@@ -36,3 +36,21 @@ func CheckFieldIDNegative() *thriftcheck.Check {
 		}
 	})
 }
+
+// CheckFieldOptional warns if a field isn't declared as "optional".
+func CheckFieldOptional() *thriftcheck.Check {
+	return thriftcheck.NewCheck("field.optional", func(c *thriftcheck.C, f *ast.Field) {
+		if f.Requiredness != ast.Optional {
+			c.Warningf(f, `field %q (%d) should be "optional"`, f.Name, f.ID)
+		}
+	})
+}
+
+// CheckFieldRequiredness warns if a field isn't explicitly declared as "required" or "optional".
+func CheckFieldRequiredness() *thriftcheck.Check {
+	return thriftcheck.NewCheck("field.requiredness", func(c *thriftcheck.C, f *ast.Field) {
+		if f.Requiredness == ast.Unspecified {
+			c.Warningf(f, `field %q (%d) should be explicitly "required" or "optional"`, f.Name, f.ID)
+		}
+	})
+}

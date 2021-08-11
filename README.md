@@ -91,6 +91,16 @@ implicit/auto-assigning syntax).
 
 This check reports an error if a field's ID is negative.
 
+### `field.optional`
+
+This check warns if a field isn't declared as "optional", which is considered
+a best practice.
+
+### `field.requiredness`
+
+This check warns if a field isn't explicitly declared as "required" or
+"optional".
+
 ### `include.path`
 
 This check ensures that each `include`'d file can be located in the set of

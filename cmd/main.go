@@ -152,6 +152,8 @@ func main() {
 		checks.CheckEnumSize(cfg.Checks.Enum.Size.Warning, cfg.Checks.Enum.Size.Error),
 		checks.CheckFieldIDMissing(),
 		checks.CheckFieldIDNegative(),
+		checks.CheckFieldOptional(),
+		checks.CheckFieldRequiredness(),
 		checks.CheckIncludePath(),
 		checks.CheckIncludeRestricted(cfg.Checks.Include.Restricted),
 		checks.CheckInteger64bit(),
