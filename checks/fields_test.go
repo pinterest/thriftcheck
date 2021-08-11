@@ -60,3 +60,49 @@ func TestCheckFieldIDNegative(t *testing.T) {
 	check := checks.CheckFieldIDNegative()
 	RunTests(t, check, tests)
 }
+
+func TestCheckFieldOptional(t *testing.T) {
+	tests := []Test{
+		{
+			node: &ast.Field{ID: 1, Name: "Field", Requiredness: ast.Unspecified},
+			want: []string{
+				`t.thrift:0:1:warning: field "Field" (1) should be "optional" (field.optional)`,
+			},
+		},
+		{
+			node: &ast.Field{ID: 1, Name: "Field", Requiredness: ast.Required},
+			want: []string{
+				`t.thrift:0:1:warning: field "Field" (1) should be "optional" (field.optional)`,
+			},
+		},
+		{
+			node: &ast.Field{ID: 1, Name: "Field", Requiredness: ast.Optional},
+			want: []string{},
+		},
+	}
+
+	check := checks.CheckFieldOptional()
+	RunTests(t, check, tests)
+}
+
+func TestCheckFieldRequiredness(t *testing.T) {
+	tests := []Test{
+		{
+			node: &ast.Field{ID: 1, Name: "Field", Requiredness: ast.Unspecified},
+			want: []string{
+				`t.thrift:0:1:warning: field "Field" (1) should be explicitly "required" or "optional" (field.requiredness)`,
+			},
+		},
+		{
+			node: &ast.Field{ID: 1, Name: "Field", Requiredness: ast.Required},
+			want: []string{},
+		},
+		{
+			node: &ast.Field{ID: 1, Name: "Field", Requiredness: ast.Optional},
+			want: []string{},
+		},
+	}
+
+	check := checks.CheckFieldRequiredness()
+	RunTests(t, check, tests)
+}
