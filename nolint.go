@@ -26,7 +26,7 @@ var nolintRegexp = regexp.MustCompile(`@nolint(?:\((.*)\))?`)
 func nolint(n ast.Node) ([]string, bool) {
 	var names []string
 
-	if annotations := Annotations(n); annotations != nil {
+	if annotations := ast.Annotations(n); annotations != nil {
 		for _, annotation := range annotations {
 			if annotation.Name == "nolint" {
 				if annotation.Value == "" {
