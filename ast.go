@@ -37,16 +37,6 @@ func (f VisitorFunc) Visit(w ast.Walker, n ast.Node) ast.Visitor {
 	return nil
 }
 
-// Annotations returns an ast.Node's Annotations.
-func Annotations(node ast.Node) []*ast.Annotation {
-	if v := reflect.ValueOf(node); v.Kind() == reflect.Ptr {
-		if f := v.Elem().FieldByName("Annotations"); f.IsValid() {
-			return f.Interface().([]*ast.Annotation)
-		}
-	}
-	return nil
-}
-
 // Doc returns an ast.Node's Doc string.
 func Doc(node ast.Node) string {
 	if v := reflect.ValueOf(node); v.Kind() == reflect.Ptr {
