@@ -127,7 +127,9 @@ func lint(l *thriftcheck.Linter, filenames []string) (thriftcheck.Messages, erro
 
 func main() {
 	// Parse command line flags
-	getopt.Parse()
+	if err := getopt.CommandLine.Parse(os.Args[1:]); err != nil {
+		os.Exit(1 << uint(thriftcheck.Error))
+	}
 	if *helpFlag {
 		flag.Usage()
 		os.Exit(0)
