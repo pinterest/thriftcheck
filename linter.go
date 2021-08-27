@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"go.uber.org/thriftrw/ast"
@@ -115,7 +116,7 @@ func (l *Linter) lint(program *ast.Program, filename string, parseInfo *idl.Info
 
 	ctx := &C{
 		Filename:  filename,
-		Includes:  l.includes,
+		Dirs:      append([]string{filepath.Dir(filename)}, l.includes...),
 		Program:   program,
 		logger:    l.logger,
 		parseInfo: parseInfo,

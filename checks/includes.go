@@ -36,14 +36,8 @@ func CheckIncludePath() *thriftcheck.Check {
 			return
 		}
 
-		// Check the current directory first to match `thrift`s behavior.
-		dirs := c.Includes
-		if cwd, err := os.Getwd(); err != nil {
-			dirs = append([]string{cwd}, c.Includes...)
-		}
-
 		found := false
-		for _, dir := range dirs {
+		for _, dir := range c.Dirs {
 			if _, err := os.Stat(filepath.Join(dir, i.Path)); err == nil {
 				found = true
 				break
