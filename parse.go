@@ -47,11 +47,6 @@ func ParseFile(filename string, dirs []string) (*ast.Program, *idl.Info, error) 
 		return nil, nil, fmt.Errorf("%s not found", filename)
 	}
 
-	// Check the current directory first to match `thrift`s behavior.
-	if cwd, err := os.Getwd(); err != nil {
-		dirs = append([]string{cwd}, dirs...)
-	}
-
 	for _, dir := range dirs {
 		if f, err := os.Open(filepath.Join(dir, filename)); err == nil {
 			return Parse(f)

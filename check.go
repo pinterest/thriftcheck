@@ -167,7 +167,7 @@ next:
 // C is a type passed to all check functions to provide context.
 type C struct {
 	Filename  string
-	Includes  []string
+	Dirs      []string
 	Program   *ast.Program
 	Check     string
 	Messages  Messages
@@ -204,7 +204,7 @@ func (c *C) Errorf(node ast.Node, message string, args ...interface{}) {
 
 // Resolve resolves a type reference.
 func (c *C) Resolve(ref ast.TypeReference) ast.Node {
-	if n, err := Resolve(ref, c.Program, c.Includes); err == nil {
+	if n, err := Resolve(ref, c.Program, c.Dirs); err == nil {
 		return n
 	}
 	return nil
@@ -212,7 +212,7 @@ func (c *C) Resolve(ref ast.TypeReference) ast.Node {
 
 // ResolveType resolves a type reference to its target type.
 func (c *C) ResolveType(ref ast.TypeReference) ast.Node {
-	if n, err := ResolveType(ref, c.Program, c.Includes); err == nil {
+	if n, err := ResolveType(ref, c.Program, c.Dirs); err == nil {
 		return n
 	}
 	return nil
