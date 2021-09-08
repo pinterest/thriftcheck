@@ -33,28 +33,28 @@ func TestCheckIncludeRestricted(t *testing.T) {
 			name: "a.thrift",
 			node: &ast.Include{Path: "bad.thrift"},
 			want: []string{
-				`a.thrift:0:1:error: "bad.thrift" is a restricted import (include.restricted)`,
+				`a.thrift:0:1: error: "bad.thrift" is a restricted import (include.restricted)`,
 			},
 		},
 		{
 			name: "a.thrift",
 			node: &ast.Include{Path: "abad.thrift"},
 			want: []string{
-				`a.thrift:0:1:error: "abad.thrift" is a restricted import (include.restricted)`,
+				`a.thrift:0:1: error: "abad.thrift" is a restricted import (include.restricted)`,
 			},
 		},
 		{
 			name: "b.thrift",
 			node: &ast.Include{Path: "bad.thrift"},
 			want: []string{
-				`b.thrift:0:1:error: "bad.thrift" is a restricted import (include.restricted)`,
+				`b.thrift:0:1: error: "bad.thrift" is a restricted import (include.restricted)`,
 			},
 		},
 		{
 			name: "b.thrift",
 			node: &ast.Include{Path: "abad.thrift"},
 			want: []string{
-				`b.thrift:0:1:error: "abad.thrift" is a restricted import (include.restricted)`,
+				`b.thrift:0:1: error: "abad.thrift" is a restricted import (include.restricted)`,
 			},
 		},
 		{
@@ -66,14 +66,14 @@ func TestCheckIncludeRestricted(t *testing.T) {
 			name: "nested/a.thrift",
 			node: &ast.Include{Path: "bad.thrift"},
 			want: []string{
-				`nested/a.thrift:0:1:error: "bad.thrift" is a restricted import (include.restricted)`,
+				`nested/a.thrift:0:1: error: "bad.thrift" is a restricted import (include.restricted)`,
 			},
 		},
 		{
 			name: "nested/a.thrift",
 			node: &ast.Include{Path: "inner.thrift"},
 			want: []string{
-				`nested/a.thrift:0:1:error: "inner.thrift" is a restricted import (include.restricted)`,
+				`nested/a.thrift:0:1: error: "inner.thrift" is a restricted import (include.restricted)`,
 			},
 		},
 	}

@@ -31,13 +31,13 @@ func TestCheckInteger64bit(t *testing.T) {
 		{
 			node: ast.ConstantInteger(math.MinInt32 - 1),
 			want: []string{
-				`t.thrift:0:1:warning: 64-bit integer constant -2147483649 may not work in all languages (int.64bit)`,
+				`t.thrift:0:1: warning: 64-bit integer constant -2147483649 may not work in all languages (int.64bit)`,
 			},
 		},
 		{
 			node: ast.ConstantInteger(math.MaxInt32 + 1),
 			want: []string{
-				`t.thrift:0:1:warning: 64-bit integer constant 2147483648 may not work in all languages (int.64bit)`,
+				`t.thrift:0:1: warning: 64-bit integer constant 2147483648 may not work in all languages (int.64bit)`,
 			},
 		},
 	}

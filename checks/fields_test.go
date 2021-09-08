@@ -30,7 +30,7 @@ func TestCheckFieldIDMissing(t *testing.T) {
 		{
 			node: &ast.Field{IDUnset: true},
 			want: []string{
-				`t.thrift:0:1:error: field ID for "" is missing (field.id.missing)`,
+				`t.thrift:0:1: error: field ID for "" is missing (field.id.missing)`,
 			},
 		},
 	}
@@ -52,7 +52,7 @@ func TestCheckFieldIDNegative(t *testing.T) {
 		{
 			node: &ast.Field{ID: -1, Name: "Field"},
 			want: []string{
-				`t.thrift:0:1:error: field ID for "Field" (-1) is negative (field.id.negative)`,
+				`t.thrift:0:1: error: field ID for "Field" (-1) is negative (field.id.negative)`,
 			},
 		},
 	}
@@ -66,13 +66,13 @@ func TestCheckFieldOptional(t *testing.T) {
 		{
 			node: &ast.Field{ID: 1, Name: "Field", Requiredness: ast.Unspecified},
 			want: []string{
-				`t.thrift:0:1:warning: field "Field" (1) should be "optional" (field.optional)`,
+				`t.thrift:0:1: warning: field "Field" (1) should be "optional" (field.optional)`,
 			},
 		},
 		{
 			node: &ast.Field{ID: 1, Name: "Field", Requiredness: ast.Required},
 			want: []string{
-				`t.thrift:0:1:warning: field "Field" (1) should be "optional" (field.optional)`,
+				`t.thrift:0:1: warning: field "Field" (1) should be "optional" (field.optional)`,
 			},
 		},
 		{
@@ -90,7 +90,7 @@ func TestCheckFieldRequiredness(t *testing.T) {
 		{
 			node: &ast.Field{ID: 1, Name: "Field", Requiredness: ast.Unspecified},
 			want: []string{
-				`t.thrift:0:1:warning: field "Field" (1) should be explicitly "required" or "optional" (field.requiredness)`,
+				`t.thrift:0:1: warning: field "Field" (1) should be explicitly "required" or "optional" (field.requiredness)`,
 			},
 		},
 		{
