@@ -27,11 +27,11 @@ func TestMessageString(t *testing.T) {
 	}{
 		{
 			&Message{Filename: "a.thrift", Pos: ast.Position{Line: 5}, Check: "check", Severity: Warning, Message: "Warning"},
-			"a.thrift:5:1:warning: Warning (check)",
+			"a.thrift:5:1: warning: Warning (check)",
 		},
 		{
 			&Message{Filename: "a.thrift", Pos: ast.Position{Line: 5}, Check: "check", Severity: Error, Message: "Error"},
-			"a.thrift:5:1:error: Error (check)",
+			"a.thrift:5:1: error: Error (check)",
 		},
 	}
 

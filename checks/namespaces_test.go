@@ -31,7 +31,7 @@ func TestCheckNamespacePattern(t *testing.T) {
 		{
 			node: &ast.Namespace{Scope: "java", Name: "com.example.idl.test"},
 			want: []string{
-				`t.thrift:0:1:error: "java" namespace must match "^com\\.pinterest\\.idl\\." (namespace.patterns)`,
+				`t.thrift:0:1: error: "java" namespace must match "^com\\.pinterest\\.idl\\." (namespace.patterns)`,
 			},
 		},
 	}

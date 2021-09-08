@@ -30,7 +30,7 @@ func TestCheckNamesReserved(t *testing.T) {
 		{
 			node: &ast.Struct{Name: "reserved"},
 			want: []string{
-				`t.thrift:0:1:error: "reserved" is a reserved name (names.reserved)`,
+				`t.thrift:0:1: error: "reserved" is a reserved name (names.reserved)`,
 			},
 		},
 		{
@@ -40,7 +40,7 @@ func TestCheckNamesReserved(t *testing.T) {
 		{
 			node: &ast.Field{Name: "reserved"},
 			want: []string{
-				`t.thrift:0:1:error: "reserved" is a reserved name (names.reserved)`,
+				`t.thrift:0:1: error: "reserved" is a reserved name (names.reserved)`,
 			},
 		},
 	}

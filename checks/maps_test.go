@@ -36,7 +36,7 @@ func TestCheckMapKeyType(t *testing.T) {
 					ValueType: ast.BaseType{ID: ast.StringTypeID}},
 				ValueType: ast.BaseType{ID: ast.StringTypeID}},
 			want: []string{
-				`t.thrift:0:1:error: map key must be a primitive type (map.key.type)`,
+				`t.thrift:0:1: error: map key must be a primitive type (map.key.type)`,
 			},
 		},
 		{
@@ -45,7 +45,7 @@ func TestCheckMapKeyType(t *testing.T) {
 				KeyType:   ast.TypeReference{Name: "Enum"},
 				ValueType: ast.BaseType{ID: ast.StringTypeID}},
 			want: []string{
-				`t.thrift:0:1:error: map key must be a primitive type (map.key.type)`,
+				`t.thrift:0:1: error: map key must be a primitive type (map.key.type)`,
 			},
 		},
 		{

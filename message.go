@@ -52,7 +52,7 @@ func (m Message) String() string {
 	if col == 0 {
 		col = 1
 	}
-	return fmt.Sprintf("%s:%d:%d:%s: %s (%s)", m.Filename, m.Pos.Line, col, m.Severity, m.Message, m.Check)
+	return fmt.Sprintf("%s:%d:%d: %s: %s (%s)", m.Filename, m.Pos.Line, col, m.Severity, m.Message, m.Check)
 }
 
 // Messages is a list of messages.

@@ -30,14 +30,14 @@ func TestCheckSetValueType(t *testing.T) {
 		{
 			node: ast.SetType{ValueType: ast.SetType{ValueType: ast.BaseType{ID: ast.StringTypeID}}},
 			want: []string{
-				`t.thrift:0:1:error: set value must be a primitive type (set.value.type)`,
+				`t.thrift:0:1: error: set value must be a primitive type (set.value.type)`,
 			},
 		},
 		{
 			prog: &ast.Program{},
 			node: ast.SetType{ValueType: ast.TypeReference{Name: "Enum"}},
 			want: []string{
-				`t.thrift:0:1:error: set value must be a primitive type (set.value.type)`,
+				`t.thrift:0:1: error: set value must be a primitive type (set.value.type)`,
 			},
 		},
 		{
