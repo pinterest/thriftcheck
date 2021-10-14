@@ -148,7 +148,7 @@ additional disallowed names.
 ```toml
 [checks.names]
 reserved = [
-	"template",
+    "template",
 ]
 ```
 
