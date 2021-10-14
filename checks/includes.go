@@ -30,15 +30,16 @@ func CheckIncludePath() *thriftcheck.Check {
 	return thriftcheck.NewCheck("include.path", func(c *thriftcheck.C, i *ast.Include) {
 		// If the path is absolute, we don't need to check the include paths.
 		if filepath.IsAbs(i.Path) {
-			if _, err := os.Stat(i.Path); err != nil {
-				c.Errorf(i, "unable to read %q", i.Path)
+			if info, err := os.Stat(i.Path); err != nil || info.IsDir() {
+				c.Errorf(i, "unable to read file %q", i.Path)
 			}
 			return
 		}
 
 		found := false
 		for _, dir := range c.Dirs {
-			if _, err := os.Stat(filepath.Join(dir, i.Path)); err == nil {
+			path := filepath.Join(dir, i.Path)
+			if info, err := os.Stat(path); err == nil && !info.IsDir() {
 				found = true
 				break
 			}
