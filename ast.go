@@ -16,6 +16,7 @@ package thriftcheck
 
 import (
 	"fmt"
+	"path/filepath"
 	"reflect"
 	"strings"
 
@@ -58,7 +59,22 @@ func Resolve(ref ast.TypeReference, program *ast.Program, dirs []string) (ast.No
 
 	if strings.Contains(name, ".") {
 		parts := strings.SplitN(name, ".", 2)
-		program, _, err := ParseFile(parts[0]+".thrift", dirs)
+		fname := parts[0] + ".thrift"
+
+		var ipath string
+		for _, header := range program.Headers {
+			if include, ok := header.(*ast.Include); ok {
+				if _, file := filepath.Split(include.Path); file == fname {
+					ipath = include.Path
+					break
+				}
+			}
+		}
+		if ipath == "" {
+			return nil, fmt.Errorf("missing \"include\" for type reference %q", ref.Name)
+		}
+
+		program, _, err := ParseFile(ipath, dirs)
 		if err != nil {
 			return nil, err
 		}
