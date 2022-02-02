@@ -1,0 +1,6 @@
+- id: thriftcheck
+  name: ThriftCheck
+  description: Lint Thrift IDL files
+  entry: cmd
+  language: golang
+  types: [thrift]
