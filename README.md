@@ -49,6 +49,19 @@ If you only want errors (and not warnings) to be reported, you can use the
 `thriftcheck`'s exit code indicates whether it reported any warnings (**1**)
 or errors (**2**). Otherwise, exit code **0** is returned.
 
+### pre-commit
+
+[pre-commit](https://pre-commit.com/) support is provided. Simply add the
+following to your `.pre-commit-config.yaml` configuration file:
+
+```yaml
+- repo: https://github.com/pinterest/thriftcheck
+  rev: 1.0.0  # git revision or tag
+  hooks:
+    - id: thriftcheck
+      name: thriftcheck
+```
+
 ## Configuration
 
 Many checks are configurable via the configuration file. This file is named
