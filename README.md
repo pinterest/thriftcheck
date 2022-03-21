@@ -71,6 +71,11 @@ You can enable or disable checks using the configuration file's top-level
 from the full list first, and then the resulting list is filtered by the list
 of `enabled` checks. Either list can be empty (the default).
 
+### `constant.ref`
+
+This check reports an error if a referenced constant or enum value cannot be
+found in either the current scope or in an included file (using dot notation).
+
 ### `enum.size`
 
 This check warns or errors if an enumeration's element size grows beyond a

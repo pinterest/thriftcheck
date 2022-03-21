@@ -202,9 +202,9 @@ func (c *C) Errorf(node ast.Node, message string, args ...interface{}) {
 	c.Messages = append(c.Messages, m)
 }
 
-// Resolve resolves a type reference.
-func (c *C) Resolve(ref ast.TypeReference) ast.Node {
-	if n, err := Resolve(ref, c.Program, c.Dirs); err == nil {
+// Resolve resolves a name.
+func (c *C) Resolve(name string) ast.Node {
+	if n, err := Resolve(name, c.Program, c.Dirs); err == nil {
 		return n
 	}
 	return nil
