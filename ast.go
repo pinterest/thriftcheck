@@ -48,14 +48,13 @@ func Doc(node ast.Node) string {
 	return ""
 }
 
-// Resolve resolves an ast.TypeReference to its target node.
+// Resolve resolves a named reference to its target node.
 //
 // The target can either be in the current program's scope or it can refer to
 // an included file using dot notation. Included files must exist in one of the
 // given search directories.
-func Resolve(ref ast.TypeReference, program *ast.Program, dirs []string) (ast.Node, error) {
+func Resolve(name string, program *ast.Program, dirs []string) (ast.Node, error) {
 	defs := program.Definitions
-	name := ref.Name
 
 	if strings.Contains(name, ".") {
 		parts := strings.SplitN(name, ".", 2)
@@ -71,7 +70,7 @@ func Resolve(ref ast.TypeReference, program *ast.Program, dirs []string) (ast.No
 			}
 		}
 		if ipath == "" {
-			return nil, fmt.Errorf("missing \"include\" for type reference %q", ref.Name)
+			return nil, fmt.Errorf("missing \"include\" for type reference %q", name)
 		}
 
 		program, _, err := ParseFile(ipath, dirs)
@@ -89,7 +88,37 @@ func Resolve(ref ast.TypeReference, program *ast.Program, dirs []string) (ast.No
 		}
 	}
 
-	return nil, fmt.Errorf("%q could not be resolved", ref.Name)
+	return nil, fmt.Errorf("%q could not be resolved", name)
+}
+
+// ResolveConstant resolves an ast.ConstantReference to its target node.
+//
+// The following name formats are supported:
+// 	- "Constant" (ast.Constant)
+// 	- "Enum.Value" (ast.EnumItem)
+// 	- "include.Constant" (ast.Constant)
+// 	- "include.Enum.Value" (ast.EnumItem)
+func ResolveConstant(ref ast.ConstantReference, program *ast.Program, dirs []string) (ast.Node, error) {
+	parts := strings.SplitN(ref.Name, ".", 3)
+
+	n, err := Resolve(parts[0], program, dirs)
+	if err != nil && len(parts) > 1 {
+		n, err = Resolve(parts[0]+"."+parts[1], program, dirs)
+	}
+	if err != nil {
+		return n, err
+	}
+
+	if e, ok := n.(*ast.Enum); ok {
+		for _, ei := range e.Items {
+			if ei.Name == parts[len(parts)-1] {
+				return ei, nil
+			}
+		}
+		return nil, fmt.Errorf("enum value %q could not be resolved", ref.Name)
+	}
+
+	return n, err
 }
 
 // ResolveType calls Resolve and goes one step further by attempting to
@@ -97,7 +126,7 @@ func Resolve(ref ast.TypeReference, program *ast.Program, dirs []string) (ast.No
 // points to an ast.Typedef or ast.Constant, for example, and the caller
 // is primarily intererested in the target's ast.Type.
 func ResolveType(ref ast.TypeReference, program *ast.Program, dirs []string) (ast.Node, error) {
-	n, err := Resolve(ref, program, dirs)
+	n, err := Resolve(ref.Name, program, dirs)
 	if err != nil {
 		return nil, err
 	}

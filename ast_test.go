@@ -15,6 +15,7 @@
 package thriftcheck
 
 import (
+	"reflect"
 	"testing"
 
 	"go.uber.org/thriftrw/ast"
@@ -34,6 +35,55 @@ func TestDoc(t *testing.T) {
 		got := Doc(tt.node)
 		if got != tt.want {
 			t.Errorf("expected %s but got %s", tt.want, got)
+		}
+	}
+}
+
+func TestResolveConstant(t *testing.T) {
+	tests := []struct {
+		ref  ast.ConstantReference
+		prog *ast.Program
+		want reflect.Type
+		err  bool
+	}{
+		{
+			ast.ConstantReference{Name: "Constant"},
+			&ast.Program{Definitions: []ast.Definition{
+				&ast.Constant{Name: "Constant"},
+			}},
+			reflect.TypeOf((*ast.Constant)(nil)),
+			false,
+		},
+		{
+			ast.ConstantReference{Name: "Enum.Value"}, &ast.Program{Definitions: []ast.Definition{
+				&ast.Enum{
+					Name: "Enum",
+					Items: []*ast.EnumItem{
+						{Name: "Value"},
+					},
+				},
+			}}, reflect.TypeOf((*ast.EnumItem)(nil)),
+			false,
+		},
+		{
+			ast.ConstantReference{Name: "Unknown"},
+			&ast.Program{},
+			nil,
+			true,
+		},
+	}
+
+	for _, tt := range tests {
+		n, err := ResolveConstant(tt.ref, tt.prog, nil)
+		if tt.err {
+			if err == nil {
+				t.Errorf("expected an error, got %s", n)
+			}
+		} else if err != nil {
+			t.Errorf("unexpected error: %s", err)
+		}
+		if got := reflect.TypeOf(n); tt.want != nil && got != tt.want {
+			t.Errorf("expected %v but got %v", tt.want, got)
 		}
 	}
 }
