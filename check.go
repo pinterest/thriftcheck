@@ -210,6 +210,14 @@ func (c *C) Resolve(name string) ast.Node {
 	return nil
 }
 
+// ResolveConstant resolves a constant reference to its target.
+func (c *C) ResolveConstant(ref ast.ConstantReference) ast.Node {
+	if n, err := ResolveConstant(ref, c.Program, c.Dirs); err == nil {
+		return n
+	}
+	return nil
+}
+
 // ResolveType resolves a type reference to its target type.
 func (c *C) ResolveType(ref ast.TypeReference) ast.Node {
 	if n, err := ResolveType(ref, c.Program, c.Dirs); err == nil {

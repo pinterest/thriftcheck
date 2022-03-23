@@ -32,9 +32,14 @@ func TestCheckConstantRef(t *testing.T) {
 		},
 		{
 			prog: &ast.Program{Definitions: []ast.Definition{
-				&ast.Enum{Name: "Enum"},
+				&ast.Enum{
+					Name: "Enum",
+					Items: []*ast.EnumItem{
+						{Name: "Value"},
+					},
+				},
 			}},
-			node: ast.ConstantReference{Name: "Enum"},
+			node: ast.ConstantReference{Name: "Enum.Value"},
 			want: []string{},
 		},
 		{

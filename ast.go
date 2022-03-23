@@ -91,6 +91,36 @@ func Resolve(name string, program *ast.Program, dirs []string) (ast.Node, error)
 	return nil, fmt.Errorf("%q could not be resolved", name)
 }
 
+// ResolveConstant resolves an ast.ConstantReference to its target node.
+//
+// The following name formats are supported:
+// 	- "Constant" (ast.Constant)
+// 	- "Enum.Value" (ast.EnumItem)
+// 	- "include.Constant" (ast.Constant)
+// 	- "include.Enum.Value" (ast.EnumItem)
+func ResolveConstant(ref ast.ConstantReference, program *ast.Program, dirs []string) (ast.Node, error) {
+	parts := strings.SplitN(ref.Name, ".", 3)
+
+	n, err := Resolve(parts[0], program, dirs)
+	if err != nil && len(parts) > 1 {
+		n, err = Resolve(parts[0]+"."+parts[1], program, dirs)
+	}
+	if err != nil {
+		return n, err
+	}
+
+	if e, ok := n.(*ast.Enum); ok {
+		for _, ei := range e.Items {
+			if ei.Name == parts[len(parts)-1] {
+				return ei, nil
+			}
+		}
+		return nil, fmt.Errorf("enum value %q could not be resolved", ref.Name)
+	}
+
+	return n, err
+}
+
 // ResolveType calls Resolve and goes one step further by attempting to
 // resolve the target node's own type. This is useful when the reference
 // points to an ast.Typedef or ast.Constant, for example, and the caller
