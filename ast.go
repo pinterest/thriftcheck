@@ -106,7 +106,7 @@ func ResolveConstant(ref ast.ConstantReference, program *ast.Program, dirs []str
 		n, err = Resolve(parts[0]+"."+parts[1], program, dirs)
 	}
 	if err != nil {
-		return n, err
+		return n, fmt.Errorf("%q could not be resolved", ref.Name)
 	}
 
 	if e, ok := n.(*ast.Enum); ok {
@@ -118,7 +118,7 @@ func ResolveConstant(ref ast.ConstantReference, program *ast.Program, dirs []str
 		return nil, fmt.Errorf("enum value %q could not be resolved", ref.Name)
 	}
 
-	return n, err
+	return n, nil
 }
 
 // ResolveType calls Resolve and goes one step further by attempting to
