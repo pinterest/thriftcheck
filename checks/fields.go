@@ -37,6 +37,15 @@ func CheckFieldIDNegative() *thriftcheck.Check {
 	})
 }
 
+// CheckFieldIDZero reports an error if a field's ID is zero.
+func CheckFieldIDZero() *thriftcheck.Check {
+	return thriftcheck.NewCheck("field.id.zero", func(c *thriftcheck.C, f *ast.Field) {
+		if f.ID == 0 {
+			c.Errorf(f, "field ID for %q is zero", f.Name)
+		}
+	})
+}
+
 // CheckFieldOptional warns if a field isn't declared as "optional".
 func CheckFieldOptional() *thriftcheck.Check {
 	return thriftcheck.NewCheck("field.optional", func(c *thriftcheck.C, f *ast.Field) {

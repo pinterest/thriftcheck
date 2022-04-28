@@ -96,6 +96,13 @@ implicit/auto-assigning syntax).
 
 This check reports an error if a field's ID is negative.
 
+### `field.id.zero`
+
+This check reports an error if a field's ID is zero, which is generally
+unsupported by the Apache Thrift compiler. This is distinct from the
+`field.id.negative` check given the existence of the `--allow-neg-keys`
+Apache Thrift compiler option.
+
 ### `field.optional`
 
 This check warns if a field isn't declared as "optional", which is considered
