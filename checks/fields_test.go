@@ -61,6 +61,28 @@ func TestCheckFieldIDNegative(t *testing.T) {
 	RunTests(t, check, tests)
 }
 
+func TestCheckFieldIDZero(t *testing.T) {
+	tests := []Test{
+		{
+			node: &ast.Field{ID: 1, Name: "Field"},
+			want: []string{},
+		},
+		{
+			node: &ast.Field{ID: 0, Name: "Field"},
+			want: []string{
+				`t.thrift:0:1: error: field ID for "Field" is zero (field.id.zero)`,
+			},
+		},
+		{
+			node: &ast.Field{ID: -1, Name: "Field"},
+			want: []string{},
+		},
+	}
+
+	check := checks.CheckFieldIDZero()
+	RunTests(t, check, tests)
+}
+
 func TestCheckFieldOptional(t *testing.T) {
 	tests := []Test{
 		{
