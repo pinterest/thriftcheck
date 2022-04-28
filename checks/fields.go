@@ -28,19 +28,19 @@ func CheckFieldIDMissing() *thriftcheck.Check {
 	})
 }
 
-// CheckFieldIDNegative reports an error if a field's ID is negative.
+// CheckFieldIDNegative reports an error if a field's ID is explicitly negative.
 func CheckFieldIDNegative() *thriftcheck.Check {
 	return thriftcheck.NewCheck("field.id.negative", func(c *thriftcheck.C, f *ast.Field) {
-		if f.ID < 0 {
+		if !f.IDUnset && f.ID < 0 {
 			c.Errorf(f, "field ID for %q (%d) is negative", f.Name, f.ID)
 		}
 	})
 }
 
-// CheckFieldIDZero reports an error if a field's ID is zero.
+// CheckFieldIDZero reports an error if a field's ID is explicitly zero.
 func CheckFieldIDZero() *thriftcheck.Check {
 	return thriftcheck.NewCheck("field.id.zero", func(c *thriftcheck.C, f *ast.Field) {
-		if f.ID == 0 {
+		if !f.IDUnset && f.ID == 0 {
 			c.Errorf(f, "field ID for %q is zero", f.Name)
 		}
 	})

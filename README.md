@@ -94,13 +94,13 @@ implicit/auto-assigning syntax).
 
 ### `field.id.negative`
 
-This check reports an error if a field's ID is negative.
+This check reports an error if a field's ID is explicitly negative.
 
 ### `field.id.zero`
 
-This check reports an error if a field's ID is zero, which is generally
-unsupported by the Apache Thrift compiler. This is distinct from the
-`field.id.negative` check given the existence of the `--allow-neg-keys`
+This check reports an error if a field's ID is explicitly zero, which is
+generally unsupported by the Apache Thrift compiler. This is distinct from
+the `field.id.negative` check given the existence of the `--allow-neg-keys`
 Apache Thrift compiler option.
 
 ### `field.optional`

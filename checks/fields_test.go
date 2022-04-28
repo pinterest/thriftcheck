@@ -55,6 +55,10 @@ func TestCheckFieldIDNegative(t *testing.T) {
 				`t.thrift:0:1: error: field ID for "Field" (-1) is negative (field.id.negative)`,
 			},
 		},
+		{
+			node: &ast.Field{IDUnset: true},
+			want: []string{},
+		},
 	}
 
 	check := checks.CheckFieldIDNegative()
@@ -75,6 +79,10 @@ func TestCheckFieldIDZero(t *testing.T) {
 		},
 		{
 			node: &ast.Field{ID: -1, Name: "Field"},
+			want: []string{},
+		},
+		{
+			node: &ast.Field{IDUnset: true},
 			want: []string{},
 		},
 	}
