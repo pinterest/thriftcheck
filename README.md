@@ -87,6 +87,10 @@ warning = 500
 error = 1000
 ```
 
+### `field.doc.missing`
+
+This check warns if a field is missing a documentation comment.
+
 ### `field.id.missing`
 
 This check reports an error if a field's ID is missing (using the legacy
@@ -253,7 +257,7 @@ following to your `.pre-commit-config.yaml` configuration file:
 
 ```yaml
 - repo: https://github.com/pinterest/thriftcheck
-  rev: 1.0.0  # git revision or tag
+  rev: 1.0.0 # git revision or tag
   hooks:
     - id: thriftcheck
       name: thriftcheck

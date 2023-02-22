@@ -63,3 +63,12 @@ func CheckFieldRequiredness() *thriftcheck.Check {
 		}
 	})
 }
+
+// CheckFieldDocMissing if a field is missing a documentation comment.
+func CheckFieldDocMissing() *thriftcheck.Check {
+	return thriftcheck.NewCheck("field.doc.missing", func(c *thriftcheck.C, f *ast.Field) {
+		if f.Doc == "" {
+			c.Warningf(f, `field %q (%d) is missing a documentation comment`, f.Name, f.ID)
+		}
+	})
+}

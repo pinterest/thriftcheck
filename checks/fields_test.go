@@ -136,3 +136,21 @@ func TestCheckFieldRequiredness(t *testing.T) {
 	check := checks.CheckFieldRequiredness()
 	RunTests(t, check, tests)
 }
+
+func TestCheckFieldDocMissing(t *testing.T) {
+	tests := []Test{
+		{
+			node: &ast.Field{ID: 1, Name: "Field", Doc: "abc"},
+			want: []string{},
+		},
+		{
+			node: &ast.Field{ID: 1, Name: "Field"},
+			want: []string{
+				`t.thrift:0:1: warning: field "Field" (1) is missing a documentation comment (field.doc.missing)`,
+			},
+		},
+	}
+
+	check := checks.CheckFieldDocMissing()
+	RunTests(t, check, tests)
+}
