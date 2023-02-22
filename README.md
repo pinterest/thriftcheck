@@ -87,6 +87,10 @@ warning = 500
 error = 1000
 ```
 
+### `field.doc.missing`
+
+This check warns if a field is missing a documentation comment.
+
 ### `field.id.missing`
 
 This check reports an error if a field's ID is missing (using the legacy
@@ -112,10 +116,6 @@ a best practice.
 
 This check warns if a field isn't explicitly declared as "required" or
 "optional".
-
-### `field.doc.missing`
-
-This check warns if a field is missing a documentation comment.
 
 ### `include.path`
 
