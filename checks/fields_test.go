@@ -146,7 +146,7 @@ func TestCheckFieldDocMissing(t *testing.T) {
 		{
 			node: &ast.Field{ID: 1, Name: "Field"},
 			want: []string{
-				`t.thrift:0:1: warning: field "Field" (1) is missing a documentation comment`,
+				`t.thrift:0:1: warning: field "Field" (1) is missing a documentation comment (field.doc.missing)`,
 			},
 		},
 	}
