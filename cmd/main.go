@@ -158,6 +158,7 @@ func main() {
 		checks.CheckFieldIDZero(),
 		checks.CheckFieldOptional(),
 		checks.CheckFieldRequiredness(),
+		checks.CheckFieldCommentMissing(),
 		checks.CheckIncludePath(),
 		checks.CheckIncludeRestricted(cfg.Checks.Include.Restricted),
 		checks.CheckInteger64bit(),

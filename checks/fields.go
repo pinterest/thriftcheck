@@ -63,3 +63,12 @@ func CheckFieldRequiredness() *thriftcheck.Check {
 		}
 	})
 }
+
+// CheckFieldCommentMissing warns if a field doesn't have comments.
+func CheckFieldCommentMissing() *thriftcheck.Check {
+	return thriftcheck.NewCheck("field.comment.missing", func(c *thriftcheck.C, f *ast.Field) {
+		if f.Doc == "" {
+			c.Warningf(f, `field %q (%d) don't have comments`, f.Name, f.ID)
+		}
+	})
+}
