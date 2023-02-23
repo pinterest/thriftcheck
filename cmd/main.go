@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -125,6 +126,37 @@ func lint(l *thriftcheck.Linter, filenames []string) (thriftcheck.Messages, erro
 	return l.LintFiles(filenames)
 }
 
+func getFilenames(inputs []string) ([]string, error) {
+	var paths []string
+	for _, input := range inputs {
+		info, err := os.Stat(input)
+		if err != nil {
+			return nil, err
+		}
+
+		if info.IsDir() {
+			err = filepath.Walk(input, func(path string, info os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+
+				if !info.IsDir() {
+					paths = append(paths, path)
+				}
+
+				return nil
+			})
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			paths = append(paths, input)
+		}
+	}
+
+	return paths, nil
+}
+
 func main() {
 	// Parse command line flags
 	if err := getopt.CommandLine.Parse(os.Args[1:]); err != nil {
@@ -199,14 +231,25 @@ func main() {
 		options = append(options, thriftcheck.WithLogger(logger))
 	}
 
-	if len(flag.Args()) == 0 {
+	if len(flag.Args()) == 0 && *stdinFilename == "stdin" {
 		flag.Usage()
 		os.Exit(0)
 	}
 
+	var inputs []string
+	if *stdinFilename != "stdin" {
+		inputs = append(inputs, *stdinFilename)
+	}
+	inputs = append(inputs, flag.Args()...)
+	filenames, err := getFilenames(inputs)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1 << uint(thriftcheck.Error))
+	}
+
 	// Create the linter and run it over the input files
 	linter := thriftcheck.NewLinter(checks, options...)
-	messages, err := lint(linter, flag.Args())
+	messages, err := lint(linter, filenames)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1 << uint(thriftcheck.Error))
