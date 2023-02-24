@@ -70,23 +70,22 @@ func NewCheck(name string, fn interface{}) *Check {
 //
 // The following functions would match:
 //
-// 		f(*C, *ast.Program, *ast.Enum, *ast.EnumItem)
-// 		f(*C, *ast.Enum, *ast.EnumItem)
-// 		f(*C, *ast.EnumItem)
+//	f(*C, *ast.Program, *ast.Enum, *ast.EnumItem)
+//	f(*C, *ast.Enum, *ast.EnumItem)
+//	f(*C, *ast.EnumItem)
 //
 // But these would not:
 //
-// 		f(*C, *ast.Program)
-// 		f(*C, *ast.Enum)
-// 		f(*C, *ast.EnumItem, *ast.Enum)
-// 		f(*C, *ast.Program, *ast.EnumItem)
+//	f(*C, *ast.Program)
+//	f(*C, *ast.Enum)
+//	f(*C, *ast.EnumItem, *ast.Enum)
+//	f(*C, *ast.Program, *ast.EnumItem)
 //
 // Function arguments can also use the generic ast.Node interface type:
 //
-//		f(*C, ast.Node)
-//		f(*C, *ast.Program, ast.Node)
-//		f(*C, parent, node ast.Node)
-//
+//	f(*C, ast.Node)
+//	f(*C, *ast.Program, ast.Node)
+//	f(*C, parent, node ast.Node)
 func (c *Check) Call(ctx *C, nodes ...ast.Node) bool {
 	if len(nodes) < 1 {
 		panic("expected at least one node")

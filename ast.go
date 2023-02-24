@@ -94,10 +94,10 @@ func Resolve(name string, program *ast.Program, dirs []string) (ast.Node, error)
 // ResolveConstant resolves an ast.ConstantReference to its target node.
 //
 // The following name formats are supported:
-// 	- "Constant" (ast.Constant)
-// 	- "Enum.Value" (ast.EnumItem)
-// 	- "include.Constant" (ast.Constant)
-// 	- "include.Enum.Value" (ast.EnumItem)
+//   - "Constant" (ast.Constant)
+//   - "Enum.Value" (ast.EnumItem)
+//   - "include.Constant" (ast.Constant)
+//   - "include.Enum.Value" (ast.EnumItem)
 func ResolveConstant(ref ast.ConstantReference, program *ast.Program, dirs []string) (ast.Node, error) {
 	parts := strings.SplitN(ref.Name, ".", 3)
 
