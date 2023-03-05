@@ -119,42 +119,47 @@ func loadConfig(cfg *Config) error {
 	return nil
 }
 
-func lint(l *thriftcheck.Linter, filenames []string) (thriftcheck.Messages, error) {
-	if len(filenames) == 1 && filenames[0] == "-" {
+func lint(l *thriftcheck.Linter, paths []string) (thriftcheck.Messages, error) {
+	if len(paths) == 1 && paths[0] == "-" {
 		return l.Lint(os.Stdin, *stdinFilename)
 	}
-	return l.LintFiles(filenames)
+	paths, err := expandPaths(paths)
+	if err != nil {
+		return nil, err
+	}
+	return l.LintFiles(paths)
 }
 
-func getFilenames(inputs []string) ([]string, error) {
-	var paths []string
-	for _, input := range inputs {
-		info, err := os.Stat(input)
+func expandPaths(paths []string) ([]string, error) {
+	var filenames []string
+	for _, path := range paths {
+		info, err := os.Stat(path)
 		if err != nil {
 			return nil, err
 		}
 
-		if info.IsDir() {
-			err = filepath.Walk(input, func(path string, info os.FileInfo, err error) error {
-				if err != nil {
-					return err
-				}
+		if !info.IsDir() {
+			filenames = append(filenames, path)
+			continue
+		}
 
-				if !info.IsDir() {
-					paths = append(paths, path)
-				}
-
-				return nil
-			})
+		err = filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
-				return nil, err
+				return err
 			}
-		} else {
-			paths = append(paths, input)
+
+			if !info.IsDir() {
+				filenames = append(filenames, path)
+			}
+
+			return nil
+		})
+		if err != nil {
+			return nil, err
 		}
 	}
 
-	return paths, nil
+	return filenames, nil
 }
 
 func main() {
@@ -231,20 +236,10 @@ func main() {
 		options = append(options, thriftcheck.WithLogger(logger))
 	}
 
-	if len(flag.Args()) == 0 && *stdinFilename == "stdin" {
+	filenames := flag.Args()
+	if len(filenames) == 0 {
 		flag.Usage()
 		os.Exit(0)
-	}
-
-	var inputs []string
-	if *stdinFilename != "stdin" {
-		inputs = append(inputs, *stdinFilename)
-	}
-	inputs = append(inputs, flag.Args()...)
-	filenames, err := getFilenames(inputs)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1 << uint(thriftcheck.Error))
 	}
 
 	// Create the linter and run it over the input files
