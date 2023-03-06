@@ -87,7 +87,7 @@ var (
 func init() {
 	flag.Var(&includes, "I", "include path (can be specified multiple times)")
 	flag.Usage = func() {
-		fmt.Fprintf(flag.CommandLine.Output(), "usage: thriftcheck [options] [file ...]\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "usage: thriftcheck [options] [path ...]\n")
 		getopt.PrintDefaults()
 	}
 	getopt.Aliases(
@@ -148,7 +148,7 @@ func expandPaths(paths []string) ([]string, error) {
 				return err
 			}
 
-			if !info.IsDir() {
+			if !info.IsDir() && filepath.Ext(path) == ".thrift" {
 				filenames = append(filenames, path)
 			}
 

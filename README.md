@@ -10,7 +10,7 @@ command line tool (`thriftcheck`).
 the command line:
 
 ```
-usage: thriftcheck [options] [file ...]
+usage: thriftcheck [options] [path ...]
   -I, --include value
     	include path (can be specified multiple times)
   -c, --config string
@@ -29,8 +29,11 @@ usage: thriftcheck [options] [file ...]
     	print the version and exit
 ```
 
-You can lint from standard input by passing `-` as the sole filename. You can
-also use `--stdin-name` to customize the filename used in output messages.
+You can pass a list of filenames or directory paths. Directories will be
+expanded recursively to include all nested `.thrift` files.
+
+You also can lint from standard input by passing `-` as the sole filename. You
+can also use `--stdin-name` to customize the filename used in output messages.
 
 ```sh
 $ thriftlint --stdin-name filename.thrift - < filename.thrift
@@ -41,12 +44,6 @@ Messages are reported to standard output using a familiar parseable format:
 ```
 file.thrift:1:1: error: "py" namespace must match "^idl\\." (namespace.pattern)
 file.thrift:3:1: error: unable to find include path for "bar.thrift" (include.path)
-```
-
-You can also directly use the path of a directory to check all the Thrift files within the folder.
-
-```sh
-$ thriftlint ./testdata
 ```
 
 If you only want errors (and not warnings) to be reported, you can use the
