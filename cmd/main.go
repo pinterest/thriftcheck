@@ -236,15 +236,15 @@ func main() {
 		options = append(options, thriftcheck.WithLogger(logger))
 	}
 
-	filenames := flag.Args()
-	if len(filenames) == 0 {
+	paths := flag.Args()
+	if len(paths) == 0 {
 		flag.Usage()
 		os.Exit(0)
 	}
 
 	// Create the linter and run it over the input files
 	linter := thriftcheck.NewLinter(checks, options...)
-	messages, err := lint(linter, filenames)
+	messages, err := lint(linter, paths)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1 << uint(thriftcheck.Error))
