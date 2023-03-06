@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -118,11 +119,47 @@ func loadConfig(cfg *Config) error {
 	return nil
 }
 
-func lint(l *thriftcheck.Linter, filenames []string) (thriftcheck.Messages, error) {
-	if len(filenames) == 1 && filenames[0] == "-" {
+func lint(l *thriftcheck.Linter, paths []string) (thriftcheck.Messages, error) {
+	if len(paths) == 1 && paths[0] == "-" {
 		return l.Lint(os.Stdin, *stdinFilename)
 	}
-	return l.LintFiles(filenames)
+	paths, err := expandPaths(paths)
+	if err != nil {
+		return nil, err
+	}
+	return l.LintFiles(paths)
+}
+
+func expandPaths(paths []string) ([]string, error) {
+	var filenames []string
+	for _, path := range paths {
+		info, err := os.Stat(path)
+		if err != nil {
+			return nil, err
+		}
+
+		if !info.IsDir() {
+			filenames = append(filenames, path)
+			continue
+		}
+
+		err = filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if !info.IsDir() {
+				filenames = append(filenames, path)
+			}
+
+			return nil
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return filenames, nil
 }
 
 func main() {
@@ -199,14 +236,15 @@ func main() {
 		options = append(options, thriftcheck.WithLogger(logger))
 	}
 
-	if len(flag.Args()) == 0 {
+	paths := flag.Args()
+	if len(paths) == 0 {
 		flag.Usage()
 		os.Exit(0)
 	}
 
 	// Create the linter and run it over the input files
 	linter := thriftcheck.NewLinter(checks, options...)
-	messages, err := lint(linter, flag.Args())
+	messages, err := lint(linter, paths)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1 << uint(thriftcheck.Error))

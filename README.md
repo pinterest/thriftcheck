@@ -43,6 +43,12 @@ file.thrift:1:1: error: "py" namespace must match "^idl\\." (namespace.pattern)
 file.thrift:3:1: error: unable to find include path for "bar.thrift" (include.path)
 ```
 
+You can also directly use the path of a directory to check all the Thrift files within the folder.
+
+```sh
+$ thriftlint ./testdata
+```
+
 If you only want errors (and not warnings) to be reported, you can use the
 `--errors-only` command line option.
 
