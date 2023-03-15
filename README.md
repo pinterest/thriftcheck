@@ -32,8 +32,8 @@ usage: thriftcheck [options] [path ...]
 You can pass a list of filenames or directory paths. Directories will be
 expanded recursively to include all nested `.thrift` files.
 
-You also can lint from standard input by passing `-` as the sole filename. You
-can also use `--stdin-name` to customize the filename used in output messages.
+You also can lint from standard input by passing `-` as the sole filename.
+Use `--stdin-name` to customize the filename used in output messages.
 
 ```sh
 $ thriftlint --stdin-name filename.thrift - < filename.thrift
