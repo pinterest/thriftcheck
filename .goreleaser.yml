@@ -22,8 +22,6 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
-    replacements:
-      darwin: macos
 
 snapshot:
   name_template: "{{ .Tag }}-dev"
