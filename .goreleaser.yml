@@ -24,14 +24,14 @@ archives:
         format: zip
 
 snapshot:
-  name_template: "{{ .Tag }}-dev"
+  name_template: "{{ .Version }}-dev"
 
 release:
   github:
     owner: pinterest
     name: thriftcheck
   prerelease: auto
-  name_template: '{{ .Tag }}'
+  name_template: '{{ .Version }}'
 
 changelog:
   sort: asc
