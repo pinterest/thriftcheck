@@ -2,16 +2,16 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: ["1.20"]
+        go: ["1.21"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v4
@@ -27,23 +27,23 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: ["1.18", "1.19", "1.20"]
+        go: ["1.18", "1.19", "1.20", "1.21"]
 
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-go@v4
-      with:
-        go-version: ${{ matrix.go }}
-    - uses: actions/cache@v3
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: ${{ runner.os }}-go-
-    - name: Dependencies
-      run: |
-        go mod download
-        go mod tidy -v
-    - name: Build
-      run: go build -v ./...
-    - name: Test
-      run: go test -v ./...
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go }}
+      - uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: ${{ runner.os }}-go-
+      - name: Dependencies
+        run: |
+          go mod download
+          go mod tidy -v
+      - name: Build
+        run: go build -v ./...
+      - name: Test
+        run: go test -v ./...
