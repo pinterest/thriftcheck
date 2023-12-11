@@ -14,7 +14,7 @@ jobs:
         go: ["1.21"]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go }}
       - name: golangci-lint
@@ -31,7 +31,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go }}
       - uses: actions/cache@v3
