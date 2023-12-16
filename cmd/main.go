@@ -109,7 +109,7 @@ func isFlagSet(name string) bool {
 }
 
 func loadConfig(cfg *Config) error {
-	if err := fig.Load(cfg, fig.File(*configFile)); err != nil {
+	if err := fig.Load(cfg, fig.UseStrict(), fig.File(*configFile)); err != nil {
 		// Ignore FileNotFound when we're using the default configuration file.
 		if errors.Is(err, fig.ErrFileNotFound) && !isFlagSet("c") {
 			return nil
