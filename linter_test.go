@@ -15,7 +15,7 @@
 package thriftcheck
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"reflect"
 	"strings"
@@ -25,7 +25,7 @@ import (
 )
 
 func TestWithLogger(t *testing.T) {
-	logger := log.New(ioutil.Discard, "", 0)
+	logger := log.New(io.Discard, "", 0)
 	linter := NewLinter(Checks{}, WithLogger(logger))
 	if linter.logger != logger {
 		t.Errorf("expected logger to be %v, got %v", logger, linter.logger)

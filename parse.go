@@ -17,7 +17,6 @@ package thriftcheck
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -27,7 +26,7 @@ import (
 
 // Parse parses Thrift document content.
 func Parse(r io.Reader) (*ast.Program, *idl.Info, error) {
-	b, err := ioutil.ReadAll(r)
+	b, err := io.ReadAll(r)
 	if err != nil {
 		return nil, nil, err
 	}

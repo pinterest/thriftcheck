@@ -18,7 +18,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -56,7 +55,7 @@ func WithIncludes(includes []string) Option {
 func NewLinter(checks Checks, options ...Option) *Linter {
 	l := &Linter{
 		checks: checks,
-		logger: log.New(ioutil.Discard, "", 0),
+		logger: log.New(io.Discard, "", 0),
 	}
 	for _, option := range options {
 		option(l)
