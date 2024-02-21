@@ -12,6 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/*
+Thriftcheck lints Thrift IDL files.
+
+Usage:
+
+	thriftcheck [options] [path ...]
+
+Options:
+
+	-I, --include value
+		include path (can be specified multiple times)
+	-c, --config string
+		configuration file path (default ".thriftcheck.toml")
+	--errors-only
+		only report errors (not warnings)
+	-h, --help
+		show command help
+	-l, --list
+		list all available checks with their status and exit
+	--stdin-filename string
+		filename used when piping from stdin (default "stdin")
+	-v, --verbose
+		enable verbose (debugging) output
+	--version
+		print the version and exit
+*/
 package main
 
 import (
