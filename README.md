@@ -4,6 +4,11 @@ ThriftCheck is a linter for [Thrift IDL](https://thrift.apache.org/docs/idl)
 files. It provides a general Thrift linting framework, a set of checks, and a
 command line tool (`thriftcheck`).
 
+You can download the [latest prebuilt release][latest] or build the project
+yourself using the Go compiler toolchain (e.g. `go install`).
+
+[latest]: https://github.com/pinterest/thriftcheck/releases/latest
+
 ## `thriftcheck`
 
 `thriftcheck` is a configuration-driven tool for linting Thrift IDL files from
