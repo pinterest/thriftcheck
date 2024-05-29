@@ -31,6 +31,24 @@ those checks will pass.
 
 [`gofmt`]: https://golang.org/cmd/gofmt/
 
+## Building
+
+You can build the project and its dependencies using `go build .`.
+
+You can run the `thriftcheck` command line tool using `go run ./cmd`.
+
+## Testing
+
+Tests are written using the [Go testing package](https://pkg.go.dev/testing).
+Run them using the `go test` command.
+
+## Releases
+
+Releases are built using [GoReleaser](https://goreleaser.com/), triggered
+using a [GitHub Actions Workflow](.github/workflows/release.yml) whenever
+a new tag is pushed to the repository. Version tags are prefixed with a `v`
+(e.g. `v1.0.0`).
+
 ## License
 
 By contributing to this project, you agree that your contributions will be
