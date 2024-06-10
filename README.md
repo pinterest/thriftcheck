@@ -271,6 +271,11 @@ following to your `.pre-commit-config.yaml` configuration file:
       name: thriftcheck
 ```
 
+## Development
+
+For information on development and making code contributions, see
+[`CONTRIBUTING.md`](CONTRIBUTING.md).
+
 ## License
 
 This software is released under the terms of the [Apache 2.0 License](LICENSE).
