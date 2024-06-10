@@ -1,6 +1,6 @@
 module github.com/pinterest/thriftcheck
 
-go 1.18
+go 1.21
 
 require (
 	github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964
