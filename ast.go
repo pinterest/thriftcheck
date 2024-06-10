@@ -25,8 +25,8 @@ import (
 
 var nodeInterface = reflect.TypeOf((*ast.Node)(nil)).Elem()
 
-// VisitorFunc adapts a function to the ast.Visitor interface. This differs
-// from ast.VisitorFunc in that is supports an ast.Visitor-compativle return
+// VisitorFunc adapts a function to the [ast.Visitor] interface. This differs
+// from [ast.VisitorFunc] in that it supports an ast.Visitor-compatible return
 // value.
 type VisitorFunc func(ast.Walker, ast.Node) VisitorFunc
 
@@ -91,7 +91,7 @@ func Resolve(name string, program *ast.Program, dirs []string) (ast.Node, error)
 	return nil, fmt.Errorf("%q could not be resolved", name)
 }
 
-// ResolveConstant resolves an ast.ConstantReference to its target node.
+// ResolveConstant resolves an [ast.ConstantReference] to its target node.
 //
 // The following name formats are supported:
 //   - "Constant" (ast.Constant)
@@ -123,7 +123,7 @@ func ResolveConstant(ref ast.ConstantReference, program *ast.Program, dirs []str
 
 // ResolveType calls Resolve and goes one step further by attempting to
 // resolve the target node's own type. This is useful when the reference
-// points to an ast.Typedef or ast.Constant, for example, and the caller
+// points to an [ast.Typedef] or [ast.Constant], for example, and the caller
 // is primarily intererested in the target's ast.Type.
 func ResolveType(ref ast.TypeReference, program *ast.Program, dirs []string) (ast.Node, error) {
 	n, err := Resolve(ref.Name, program, dirs)
