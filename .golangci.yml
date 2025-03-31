@@ -1,10 +1,10 @@
+version: "2"
 linters:
   enable:
     - errorlint
     - exhaustive
     - goconst
     - godot
-    - goimports
     - goprintffuncname
     - makezero
     - nilerr
@@ -12,3 +12,12 @@ linters:
     - thelper
     - unconvert
     - unparam
+  exclusions:
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+formatters:
+  enable:
+    - goimports
