@@ -213,7 +213,7 @@ func main() {
 	}
 
 	// Build the set of checks we'll use for the linter
-	allChecks := thriftcheck.Checks{
+	checksEnabledByDefault := thriftcheck.Checks{
 		checks.CheckConstantRef(),
 		checks.CheckEnumSize(cfg.Checks.Enum.Size.Warning, cfg.Checks.Enum.Size.Error),
 		checks.CheckFieldIDMissing(),
@@ -231,7 +231,16 @@ func main() {
 		checks.CheckSetValueType(),
 	}
 
-	checks := allChecks
+	checksDisabledByDefault := thriftcheck.Checks{
+		checks.CheckUnion(),
+	}
+
+	allChecks := append(checksEnabledByDefault, checksDisabledByDefault...)
+
+	checks := append(
+		checksEnabledByDefault,
+		checksDisabledByDefault.With(cfg.Checks.Enabled)...,
+	)
 	if len(cfg.Checks.Disabled) > 0 {
 		checks = checks.Without(cfg.Checks.Disabled)
 	}

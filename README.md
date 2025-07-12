@@ -72,19 +72,26 @@ can use as a starting point.
 ## Checks
 
 The full list of available checks can printed using the `--list` command line
-option. By default, all checks are enabled.
+option. Some checks are [enabled by default](#checks-enabled-by-default), while
+others [aren't](#checks-disabled-by-default).
 
 You can enable or disable checks using the configuration file's top-level
-`enabled` and `disabled` lists. The list of `disabled` checks is subtracted
-from the full list first, and then the resulting list is filtered by the list
-of `enabled` checks. Either list can be empty (the default).
+`enabled` and `disabled` lists. Either list can be empty (the default).
 
-### `constant.ref`
+The steps to obtain the final list of checks are as follows:
+1. The checks that are disabled by default which are not in
+the `enabled` list are removed from the full list.
+2. The list of `disabled` checks is subtracted from the resulting list.
+3. The new resulting list is filtered by the list of `enabled` checks.
+
+### Checks enabled by default
+
+#### `constant.ref`
 
 This check reports an error if a referenced constant or enum value cannot be
 found in either the current scope or in an included file (using dot notation).
 
-### `enum.size`
+#### `enum.size`
 
 This check warns or errors if an enumeration's element size grows beyond a
 limit.
@@ -95,37 +102,37 @@ warning = 500
 error = 1000
 ```
 
-### `field.doc.missing`
+#### `field.doc.missing`
 
 This check warns if a field is missing a documentation comment.
 
-### `field.id.missing`
+#### `field.id.missing`
 
 This check reports an error if a field's ID is missing (using the legacy
 implicit/auto-assigning syntax).
 
-### `field.id.negative`
+#### `field.id.negative`
 
 This check reports an error if a field's ID is explicitly negative.
 
-### `field.id.zero`
+#### `field.id.zero`
 
 This check reports an error if a field's ID is explicitly zero, which is
 generally unsupported by the Apache Thrift compiler. This is distinct from
 the `field.id.negative` check given the existence of the `--allow-neg-keys`
 Apache Thrift compiler option.
 
-### `field.optional`
+#### `field.optional`
 
 This check warns if a field isn't declared as "optional", which is considered
 a best practice.
 
-### `field.requiredness`
+#### `field.requiredness`
 
 This check warns if a field isn't explicitly declared as "required" or
 "optional".
 
-### `include.path`
+#### `include.path`
 
 This check ensures that each `include`'d file can be located in the set of
 given include paths.
@@ -141,7 +148,7 @@ includes = [
 ]
 ```
 
-### `include.restricted`
+#### `include.restricted`
 
 This check restricts some files from being imported by other files using a
 map of patterns: the key is a file name pattern that matches the *including*
@@ -155,16 +162,16 @@ error is reported.
 "*" = "(huge|massive).thrift"
 ```
 
-### `int.64bit`
+#### `int.64bit`
 
 This check warns when an integer constant exceeds the 32-bit number range.
 Some languages (e.g. JavaScript) don't support 64-bit integers.
 
-### `map.key.type`
+#### `map.key.type`
 
 This check ensures that only primitive types are used for `map<>` keys.
 
-### `names.reserved`
+#### `names.reserved`
 
 This checks allows you to extend the [default list of reserved keywords][] with
 additional disallowed names.
@@ -178,7 +185,7 @@ reserved = [
 
 [default list of reserved keywords]: https://github.com/thriftrw/thriftrw-go/blob/0cee03e01be6bbbd45303ca94663c951f0573fd0/idl/internal/lex.rl#L110-L218
 
-### `namespace.patterns`
+#### `namespace.patterns`
 
 This check ensures that a namespace's name matches a regular expression
 pattern. The pattern can be configured one a per-language basis.
@@ -188,9 +195,15 @@ pattern. The pattern can be configured one a per-language basis.
 py = "^idl\\."
 ```
 
-### `set.value.type`
+#### `set.value.type`
 
 This check ensures that only primitive types are used for `set<>` values.
+
+### Checks disabled by default
+
+#### `union`
+
+This check reports an error if a union is used.
 
 ## Custom Checks
 
