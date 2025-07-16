@@ -110,7 +110,7 @@ func (m *structureTypeMatcher) Name() string {
 
 // ParseTypes converts TOML string configuration to TypeMatcher slice.
 func ParseTypes(typeNames []string) ([]TypeMatcher, error) {
-	var matchers []TypeMatcher
+	matchers := make([]TypeMatcher, 0, len(typeNames))
 
 	typeMap := map[string]TypeMatcher{
 		// Collection types

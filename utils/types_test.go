@@ -24,24 +24,24 @@ import (
 
 func TestParseTypes(t *testing.T) {
 	tests := []struct {
-		name        string
-		input       []string
-		expectError bool
+		name          string
+		input         []string
+		expectError   bool
 		expectedCount int
 	}{
 		{
-			name: "valid collection types",
-			input: []string{"map", "list", "set"},
+			name:          "valid collection types",
+			input:         []string{"map", "list", "set"},
 			expectedCount: 3,
 		},
 		{
-			name: "valid primitive types",
-			input: []string{"bool", "i32", "string"},
+			name:          "valid primitive types",
+			input:         []string{"bool", "i32", "string"},
 			expectedCount: 3,
 		},
 		{
-			name: "valid structure types",
-			input: []string{"union", "struct", "exception"},
+			name:          "valid structure types",
+			input:         []string{"union", "struct", "exception"},
 			expectedCount: 3,
 		},
 		{
@@ -73,18 +73,18 @@ func TestParseTypes(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			matchers, err := ParseTypes(tt.input)
-			
+
 			if tt.expectError {
 				if err == nil {
 					t.Errorf("expected error for input %v", tt.input)
 				}
 				return
 			}
-			
+
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
-			
+
 			if len(matchers) != tt.expectedCount {
 				t.Errorf("expected %d matchers, got %d", tt.expectedCount, len(matchers))
 			}
@@ -94,7 +94,7 @@ func TestParseTypes(t *testing.T) {
 
 func TestTypeMatchers_Functionality(t *testing.T) {
 	c := &thriftcheck.C{}
-	
+
 	tests := []struct {
 		name     string
 		typeName string
@@ -106,25 +106,25 @@ func TestTypeMatchers_Functionality(t *testing.T) {
 		{"list matches ListType", "list", ast.ListType{}, true},
 		{"set matches SetType", "set", ast.SetType{}, true},
 		{"map doesn't match ListType", "map", ast.ListType{}, false},
-		
+
 		// Primitive types
 		{"i32 matches I32", "i32", ast.BaseType{ID: ast.I32TypeID}, true},
 		{"string matches String", "string", ast.BaseType{ID: ast.StringTypeID}, true},
 		{"bool matches Bool", "bool", ast.BaseType{ID: ast.BoolTypeID}, true},
 		{"i32 doesn't match String", "i32", ast.BaseType{ID: ast.StringTypeID}, false},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			matchers, err := ParseTypes([]string{tt.typeName})
 			if err != nil {
 				t.Fatal(err)
 			}
-			
+
 			if len(matchers) != 1 {
 				t.Fatalf("expected 1 matcher, got %d", len(matchers))
 			}
-			
+
 			if matchers[0].Matches(c, tt.astType) != tt.matches {
 				t.Errorf("%s: expected %v", tt.name, tt.matches)
 			}
