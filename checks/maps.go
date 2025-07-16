@@ -16,6 +16,7 @@ package checks
 
 import (
 	"github.com/pinterest/thriftcheck"
+	"github.com/pinterest/thriftcheck/utils"
 	"go.uber.org/thriftrw/ast"
 )
 
@@ -39,22 +40,25 @@ func CheckMapKeyType() thriftcheck.Check {
 	})
 }
 
-// CheckMapNested returns a thriftcheck.Check that ensures maps are not nested.
-// Nested maps (map<K, map<K2, V>>) are disallowed to enforce flat map structures.
-func CheckMapNested() *thriftcheck.Check {
-	return thriftcheck.NewCheck("map.value.nested", func(c *thriftcheck.C, mt ast.MapType) {
-		// Check if the value type is directly a MapType
-		if _, isMap := mt.ValueType.(ast.MapType); isMap {
-			c.Errorf(mt, "nested maps are not allowed; use flat map structures instead")
+// CheckMapValueType returns a thriftcheck.Check that ensures map values don't use restricted types.
+// The restrictedTypes slice allows configurable type restrictions.
+// Common use cases: disallow nested maps, unions, complex collections, etc.
+func CheckMapValueType(restrictedTypes []string) *thriftcheck.Check {
+	restrictedTypeMatchers, err := utils.ParseTypes(restrictedTypes)
+	if err != nil {
+		return nil
+	}
+	return thriftcheck.NewCheck("map.value", func(c *thriftcheck.C, mt ast.MapType) {
+		// If no restrictions configured, this is a no-op
+		if len(restrictedTypes) == 0 {
 			return
 		}
 
-		// Check if the value type is a TypeReference that resolves to a MapType
-		if typeRef, isTypeRef := mt.ValueType.(ast.TypeReference); isTypeRef {
-			if resolved := c.ResolveType(typeRef); resolved != nil {
-				if _, isMap := resolved.(ast.MapType); isMap {
-					c.Errorf(mt, "nested maps are not allowed; use flat map structures instead")
-				}
+		// Check if the value type matches any restricted types
+		for _, matcher := range restrictedTypeMatchers {
+			if matcher.Matches(c, mt.ValueType) {
+				c.Errorf(mt, "map value type %s is restricted", matcher.Name())
+				return
 			}
 		}
 	})
