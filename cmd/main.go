@@ -48,6 +48,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/kkyr/fig"
@@ -230,6 +231,9 @@ func main() {
 		checks.CheckNamespacePattern(cfg.Checks.Namespace.Patterns),
 		checks.CheckSetValueType(),
 	}
+	allChecks = slices.DeleteFunc(allChecks, func(c *thriftcheck.Check) bool {
+		return c == nil
+	})
 
 	checks := allChecks
 	if len(cfg.Checks.Disabled) > 0 {
