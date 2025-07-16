@@ -21,12 +21,12 @@ import (
 	"go.uber.org/thriftrw/ast"
 )
 
-func TestCheckUnion(t *testing.T) {
+func TestCheckTypesDisallowed(t *testing.T) {
 	tests := []Test{
 		{
 			node: &ast.Struct{Type: ast.UnionType},
 			want: []string{
-				`t.thrift:0:1: error: unions aren't allowed (union)`,
+				`t.thrift:0:1: error: a disallowed type (union) was used (types.disallowed)`,
 			},
 		},
 		{
@@ -34,11 +34,11 @@ func TestCheckUnion(t *testing.T) {
 			want: []string{},
 		},
 		{
-			node: &ast.Struct{Type: ast.ExceptionType},
+			node: ast.ConstantInteger(0),
 			want: []string{},
 		},
 	}
 
-	check := checks.CheckUnion()
+	check := checks.CheckTypesDisallowed([]string{"union"})
 	RunTests(t, check, tests)
 }

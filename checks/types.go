@@ -19,11 +19,24 @@ import (
 	"go.uber.org/thriftrw/ast"
 )
 
-// CheckUnion reports an error if a union is used.
-func CheckUnion() *thriftcheck.Check {
-	return thriftcheck.NewCheck("union", func(c *thriftcheck.C, s *ast.Struct) {
-		if s.Type == ast.UnionType {
-			c.Errorf(s, "unions aren't allowed")
+var TypeToTypeCheckerFunc = map[string]func(n ast.Node) bool{
+	"union": isUnionType,
+}
+
+func isUnionType(n ast.Node) bool {
+	s, ok := n.(*ast.Struct)
+
+	return ok && s.Type == ast.UnionType
+}
+
+// CheckTypesDisallowed reports an error if a disallowed type is used.
+func CheckTypesDisallowed(disallowedTypes []string) *thriftcheck.Check {
+	return thriftcheck.NewCheck("types.disallowed", func(c *thriftcheck.C, n ast.Node) {
+		for _, t := range disallowedTypes {
+			if TypeToTypeCheckerFunc[t](n) {
+				c.Errorf(n, "a disallowed type (%s) was used", t)
+				break
+			}
 		}
 	})
 }
