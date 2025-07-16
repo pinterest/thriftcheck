@@ -38,3 +38,24 @@ func CheckMapKeyType() thriftcheck.Check {
 		}
 	})
 }
+
+// CheckMapNested returns a thriftcheck.Check that ensures maps are not nested.
+// Nested maps (map<K, map<K2, V>>) are disallowed to enforce flat map structures.
+func CheckMapNested() *thriftcheck.Check {
+	return thriftcheck.NewCheck("map.value.nested", func(c *thriftcheck.C, mt ast.MapType) {
+		// Check if the value type is directly a MapType
+		if _, isMap := mt.ValueType.(ast.MapType); isMap {
+			c.Errorf(mt, "nested maps are not allowed; use flat map structures instead")
+			return
+		}
+
+		// Check if the value type is a TypeReference that resolves to a MapType
+		if typeRef, isTypeRef := mt.ValueType.(ast.TypeReference); isTypeRef {
+			if resolved := c.ResolveType(typeRef); resolved != nil {
+				if _, isMap := resolved.(ast.MapType); isMap {
+					c.Errorf(mt, "nested maps are not allowed; use flat map structures instead")
+				}
+			}
+		}
+	})
+}

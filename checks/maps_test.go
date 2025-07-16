@@ -62,3 +62,64 @@ func TestCheckMapKeyType(t *testing.T) {
 	check := checks.CheckMapKeyType()
 	RunTests(t, &check, tests)
 }
+
+func TestCheckMapNested(t *testing.T) {
+	tests := []Test{
+		{
+			// Valid flat map - should pass
+			node: ast.MapType{
+				KeyType:   ast.BaseType{ID: ast.StringTypeID},
+				ValueType: ast.BaseType{ID: ast.StringTypeID}},
+			want: []string{},
+		},
+		{
+			// Direct nested map - should fail
+			node: ast.MapType{
+				KeyType: ast.BaseType{ID: ast.StringTypeID},
+				ValueType: ast.MapType{
+					KeyType:   ast.BaseType{ID: ast.I64TypeID},
+					ValueType: ast.BaseType{ID: ast.StringTypeID}}},
+			want: []string{
+				`t.thrift:0:1: error: nested maps are not allowed; use flat map structures instead (map.value.nested)`,
+			},
+		},
+		{
+			// TypeReference that doesn't resolve - should pass
+			prog: &ast.Program{},
+			node: ast.MapType{
+				KeyType:   ast.BaseType{ID: ast.StringTypeID},
+				ValueType: ast.TypeReference{Name: "UnknownType"}},
+			want: []string{},
+		},
+		{
+			// TypeReference that resolves to a map - should fail
+			prog: &ast.Program{Definitions: []ast.Definition{
+				&ast.Typedef{
+					Name: "NestedMapType",
+					Type: ast.MapType{
+						KeyType:   ast.BaseType{ID: ast.I64TypeID},
+						ValueType: ast.BaseType{ID: ast.StringTypeID}},
+				},
+			}},
+			node: ast.MapType{
+				KeyType:   ast.BaseType{ID: ast.StringTypeID},
+				ValueType: ast.TypeReference{Name: "NestedMapType"}},
+			want: []string{
+				`t.thrift:0:1: error: nested maps are not allowed; use flat map structures instead (map.value.nested)`,
+			},
+		},
+		{
+			// TypeReference that resolves to a non-map - should pass
+			prog: &ast.Program{Definitions: []ast.Definition{
+				&ast.Struct{Name: "MyStruct"},
+			}},
+			node: ast.MapType{
+				KeyType:   ast.BaseType{ID: ast.StringTypeID},
+				ValueType: ast.TypeReference{Name: "MyStruct"}},
+			want: []string{},
+		},
+	}
+
+	check := checks.CheckMapNested()
+	RunTests(t, check, tests)
+}
