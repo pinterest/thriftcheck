@@ -21,20 +21,20 @@ import (
 	"go.uber.org/thriftrw/ast"
 )
 
-// TypeMatcher represents a way to match against AST types
+// TypeMatcher represents a way to match against AST types.
 type TypeMatcher interface {
 	Matches(c *thriftcheck.C, t ast.Type) bool
 	Name() string
 }
 
-// directTypeMatcher matches direct AST types (map, list, set)
+// directTypeMatcher matches direct AST types (map, list, set).
 type directTypeMatcher struct {
 	name    string
 	matchFn func(ast.Type) bool
 }
 
 func (m *directTypeMatcher) Matches(c *thriftcheck.C, t ast.Type) bool {
-	// Resolve TypeReference if needed
+	// Resolve TypeReference if needed.
 	if typeRef, ok := t.(ast.TypeReference); ok {
 		if resolved := c.ResolveType(typeRef); resolved != nil {
 			if resolvedType, ok := resolved.(ast.Type); ok {
@@ -43,7 +43,7 @@ func (m *directTypeMatcher) Matches(c *thriftcheck.C, t ast.Type) bool {
 				return false
 			}
 		} else {
-			return false // Unresolved type, can't match
+			return false // Unresolved type, can't match.
 		}
 	}
 	return m.matchFn(t)
@@ -53,14 +53,13 @@ func (m *directTypeMatcher) Name() string {
 	return m.name
 }
 
-// primitiveTypeMatcher matches specific primitive types by BaseTypeID
+// primitiveTypeMatcher matches specific primitive types by BaseTypeID.
 type primitiveTypeMatcher struct {
 	name   string
 	typeID ast.BaseTypeID
 }
 
 func (m *primitiveTypeMatcher) Matches(c *thriftcheck.C, t ast.Type) bool {
-	// Resolve TypeReference if needed
 	if typeRef, ok := t.(ast.TypeReference); ok {
 		if resolved := c.ResolveType(typeRef); resolved != nil {
 			if resolvedType, ok := resolved.(ast.Type); ok {
@@ -72,7 +71,6 @@ func (m *primitiveTypeMatcher) Matches(c *thriftcheck.C, t ast.Type) bool {
 			return false
 		}
 	}
-
 	if baseType, ok := t.(ast.BaseType); ok {
 		return baseType.ID == m.typeID
 	}
@@ -83,26 +81,22 @@ func (m *primitiveTypeMatcher) Name() string {
 	return m.name
 }
 
-// structureTypeMatcher matches struct-like types (union, struct, exception)
+// structureTypeMatcher matches struct-like types (union, struct, exception).
 type structureTypeMatcher struct {
 	name       string
 	structType ast.StructureType
 }
 
 func (m *structureTypeMatcher) Matches(c *thriftcheck.C, t ast.Type) bool {
-	// Struct/union/exception types are always referenced via TypeReference
+	// Struct/union/exception types are always referenced via TypeReference.
 	typeRef, ok := t.(ast.TypeReference)
 	if !ok {
 		return false
 	}
-
-	// Resolve the reference to get the actual definition
 	resolved := c.ResolveType(typeRef)
 	if resolved == nil {
 		return false
 	}
-
-	// Check if it's a struct-like definition with the right type
 	if structDef, ok := resolved.(*ast.Struct); ok {
 		return structDef.Type == m.structType
 	}
@@ -114,7 +108,7 @@ func (m *structureTypeMatcher) Name() string {
 	return m.name
 }
 
-// ParseTypes converts TOML string configuration to TypeMatcher slice
+// ParseTypes converts TOML string configuration to TypeMatcher slice.
 func ParseTypes(typeNames []string) ([]TypeMatcher, error) {
 	var matchers []TypeMatcher
 
@@ -142,7 +136,7 @@ func ParseTypes(typeNames []string) ([]TypeMatcher, error) {
 			},
 		},
 
-		// Primitive types with specific BaseTypeID matching
+		// Primitive types with specific BaseTypeID matching.
 		"bool":   &primitiveTypeMatcher{name: "bool", typeID: ast.BoolTypeID},
 		"i8":     &primitiveTypeMatcher{name: "i8", typeID: ast.I8TypeID},
 		"i16":    &primitiveTypeMatcher{name: "i16", typeID: ast.I16TypeID},
@@ -152,7 +146,7 @@ func ParseTypes(typeNames []string) ([]TypeMatcher, error) {
 		"string": &primitiveTypeMatcher{name: "string", typeID: ast.StringTypeID},
 		"binary": &primitiveTypeMatcher{name: "binary", typeID: ast.BinaryTypeID},
 
-		// Structure types with specific StructureType matching
+		// Structure types with specific StructureType matching.
 		"union":     &structureTypeMatcher{name: "union", structType: ast.UnionType},
 		"struct":    &structureTypeMatcher{name: "struct", structType: ast.StructType},
 		"exception": &structureTypeMatcher{name: "exception", structType: ast.ExceptionType},
