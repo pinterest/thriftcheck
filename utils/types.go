@@ -16,6 +16,7 @@ package utils
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/pinterest/thriftcheck"
 	"go.uber.org/thriftrw/ast"
@@ -53,6 +54,13 @@ func (m *directTypeMatcher) Name() string {
 	return m.name
 }
 
+func newCollectionMatcher(name string, typeCheck func(ast.Type) bool) *directTypeMatcher {
+	return &directTypeMatcher{
+		name:    name,
+		matchFn: typeCheck,
+	}
+}
+
 // primitiveTypeMatcher matches specific primitive types by BaseTypeID.
 type primitiveTypeMatcher struct {
 	name   string
@@ -60,21 +68,22 @@ type primitiveTypeMatcher struct {
 }
 
 func (m *primitiveTypeMatcher) Matches(c *thriftcheck.C, t ast.Type) bool {
+	// Resolve TypeReference if needed
 	if typeRef, ok := t.(ast.TypeReference); ok {
-		if resolved := c.ResolveType(typeRef); resolved != nil {
-			if resolvedType, ok := resolved.(ast.Type); ok {
-				t = resolvedType
-			} else {
-				return false
-			}
-		} else {
+		resolved := c.ResolveType(typeRef)
+		if resolved == nil {
 			return false
 		}
+		resolvedType, ok := resolved.(ast.Type)
+		if !ok {
+			return false
+		}
+		t = resolvedType
 	}
-	if baseType, ok := t.(ast.BaseType); ok {
-		return baseType.ID == m.typeID
-	}
-	return false
+
+	// Check if it's a BaseType with matching ID
+	baseType, ok := t.(ast.BaseType)
+	return ok && baseType.ID == m.typeID
 }
 
 func (m *primitiveTypeMatcher) Name() string {
@@ -114,27 +123,9 @@ func ParseTypes(typeNames []string) ([]TypeMatcher, error) {
 
 	typeMap := map[string]TypeMatcher{
 		// Collection types
-		"map": &directTypeMatcher{
-			name: "map",
-			matchFn: func(t ast.Type) bool {
-				_, ok := t.(ast.MapType)
-				return ok
-			},
-		},
-		"list": &directTypeMatcher{
-			name: "list",
-			matchFn: func(t ast.Type) bool {
-				_, ok := t.(ast.ListType)
-				return ok
-			},
-		},
-		"set": &directTypeMatcher{
-			name: "set",
-			matchFn: func(t ast.Type) bool {
-				_, ok := t.(ast.SetType)
-				return ok
-			},
-		},
+		"map":  newCollectionMatcher("map", func(t ast.Type) bool { _, ok := t.(ast.MapType); return ok }),
+		"list": newCollectionMatcher("list", func(t ast.Type) bool { _, ok := t.(ast.ListType); return ok }),
+		"set":  newCollectionMatcher("set", func(t ast.Type) bool { _, ok := t.(ast.SetType); return ok }),
 
 		// Primitive types with specific BaseTypeID matching.
 		"bool":   &primitiveTypeMatcher{name: "bool", typeID: ast.BoolTypeID},
@@ -155,14 +146,19 @@ func ParseTypes(typeNames []string) ([]TypeMatcher, error) {
 	for _, typeName := range typeNames {
 		matcher, ok := typeMap[typeName]
 		if !ok {
-			validTypes := make([]string, 0, len(typeMap))
-			for k := range typeMap {
-				validTypes = append(validTypes, k)
-			}
-			return nil, fmt.Errorf("invalid type %q, valid types are: %v", typeName, validTypes)
+			return nil, fmt.Errorf("invalid type %q, valid types are: %v", typeName, getValidTypeNames(typeMap))
 		}
 		matchers = append(matchers, matcher)
 	}
 
 	return matchers, nil
+}
+
+func getValidTypeNames(typeMap map[string]TypeMatcher) []string {
+	validTypes := make([]string, 0, len(typeMap))
+	for k := range typeMap {
+		validTypes = append(validTypes, k)
+	}
+	sort.Strings(validTypes) // Sort for consistent error messages
+	return validTypes
 }
