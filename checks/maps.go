@@ -49,12 +49,9 @@ func CheckMapValueType(restrictedTypes []string) *thriftcheck.Check {
 		return nil
 	}
 	return thriftcheck.NewCheck("map.value", func(c *thriftcheck.C, mt ast.MapType) {
-		// If no restrictions configured, this is a no-op
 		if len(restrictedTypes) == 0 {
 			return
 		}
-
-		// Check if the value type matches any restricted types
 		for _, matcher := range restrictedTypeMatchers {
 			if matcher.Matches(c, mt.ValueType) {
 				c.Errorf(mt, "map value type %s is restricted", matcher.Name())
