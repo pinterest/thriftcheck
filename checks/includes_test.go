@@ -83,5 +83,5 @@ func TestCheckIncludeRestricted(t *testing.T) {
 		"a.thrift":        regexp.MustCompile(`abad.thrift`),
 		"nested/*.thrift": regexp.MustCompile(`inner.thrift`),
 	})
-	RunTests(t, check, tests)
+	RunTests(t, &check, tests)
 }

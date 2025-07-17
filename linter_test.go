@@ -245,11 +245,11 @@ func TestNoLint(t *testing.T) {
 }
 
 func TestOverrideableChecksLookup(t *testing.T) {
-	root := &Checks{&Check{Name: "root"}}
+	root := &Checks{Check{Name: "root"}}
 	pnode := &ast.Program{}
 	snode := &ast.Struct{}
 	fnode := &ast.Field{}
-	schecks := &Checks{&Check{Name: "s"}}
+	schecks := &Checks{Check{Name: "s"}}
 
 	checks := overridableChecks{root: root}
 	checks.add(snode, schecks)

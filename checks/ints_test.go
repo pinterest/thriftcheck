@@ -43,5 +43,5 @@ func TestCheckInteger64bit(t *testing.T) {
 	}
 
 	check := checks.CheckInteger64bit()
-	RunTests(t, check, tests)
+	RunTests(t, &check, tests)
 }

@@ -32,10 +32,10 @@ type Check struct {
 }
 
 // Checks is a list of checks.
-type Checks []*Check
+type Checks []Check
 
 // NewCheck creates a new Check.
-func NewCheck(name string, fn interface{}) *Check {
+func NewCheck(name string, fn interface{}) Check {
 	if fn == nil {
 		panic("check function must be a Func; got nil")
 	}
@@ -56,7 +56,7 @@ func NewCheck(name string, fn interface{}) *Check {
 		}
 	}
 
-	return &Check{Name: name, fn: fn}
+	return Check{Name: name, fn: fn}
 }
 
 // Call the check function if its arguments end with the current node in the
