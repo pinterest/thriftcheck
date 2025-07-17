@@ -81,6 +81,10 @@ type Config struct {
 		Namespace struct {
 			Patterns map[string]*regexp.Regexp `fig:"patterns"`
 		}
+
+		Types struct {
+			Disallowed []string `fig:"disallowed"`
+		}
 	}
 }
 
@@ -141,6 +145,15 @@ func loadConfig(cfg *Config) error {
 			return nil
 		}
 		return err
+	}
+	return nil
+}
+
+func validateConfig(cfg Config) error {
+	for _, t := range cfg.Checks.Types.Disallowed {
+		if _, ok := checks.TypeToTypeCheckerFunc[t]; !ok {
+			return fmt.Errorf("configuration validation failed: unsupported disallowed type (%s)", t)
+		}
 	}
 	return nil
 }
@@ -208,6 +221,10 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1 << uint(thriftcheck.Error))
 	}
+	if err := validateConfig(cfg); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1 << uint(thriftcheck.Error))
+	}
 	if len(includes) > 0 {
 		cfg.Includes = includes
 	}
@@ -229,6 +246,7 @@ func main() {
 		checks.CheckNamesReserved(cfg.Checks.Names.Reserved),
 		checks.CheckNamespacePattern(cfg.Checks.Namespace.Patterns),
 		checks.CheckSetValueType(),
+		checks.CheckTypesDisallowed(cfg.Checks.Types.Disallowed),
 	}
 
 	checks := allChecks

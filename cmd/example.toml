@@ -34,3 +34,6 @@ reserved = [
 [checks.namespace]
 [[checks.namespace.patterns]]
 py = "^idl\\."
+
+[checks.types]
+disallowed = []
