@@ -62,3 +62,118 @@ func TestCheckMapKeyType(t *testing.T) {
 	check := checks.CheckMapKeyType()
 	RunTests(t, &check, tests)
 }
+
+func TestCheckMapValueType(t *testing.T) {
+	// Test with no restrictions - should pass all
+	tests := []Test{
+		{
+			node: ast.MapType{
+				KeyType:   ast.BaseType{ID: ast.StringTypeID},
+				ValueType: ast.BaseType{ID: ast.I32TypeID}},
+			want: []string{},
+		},
+		{
+			node: ast.MapType{
+				KeyType:   ast.BaseType{ID: ast.StringTypeID},
+				ValueType: ast.BaseType{ID: ast.StringTypeID}},
+			want: []string{},
+		},
+	}
+
+	check := checks.CheckMapValueType([]string{})
+	RunTests(t, check, tests)
+
+	// Test with i32 restriction
+	testsI32 := []Test{
+		{
+			// Should fail for i32 value
+			node: ast.MapType{
+				KeyType:   ast.BaseType{ID: ast.StringTypeID},
+				ValueType: ast.BaseType{ID: ast.I32TypeID}},
+			want: []string{
+				`t.thrift:0:1: error: map value type i32 is restricted (map.value)`,
+			},
+		},
+		{
+			// Should pass for string value
+			node: ast.MapType{
+				KeyType:   ast.BaseType{ID: ast.StringTypeID},
+				ValueType: ast.BaseType{ID: ast.StringTypeID}},
+			want: []string{},
+		},
+	}
+
+	checkI32 := checks.CheckMapValueType([]string{"i32"})
+	RunTests(t, checkI32, testsI32)
+
+	// Test with map restriction
+	testsMap := []Test{
+		{
+			// Should fail for nested map
+			node: ast.MapType{
+				KeyType: ast.BaseType{ID: ast.StringTypeID},
+				ValueType: ast.MapType{
+					KeyType:   ast.BaseType{ID: ast.I64TypeID},
+					ValueType: ast.BaseType{ID: ast.StringTypeID}}},
+			want: []string{
+				`t.thrift:0:1: error: map value type map is restricted (map.value)`,
+			},
+		},
+		{
+			// Should fail for TypeRef that resolves to map
+			prog: &ast.Program{Definitions: []ast.Definition{
+				&ast.Typedef{
+					Name: "MapType",
+					Type: ast.MapType{
+						KeyType:   ast.BaseType{ID: ast.I64TypeID},
+						ValueType: ast.BaseType{ID: ast.StringTypeID}},
+				},
+			}},
+			node: ast.MapType{
+				KeyType:   ast.BaseType{ID: ast.StringTypeID},
+				ValueType: ast.TypeReference{Name: "MapType"}},
+			want: []string{
+				`t.thrift:0:1: error: map value type map is restricted (map.value)`,
+			},
+		},
+		{
+			// Should pass for string value
+			node: ast.MapType{
+				KeyType:   ast.BaseType{ID: ast.StringTypeID},
+				ValueType: ast.BaseType{ID: ast.StringTypeID}},
+			want: []string{},
+		},
+	}
+
+	checkMap := checks.CheckMapValueType([]string{"map"})
+	RunTests(t, checkMap, testsMap)
+
+	// Test with union restriction
+	testsUnion := []Test{
+		{
+			// Should fail for union value
+			prog: &ast.Program{Definitions: []ast.Definition{
+				&ast.Struct{Name: "TestUnion", Type: ast.UnionType},
+			}},
+			node: ast.MapType{
+				KeyType:   ast.BaseType{ID: ast.StringTypeID},
+				ValueType: ast.TypeReference{Name: "TestUnion"}},
+			want: []string{
+				`t.thrift:0:1: error: map value type union is restricted (map.value)`,
+			},
+		},
+		{
+			// Should pass for struct value
+			prog: &ast.Program{Definitions: []ast.Definition{
+				&ast.Struct{Name: "TestStruct"},
+			}},
+			node: ast.MapType{
+				KeyType:   ast.BaseType{ID: ast.StringTypeID},
+				ValueType: ast.TypeReference{Name: "TestStruct"}},
+			want: []string{},
+		},
+	}
+
+	checkUnion := checks.CheckMapValueType([]string{"union"})
+	RunTests(t, checkUnion, testsUnion)
+}
