@@ -36,7 +36,7 @@ func TestCheckFieldIDMissing(t *testing.T) {
 	}
 
 	check := checks.CheckFieldIDMissing()
-	RunTests(t, check, tests)
+	RunTests(t, &check, tests)
 }
 
 func TestCheckFieldIDNegative(t *testing.T) {
@@ -62,7 +62,7 @@ func TestCheckFieldIDNegative(t *testing.T) {
 	}
 
 	check := checks.CheckFieldIDNegative()
-	RunTests(t, check, tests)
+	RunTests(t, &check, tests)
 }
 
 func TestCheckFieldIDZero(t *testing.T) {
@@ -88,7 +88,7 @@ func TestCheckFieldIDZero(t *testing.T) {
 	}
 
 	check := checks.CheckFieldIDZero()
-	RunTests(t, check, tests)
+	RunTests(t, &check, tests)
 }
 
 func TestCheckFieldOptional(t *testing.T) {
@@ -112,7 +112,7 @@ func TestCheckFieldOptional(t *testing.T) {
 	}
 
 	check := checks.CheckFieldOptional()
-	RunTests(t, check, tests)
+	RunTests(t, &check, tests)
 }
 
 func TestCheckFieldRequiredness(t *testing.T) {
@@ -134,7 +134,7 @@ func TestCheckFieldRequiredness(t *testing.T) {
 	}
 
 	check := checks.CheckFieldRequiredness()
-	RunTests(t, check, tests)
+	RunTests(t, &check, tests)
 }
 
 func TestCheckFieldDocMissing(t *testing.T) {
@@ -152,5 +152,5 @@ func TestCheckFieldDocMissing(t *testing.T) {
 	}
 
 	check := checks.CheckFieldDocMissing()
-	RunTests(t, check, tests)
+	RunTests(t, &check, tests)
 }

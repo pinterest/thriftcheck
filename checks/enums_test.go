@@ -42,5 +42,5 @@ func TestCheckEnumSize(t *testing.T) {
 	}
 
 	check := checks.CheckEnumSize(1, 2)
-	RunTests(t, check, tests)
+	RunTests(t, &check, tests)
 }
