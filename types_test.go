@@ -21,7 +21,6 @@ import (
 	"go.uber.org/thriftrw/ast"
 )
 
-// parseTypes is a helper function for tests to convert strings to TypeMatchers
 func parseTypes(typeNames []string) ([]TypeMatcher, error) {
 	matchers := make([]TypeMatcher, 0, len(typeNames))
 	for _, name := range typeNames {

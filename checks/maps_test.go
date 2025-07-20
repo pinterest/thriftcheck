@@ -105,7 +105,9 @@ func TestCheckMapValueType(t *testing.T) {
 	}
 
 	var i32Type thriftcheck.ThriftType
-	i32Type.UnmarshalString("i32")
+	if err := i32Type.UnmarshalString("i32"); err != nil {
+		t.Fatalf("Failed to unmarshal i32 type: %v", err)
+	}
 	checkI32 := checks.CheckMapValueType([]thriftcheck.ThriftType{i32Type})
 	RunTests(t, &checkI32, testsI32)
 
@@ -149,7 +151,9 @@ func TestCheckMapValueType(t *testing.T) {
 	}
 
 	var mapType thriftcheck.ThriftType
-	mapType.UnmarshalString("map")
+	if err := mapType.UnmarshalString("map"); err != nil {
+		t.Fatalf("Failed to unmarshal map type: %v", err)
+	}
 	checkMap := checks.CheckMapValueType([]thriftcheck.ThriftType{mapType})
 	RunTests(t, &checkMap, testsMap)
 
@@ -180,7 +184,9 @@ func TestCheckMapValueType(t *testing.T) {
 	}
 
 	var unionType thriftcheck.ThriftType
-	unionType.UnmarshalString("union")
+	if err := unionType.UnmarshalString("union"); err != nil {
+		t.Fatalf("Failed to unmarshal union type: %v", err)
+	}
 	checkUnion := checks.CheckMapValueType([]thriftcheck.ThriftType{unionType})
 	RunTests(t, &checkUnion, testsUnion)
 }

@@ -22,19 +22,19 @@ import (
 	"go.uber.org/thriftrw/ast"
 )
 
-// TypeMatcher represents a way to match against AST nodes
+// TypeMatcher represents a way to match against AST nodes.
 type TypeMatcher interface {
 	Matches(c *C, n ast.Node) bool
 	Name() string
 }
 
-// ThriftType implements fig StringUnmarshaler for automatic toml parsing
+// ThriftType implements fig StringUnmarshaler for automatic toml parsing.
 type ThriftType struct {
 	name    string
 	matcher TypeMatcher
 }
 
-// UnmarshalString implements fig.StringUnmarshaler for automatic toml parsing
+// UnmarshalString implements fig.StringUnmarshaler for automatic toml parsing.
 func (t *ThriftType) UnmarshalString(v string) error {
 	name := strings.ToLower(v)
 	factory, ok := typeFactories[name]
@@ -60,7 +60,7 @@ func (t *ThriftType) Name() string {
 	return t.name
 }
 
-// thriftTypeMatcher handles all types with unified TypeReference resolution
+// thriftTypeMatcher handles all types with unified TypeReference resolution.
 type thriftTypeMatcher struct {
 	name    string
 	matchFn func(ast.Node) bool
@@ -85,7 +85,7 @@ func (m *thriftTypeMatcher) Name() string {
 	return m.name
 }
 
-// structureTypeMatcher matches struct-like types (union, struct, exception)
+// structureTypeMatcher matches struct-like types (union, struct, exception).
 type structureTypeMatcher struct {
 	name       string
 	structType ast.StructureType
@@ -120,7 +120,7 @@ func (m *structureTypeMatcher) Name() string {
 	return m.name
 }
 
-// Factory functions for creating type matchers
+// Factory functions for creating type matchers.
 var typeFactories = map[string]func(string) TypeMatcher{
 	// Collection types
 	"map": func(name string) TypeMatcher {
@@ -165,7 +165,7 @@ var typeFactories = map[string]func(string) TypeMatcher{
 	"exception": func(name string) TypeMatcher { return &structureTypeMatcher{name, ast.ExceptionType} },
 }
 
-// Helper function for primitive type matching
+// Helper function for primitive type matching.
 func matchBaseType(n ast.Node, expectedID ast.BaseTypeID) bool {
 	if baseType, ok := n.(ast.BaseType); ok {
 		return baseType.ID == expectedID
