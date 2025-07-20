@@ -82,7 +82,7 @@ func TestCheckMapValueType(t *testing.T) {
 	}
 
 	check := checks.CheckMapValueType([]thriftcheck.ThriftType{})
-	RunTests(t, check, tests)
+	RunTests(t, &check, tests)
 
 	// Test with i32 restriction
 	testsI32 := []Test{
@@ -92,7 +92,7 @@ func TestCheckMapValueType(t *testing.T) {
 				KeyType:   ast.BaseType{ID: ast.StringTypeID},
 				ValueType: ast.BaseType{ID: ast.I32TypeID}},
 			want: []string{
-				`t.thrift:0:1: error: map value type i32 is restricted (map.value)`,
+				`t.thrift:0:1: error: map value type i32 is restricted (map.value.restricted)`,
 			},
 		},
 		{
@@ -107,7 +107,7 @@ func TestCheckMapValueType(t *testing.T) {
 	var i32Type thriftcheck.ThriftType
 	i32Type.UnmarshalString("i32")
 	checkI32 := checks.CheckMapValueType([]thriftcheck.ThriftType{i32Type})
-	RunTests(t, checkI32, testsI32)
+	RunTests(t, &checkI32, testsI32)
 
 	// Test with map restriction
 	testsMap := []Test{
@@ -119,7 +119,7 @@ func TestCheckMapValueType(t *testing.T) {
 					KeyType:   ast.BaseType{ID: ast.I64TypeID},
 					ValueType: ast.BaseType{ID: ast.StringTypeID}}},
 			want: []string{
-				`t.thrift:0:1: error: map value type map is restricted (map.value)`,
+				`t.thrift:0:1: error: map value type map is restricted (map.value.restricted)`,
 			},
 		},
 		{
@@ -136,7 +136,7 @@ func TestCheckMapValueType(t *testing.T) {
 				KeyType:   ast.BaseType{ID: ast.StringTypeID},
 				ValueType: ast.TypeReference{Name: "MapType"}},
 			want: []string{
-				`t.thrift:0:1: error: map value type map is restricted (map.value)`,
+				`t.thrift:0:1: error: map value type map is restricted (map.value.restricted)`,
 			},
 		},
 		{
@@ -151,7 +151,7 @@ func TestCheckMapValueType(t *testing.T) {
 	var mapType thriftcheck.ThriftType
 	mapType.UnmarshalString("map")
 	checkMap := checks.CheckMapValueType([]thriftcheck.ThriftType{mapType})
-	RunTests(t, checkMap, testsMap)
+	RunTests(t, &checkMap, testsMap)
 
 	// Test with union restriction
 	testsUnion := []Test{
@@ -164,7 +164,7 @@ func TestCheckMapValueType(t *testing.T) {
 				KeyType:   ast.BaseType{ID: ast.StringTypeID},
 				ValueType: ast.TypeReference{Name: "TestUnion"}},
 			want: []string{
-				`t.thrift:0:1: error: map value type union is restricted (map.value)`,
+				`t.thrift:0:1: error: map value type union is restricted (map.value.restricted)`,
 			},
 		},
 		{
@@ -182,5 +182,5 @@ func TestCheckMapValueType(t *testing.T) {
 	var unionType thriftcheck.ThriftType
 	unionType.UnmarshalString("union")
 	checkUnion := checks.CheckMapValueType([]thriftcheck.ThriftType{unionType})
-	RunTests(t, checkUnion, testsUnion)
+	RunTests(t, &checkUnion, testsUnion)
 }
