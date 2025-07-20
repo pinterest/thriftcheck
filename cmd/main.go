@@ -76,7 +76,7 @@ type Config struct {
 
 		Map struct {
 			Value struct {
-				RestrictedTypes []string `fig:"restricted"`
+				RestrictedTypes []thriftcheck.ThriftType `fig:"restricted"`
 			}
 		}
 

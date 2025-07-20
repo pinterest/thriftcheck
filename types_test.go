@@ -1,4 +1,4 @@
-// Copyright 2021 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package utils
+package thriftcheck
 
 import (
 	"strings"
 	"testing"
 
-	"github.com/pinterest/thriftcheck"
 	"go.uber.org/thriftrw/ast"
 )
+
+// parseTypes is a helper function for tests to convert strings to TypeMatchers
+func parseTypes(typeNames []string) ([]TypeMatcher, error) {
+	matchers := make([]TypeMatcher, 0, len(typeNames))
+	for _, name := range typeNames {
+		var thriftType ThriftType
+		if err := thriftType.UnmarshalString(name); err != nil {
+			return nil, err
+		}
+		matchers = append(matchers, &thriftType)
+	}
+	return matchers, nil
+}
 
 func TestParseTypes(t *testing.T) {
 	tests := []struct {
@@ -72,7 +84,7 @@ func TestParseTypes(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			matchers, err := ParseTypes(tt.input)
+			matchers, err := parseTypes(tt.input)
 
 			if tt.expectError {
 				if err == nil {
@@ -93,12 +105,12 @@ func TestParseTypes(t *testing.T) {
 }
 
 func TestTypeMatchers_Functionality(t *testing.T) {
-	c := &thriftcheck.C{}
+	c := &C{}
 
 	tests := []struct {
 		name     string
 		typeName string
-		astType  ast.Type
+		astType  ast.Node
 		matches  bool
 	}{
 		// Collection types
@@ -112,11 +124,19 @@ func TestTypeMatchers_Functionality(t *testing.T) {
 		{"string matches String", "string", ast.BaseType{ID: ast.StringTypeID}, true},
 		{"bool matches Bool", "bool", ast.BaseType{ID: ast.BoolTypeID}, true},
 		{"i32 doesn't match String", "i32", ast.BaseType{ID: ast.StringTypeID}, false},
+
+		// Structure types - Direct *ast.Struct
+		{"union matches direct Union struct", "union", &ast.Struct{Type: ast.UnionType}, true},
+		{"struct matches direct Struct", "struct", &ast.Struct{Type: ast.StructType}, true},
+		{"exception matches direct Exception", "exception", &ast.Struct{Type: ast.ExceptionType}, true},
+		{"union doesn't match Struct", "union", &ast.Struct{Type: ast.StructType}, false},
+		{"struct doesn't match Union", "struct", &ast.Struct{Type: ast.UnionType}, false},
+		{"exception doesn't match Union", "exception", &ast.Struct{Type: ast.UnionType}, false},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			matchers, err := ParseTypes([]string{tt.typeName})
+			matchers, err := parseTypes([]string{tt.typeName})
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -142,7 +162,7 @@ func TestParseTypes_ErrorMessages(t *testing.T) {
 			name:  "invalid type error message",
 			input: []string{"invalid"},
 			expectedInMsg: []string{
-				"invalid type \"invalid\"",
+				"unknown type: invalid",
 				"valid types are:",
 				"map",
 				"union",
@@ -152,7 +172,7 @@ func TestParseTypes_ErrorMessages(t *testing.T) {
 			name:  "unknown type error message",
 			input: []string{"unknown"},
 			expectedInMsg: []string{
-				"invalid type \"unknown\"",
+				"unknown type: unknown",
 				"valid types are:",
 			},
 		},
@@ -160,7 +180,7 @@ func TestParseTypes_ErrorMessages(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := ParseTypes(tt.input)
+			_, err := parseTypes(tt.input)
 			if err == nil {
 				t.Fatal("expected error")
 			}

@@ -17,6 +17,7 @@ package checks_test
 import (
 	"testing"
 
+	"github.com/pinterest/thriftcheck"
 	"github.com/pinterest/thriftcheck/checks"
 	"go.uber.org/thriftrw/ast"
 )
@@ -80,7 +81,7 @@ func TestCheckMapValueType(t *testing.T) {
 		},
 	}
 
-	check := checks.CheckMapValueType([]string{})
+	check := checks.CheckMapValueType([]thriftcheck.ThriftType{})
 	RunTests(t, check, tests)
 
 	// Test with i32 restriction
@@ -103,7 +104,9 @@ func TestCheckMapValueType(t *testing.T) {
 		},
 	}
 
-	checkI32 := checks.CheckMapValueType([]string{"i32"})
+	var i32Type thriftcheck.ThriftType
+	i32Type.UnmarshalString("i32")
+	checkI32 := checks.CheckMapValueType([]thriftcheck.ThriftType{i32Type})
 	RunTests(t, checkI32, testsI32)
 
 	// Test with map restriction
@@ -145,7 +148,9 @@ func TestCheckMapValueType(t *testing.T) {
 		},
 	}
 
-	checkMap := checks.CheckMapValueType([]string{"map"})
+	var mapType thriftcheck.ThriftType
+	mapType.UnmarshalString("map")
+	checkMap := checks.CheckMapValueType([]thriftcheck.ThriftType{mapType})
 	RunTests(t, checkMap, testsMap)
 
 	// Test with union restriction
@@ -174,6 +179,8 @@ func TestCheckMapValueType(t *testing.T) {
 		},
 	}
 
-	checkUnion := checks.CheckMapValueType([]string{"union"})
+	var unionType thriftcheck.ThriftType
+	unionType.UnmarshalString("union")
+	checkUnion := checks.CheckMapValueType([]thriftcheck.ThriftType{unionType})
 	RunTests(t, checkUnion, testsUnion)
 }

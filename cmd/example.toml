@@ -36,6 +36,7 @@ error = 1000
 restricted = [
     "union",  # Disallow unions as map values
     "map",    # Disallow nested maps
+    "string", # Disallow string as map values
 ]
 
 [checks.names]
