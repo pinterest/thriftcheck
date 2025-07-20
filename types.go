@@ -52,12 +52,10 @@ func (t *ThriftType) UnmarshalString(v string) error {
 	return nil
 }
 
-// Matches delegates to the internal matcher
 func (t *ThriftType) Matches(c *C, n ast.Node) bool {
 	return t.matcher.Matches(c, n)
 }
 
-// Name returns the type name
 func (t *ThriftType) Name() string {
 	return t.name
 }
@@ -69,7 +67,6 @@ type thriftTypeMatcher struct {
 }
 
 func (m *thriftTypeMatcher) Matches(c *C, n ast.Node) bool {
-	// Resolve TypeReference if needed
 	if typeRef, ok := n.(ast.TypeReference); ok {
 		if resolved := c.ResolveType(typeRef); resolved != nil {
 			if resolvedType, ok := resolved.(ast.Type); ok {
@@ -78,7 +75,7 @@ func (m *thriftTypeMatcher) Matches(c *C, n ast.Node) bool {
 				return false
 			}
 		} else {
-			return false // Unresolved type, can't match
+			return false
 		}
 	}
 	return m.matchFn(n)
@@ -112,7 +109,6 @@ func (m *structureTypeMatcher) Matches(c *C, n ast.Node) bool {
 		return false
 	}
 
-	// Check if it's a struct-like definition with the right type
 	if structDef, ok := resolved.(*ast.Struct); ok {
 		return structDef.Type == m.structType
 	}
