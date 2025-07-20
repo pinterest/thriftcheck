@@ -38,3 +38,20 @@ func CheckMapKeyType() thriftcheck.Check {
 		}
 	})
 }
+
+// CheckMapValueType returns a thriftcheck.Check that ensures map values don't use restricted types.
+// The restrictedTypes slice allows configurable type restrictions.
+// Common use cases: disallow nested maps, unions, complex collections, etc.
+func CheckMapValueType(restrictedTypes []thriftcheck.ThriftType) thriftcheck.Check {
+	return thriftcheck.NewCheck("map.value.restricted", func(c *thriftcheck.C, mt ast.MapType) {
+		if len(restrictedTypes) == 0 {
+			return
+		}
+		for _, matcher := range restrictedTypes {
+			if matcher.Matches(c, mt.ValueType) {
+				c.Errorf(mt, "map value type %s is restricted", matcher.Name())
+				return
+			}
+		}
+	})
+}
