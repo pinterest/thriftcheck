@@ -49,7 +49,7 @@ func CheckMapValueType(restrictedTypes []thriftcheck.ThriftType) thriftcheck.Che
 		}
 		for _, matcher := range restrictedTypes {
 			if matcher.Matches(c, mt.ValueType) {
-				c.Errorf(mt, "map value type %s is restricted", matcher.Name())
+				c.Errorf(mt, "map value type %s is restricted", matcher)
 				return
 			}
 		}

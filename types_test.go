@@ -21,16 +21,16 @@ import (
 	"go.uber.org/thriftrw/ast"
 )
 
-func parseTypes(typeNames []string) ([]TypeMatcher, error) {
-	matchers := make([]TypeMatcher, 0, len(typeNames))
+func parseTypes(typeNames []string) ([]ThriftType, error) {
+	types := make([]ThriftType, 0, len(typeNames))
 	for _, name := range typeNames {
 		var thriftType ThriftType
 		if err := thriftType.UnmarshalString(name); err != nil {
 			return nil, err
 		}
-		matchers = append(matchers, &thriftType)
+		types = append(types, thriftType)
 	}
-	return matchers, nil
+	return types, nil
 }
 
 func TestParseTypes(t *testing.T) {
@@ -83,7 +83,7 @@ func TestParseTypes(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			matchers, err := parseTypes(tt.input)
+			types, err := parseTypes(tt.input)
 
 			if tt.expectError {
 				if err == nil {
@@ -96,8 +96,8 @@ func TestParseTypes(t *testing.T) {
 				t.Fatalf("unexpected error: %v", err)
 			}
 
-			if len(matchers) != tt.expectedCount {
-				t.Errorf("expected %d matchers, got %d", tt.expectedCount, len(matchers))
+			if len(types) != tt.expectedCount {
+				t.Errorf("expected %d types, got %d", tt.expectedCount, len(types))
 			}
 		})
 	}
@@ -135,16 +135,16 @@ func TestTypeMatchers_Functionality(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			matchers, err := parseTypes([]string{tt.typeName})
+			types, err := parseTypes([]string{tt.typeName})
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			if len(matchers) != 1 {
-				t.Fatalf("expected 1 matcher, got %d", len(matchers))
+			if len(types) != 1 {
+				t.Fatalf("expected 1 matcher, got %d", len(types))
 			}
 
-			if matchers[0].Matches(c, tt.astType) != tt.matches {
+			if types[0].Matches(c, tt.astType) != tt.matches {
 				t.Errorf("%s: expected %v", tt.name, tt.matches)
 			}
 		})
