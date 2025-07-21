@@ -229,6 +229,7 @@ func main() {
 		checks.CheckNamesReserved(cfg.Checks.Names.Reserved),
 		checks.CheckNamespacePattern(cfg.Checks.Namespace.Patterns),
 		checks.CheckSetValueType(),
+		checks.CheckCircularIncludes(),
 	}
 
 	checks := allChecks

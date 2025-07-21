@@ -27,15 +27,30 @@ import (
 
 // Check is a named check function.
 type Check struct {
-	Name string
-	fn   interface{}
+	Name         string
+	fn           interface{}
+	isMultiFile  bool
+	multiFileCtx interface{}
+	multiFileFn  interface{}
 }
 
 // Checks is a list of checks.
 type Checks []*Check
 
+func NewMultiFileCheck(name string, fn interface{}, multiFileCtx interface{}, multiFileFn interface{}) *Check {
+	fnValidations(fn, 2)
+
+	return &Check{Name: name, fn: fn, isMultiFile: true, multiFileFn: multiFileFn, multiFileCtx: multiFileCtx}
+}
+
 // NewCheck creates a new Check.
 func NewCheck(name string, fn interface{}) *Check {
+	fnValidations(fn, 1)
+
+	return &Check{Name: name, fn: fn}
+}
+
+func fnValidations(fn interface{}, numBaseArgs int) {
 	if fn == nil {
 		panic("check function must be a Func; got nil")
 	}
@@ -50,13 +65,11 @@ func NewCheck(name string, fn interface{}) *Check {
 	if f.In(0) != reflect.TypeOf(&C{}) {
 		panic("check function must receive C as its first argument")
 	}
-	for i := 1; i < f.NumIn(); i++ {
+	for i := numBaseArgs; i < f.NumIn(); i++ {
 		if !f.In(i).Implements(nodeInterface) {
 			panic("all additional arguments must implement ast.Node")
 		}
 	}
-
-	return &Check{Name: name, fn: fn}
 }
 
 // Call the check function if its arguments end with the current node in the
@@ -103,7 +116,12 @@ func (c *Check) Call(ctx *C, nodes ...ast.Node) bool {
 	}
 
 	args := []reflect.Value{reflect.ValueOf(ctx)}
-	for i := 1; i < f.NumIn() && i <= len(nodes); i++ {
+	startIdx := 1
+	if c.isMultiFile {
+		args = append(args, reflect.ValueOf(c.multiFileCtx))
+		startIdx = 2
+	}
+	for i := startIdx; i < f.NumIn() && i <= len(nodes); i++ {
 		node := nodes[f.NumIn()-i-1]
 		if arg := reflect.ValueOf(node); arg.Type().AssignableTo(f.In(i)) {
 			args = append(args, arg)
