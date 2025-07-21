@@ -22,25 +22,21 @@ import (
 	"go.uber.org/thriftrw/ast"
 )
 
-// TypeMatcher represents a way to match against AST nodes.
-type TypeMatcher interface {
-	Matches(c *C, n ast.Node) bool
-	Name() string
-}
+type typeMatcher func(c *C, n ast.Node) bool
 
 // ThriftType implements fig StringUnmarshaler for automatic toml parsing.
 type ThriftType struct {
 	name    string
-	matcher TypeMatcher
+	matcher typeMatcher
 }
 
 // UnmarshalString implements fig.StringUnmarshaler for automatic toml parsing.
 func (t *ThriftType) UnmarshalString(v string) error {
 	name := strings.ToLower(v)
-	factory, ok := typeFactories[name]
+	matcher, ok := typeMatchers[name]
 	if !ok {
-		validTypes := make([]string, 0, len(typeFactories))
-		for k := range typeFactories {
+		validTypes := make([]string, 0, len(typeMatchers))
+		for k := range typeMatchers {
 			validTypes = append(validTypes, k)
 		}
 		sort.Strings(validTypes)
@@ -48,124 +44,68 @@ func (t *ThriftType) UnmarshalString(v string) error {
 	}
 
 	t.name = name
-	t.matcher = factory(name)
+	t.matcher = matcher
 	return nil
 }
 
-func (t *ThriftType) Matches(c *C, n ast.Node) bool {
-	return t.matcher.Matches(c, n)
+func (t ThriftType) Matches(c *C, n ast.Node) bool {
+	return t.matcher(c, n)
 }
 
-func (t *ThriftType) Name() string {
+func (t ThriftType) String() string {
 	return t.name
 }
 
-// thriftTypeMatcher handles all types with unified TypeReference resolution.
-type thriftTypeMatcher struct {
-	name    string
-	matchFn func(ast.Node) bool
+var typeMatchers = map[string]typeMatcher{
+	// Collection types
+	"map":  func(c *C, n ast.Node) bool { return matchType[ast.MapType](c, n) },
+	"list": func(c *C, n ast.Node) bool { return matchType[ast.ListType](c, n) },
+	"set":  func(c *C, n ast.Node) bool { return matchType[ast.SetType](c, n) },
+
+	// Primitive types
+	"bool":   func(c *C, n ast.Node) bool { return matchBaseType(n, ast.BoolTypeID) },
+	"i8":     func(c *C, n ast.Node) bool { return matchBaseType(n, ast.I8TypeID) },
+	"i16":    func(c *C, n ast.Node) bool { return matchBaseType(n, ast.I16TypeID) },
+	"i32":    func(c *C, n ast.Node) bool { return matchBaseType(n, ast.I32TypeID) },
+	"i64":    func(c *C, n ast.Node) bool { return matchBaseType(n, ast.I64TypeID) },
+	"double": func(c *C, n ast.Node) bool { return matchBaseType(n, ast.DoubleTypeID) },
+	"string": func(c *C, n ast.Node) bool { return matchBaseType(n, ast.StringTypeID) },
+	"binary": func(c *C, n ast.Node) bool { return matchBaseType(n, ast.BinaryTypeID) },
+
+	// Structure types
+	"union":     func(c *C, n ast.Node) bool { return matchStructureType(c, n, ast.UnionType) },
+	"struct":    func(c *C, n ast.Node) bool { return matchStructureType(c, n, ast.StructType) },
+	"exception": func(c *C, n ast.Node) bool { return matchStructureType(c, n, ast.ExceptionType) },
 }
 
-func (m *thriftTypeMatcher) Matches(c *C, n ast.Node) bool {
-	if typeRef, ok := n.(ast.TypeReference); ok {
-		if resolved := c.ResolveType(typeRef); resolved != nil {
-			if resolvedType, ok := resolved.(ast.Type); ok {
-				n = resolvedType
-			} else {
-				return false
-			}
-		} else {
+// Match a generic type, resolving any type references.
+func matchType[T ast.Type](c *C, n ast.Node) bool {
+	if ref, ok := n.(ast.TypeReference); ok {
+		if n = c.ResolveType(ref); n == nil {
 			return false
 		}
 	}
-	return m.matchFn(n)
+
+	_, ok := n.(T)
+	return ok
 }
 
-func (m *thriftTypeMatcher) Name() string {
-	return m.name
-}
-
-// structureTypeMatcher matches struct-like types (union, struct, exception).
-type structureTypeMatcher struct {
-	name       string
-	structType ast.StructureType
-}
-
-func (m *structureTypeMatcher) Matches(c *C, n ast.Node) bool {
-	// Handle direct *ast.Struct types (when used directly)
-	if structDef, ok := n.(*ast.Struct); ok {
-		return structDef.Type == m.structType
+// Match a structure type, resolving any type references.
+func matchStructureType(c *C, n ast.Node, t ast.StructureType) bool {
+	if ref, ok := n.(ast.TypeReference); ok {
+		if n = c.ResolveType(ref); n == nil {
+			return false
+		}
 	}
 
-	// Handle TypeReference (struct/union/exception referenced by name)
-	typeRef, ok := n.(ast.TypeReference)
-	if !ok {
-		return false
-	}
-
-	// Resolve the reference to get the actual definition
-	resolved := c.ResolveType(typeRef)
-	if resolved == nil {
-		return false
-	}
-
-	if structDef, ok := resolved.(*ast.Struct); ok {
-		return structDef.Type == m.structType
+	if s, ok := n.(*ast.Struct); ok {
+		return s.Type == t
 	}
 
 	return false
 }
 
-func (m *structureTypeMatcher) Name() string {
-	return m.name
-}
-
-// Factory functions for creating type matchers.
-var typeFactories = map[string]func(string) TypeMatcher{
-	// Collection types
-	"map": func(name string) TypeMatcher {
-		return &thriftTypeMatcher{name, func(n ast.Node) bool { _, ok := n.(ast.MapType); return ok }}
-	},
-	"list": func(name string) TypeMatcher {
-		return &thriftTypeMatcher{name, func(n ast.Node) bool { _, ok := n.(ast.ListType); return ok }}
-	},
-	"set": func(name string) TypeMatcher {
-		return &thriftTypeMatcher{name, func(n ast.Node) bool { _, ok := n.(ast.SetType); return ok }}
-	},
-
-	// Primitive types
-	"bool": func(name string) TypeMatcher {
-		return &thriftTypeMatcher{name, func(n ast.Node) bool { return matchBaseType(n, ast.BoolTypeID) }}
-	},
-	"i8": func(name string) TypeMatcher {
-		return &thriftTypeMatcher{name, func(n ast.Node) bool { return matchBaseType(n, ast.I8TypeID) }}
-	},
-	"i16": func(name string) TypeMatcher {
-		return &thriftTypeMatcher{name, func(n ast.Node) bool { return matchBaseType(n, ast.I16TypeID) }}
-	},
-	"i32": func(name string) TypeMatcher {
-		return &thriftTypeMatcher{name, func(n ast.Node) bool { return matchBaseType(n, ast.I32TypeID) }}
-	},
-	"i64": func(name string) TypeMatcher {
-		return &thriftTypeMatcher{name, func(n ast.Node) bool { return matchBaseType(n, ast.I64TypeID) }}
-	},
-	"double": func(name string) TypeMatcher {
-		return &thriftTypeMatcher{name, func(n ast.Node) bool { return matchBaseType(n, ast.DoubleTypeID) }}
-	},
-	"string": func(name string) TypeMatcher {
-		return &thriftTypeMatcher{name, func(n ast.Node) bool { return matchBaseType(n, ast.StringTypeID) }}
-	},
-	"binary": func(name string) TypeMatcher {
-		return &thriftTypeMatcher{name, func(n ast.Node) bool { return matchBaseType(n, ast.BinaryTypeID) }}
-	},
-
-	// Structure types
-	"union":     func(name string) TypeMatcher { return &structureTypeMatcher{name, ast.UnionType} },
-	"struct":    func(name string) TypeMatcher { return &structureTypeMatcher{name, ast.StructType} },
-	"exception": func(name string) TypeMatcher { return &structureTypeMatcher{name, ast.ExceptionType} },
-}
-
-// Helper function for primitive type matching.
+// Match a BaseType.
 func matchBaseType(n ast.Node, expectedID ast.BaseTypeID) bool {
 	if baseType, ok := n.(ast.BaseType); ok {
 		return baseType.ID == expectedID
