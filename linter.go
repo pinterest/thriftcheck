@@ -98,6 +98,7 @@ func (l *Linter) LintFiles(filenames []string) (Messages, error) {
 		if err != nil {
 			return msgs, fmt.Errorf("%s: %w", filename, err)
 		}
+		defer f.Close()
 
 		m, err := l.Lint(f, filename)
 		if err != nil {
