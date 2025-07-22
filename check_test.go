@@ -23,7 +23,7 @@ import (
 
 func TestNewCheck(t *testing.T) {
 	tests := []struct {
-		fn     interface{}
+		fn     any
 		panics bool
 	}{
 		{"", true},
