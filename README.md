@@ -164,13 +164,13 @@ Some languages (e.g. JavaScript) don't support 64-bit integers.
 
 This check ensures that only primitive types are used for `map<>` keys.
 
-### `map.value.restricted`
+### `map.value.disallowed`
 
-This check allows you to restrict specific types from being used as `map<>` values. This is useful for enforcing coding standards around map usage, such as disallowing nested maps for simplicity or preventing unions as map values for serialization compatibility.
+This check allows you to disallow specific types from being used as `map<>` values. This is useful for enforcing coding standards around map usage, such as disallowing nested maps for simplicity or preventing unions as map values for serialization compatibility.
 
 ```toml
 [checks.map.value]
-restricted = [
+disallowed = [
     "union",  # Disallow unions as map values
     "map",    # Disallow nested maps
     "i32",    # Disallow i32 as map values
