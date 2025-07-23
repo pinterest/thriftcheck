@@ -30,7 +30,7 @@ func isUnionType(n ast.Node) bool {
 }
 
 // CheckTypesDisallowed reports an error if a disallowed type is used.
-func CheckTypesDisallowed(disallowedTypes []string) *thriftcheck.Check {
+func CheckTypesDisallowed(disallowedTypes []string) thriftcheck.Check {
 	return thriftcheck.NewCheck("types.disallowed", func(c *thriftcheck.C, n ast.Node) {
 		for _, t := range disallowedTypes {
 			if TypeToTypeCheckerFunc[t](n) {

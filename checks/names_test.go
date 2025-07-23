@@ -46,5 +46,5 @@ func TestCheckNamesReserved(t *testing.T) {
 	}
 
 	check := checks.CheckNamesReserved([]string{"reserved"})
-	RunTests(t, check, tests)
+	RunTests(t, &check, tests)
 }

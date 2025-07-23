@@ -164,6 +164,26 @@ Some languages (e.g. JavaScript) don't support 64-bit integers.
 
 This check ensures that only primitive types are used for `map<>` keys.
 
+### `map.value.restricted`
+
+This check allows you to restrict specific types from being used as `map<>` values. This is useful for enforcing coding standards around map usage, such as disallowing nested maps for simplicity or preventing unions as map values for serialization compatibility.
+
+```toml
+[checks.map.value]
+restricted = [
+    "union",  # Disallow unions as map values
+    "map",    # Disallow nested maps
+    "i32",    # Disallow i32 as map values
+]
+```
+
+Supported type names include:
+- **Primitives**: `bool`, `i8`, `i16`, `i32`, `i64`, `double`, `string`, `binary`
+- **Collections**: `map`, `list`, `set`
+- **Structures**: `union`, `struct`, `exception`
+
+The check performs semantic type matching, including resolving `typedef`s to their underlying types, so it works correctly with typedefs and other indirect type references.
+
 ### `names.reserved`
 
 This checks allows you to extend the [default list of reserved keywords][] with

@@ -40,5 +40,5 @@ func TestCheckTypesDisallowed(t *testing.T) {
 	}
 
 	check := checks.CheckTypesDisallowed([]string{"union"})
-	RunTests(t, check, tests)
+	RunTests(t, &check, tests)
 }

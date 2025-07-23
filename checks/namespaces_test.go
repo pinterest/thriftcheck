@@ -39,5 +39,5 @@ func TestCheckNamespacePattern(t *testing.T) {
 	check := checks.CheckNamespacePattern(map[string]*regexp.Regexp{
 		"java": regexp.MustCompile(`^com\.pinterest\.idl\.`),
 	})
-	RunTests(t, check, tests)
+	RunTests(t, &check, tests)
 }

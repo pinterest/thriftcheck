@@ -21,7 +21,7 @@ import (
 
 // CheckEnumSize returns a thriftcheck.Check that warns or errors if an
 // enumeration's element size grows beyond a limit.
-func CheckEnumSize(warningLimit, errorLimit int) *thriftcheck.Check {
+func CheckEnumSize(warningLimit, errorLimit int) thriftcheck.Check {
 	return thriftcheck.NewCheck("enum.size", func(c *thriftcheck.C, e *ast.Enum) {
 		size := len(e.Items)
 		if errorLimit > 0 && size > errorLimit {

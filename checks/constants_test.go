@@ -52,5 +52,5 @@ func TestCheckConstantRef(t *testing.T) {
 	}
 
 	check := checks.CheckConstantRef()
-	RunTests(t, check, tests)
+	RunTests(t, &check, tests)
 }

@@ -21,7 +21,7 @@ import (
 
 // CheckMapKeyType returns a thriftcheck.Check that ensures that only primitive
 // types are used for `map<>` keys.
-func CheckMapKeyType() *thriftcheck.Check {
+func CheckMapKeyType() thriftcheck.Check {
 	return thriftcheck.NewCheck("map.key.type", func(c *thriftcheck.C, mt ast.MapType) {
 		switch t := mt.KeyType.(type) {
 		case ast.BaseType:
@@ -35,6 +35,23 @@ func CheckMapKeyType() *thriftcheck.Check {
 			}
 		default:
 			c.Errorf(mt, "map key must be a primitive type")
+		}
+	})
+}
+
+// CheckMapValueType returns a thriftcheck.Check that ensures map values don't use restricted types.
+// The restrictedTypes slice allows configurable type restrictions.
+// Common use cases: disallow nested maps, unions, complex collections, etc.
+func CheckMapValueType(restrictedTypes []thriftcheck.ThriftType) thriftcheck.Check {
+	return thriftcheck.NewCheck("map.value.restricted", func(c *thriftcheck.C, mt ast.MapType) {
+		if len(restrictedTypes) == 0 {
+			return
+		}
+		for _, matcher := range restrictedTypes {
+			if matcher.Matches(c, mt.ValueType) {
+				c.Errorf(mt, "map value type %s is restricted", matcher)
+				return
+			}
 		}
 	})
 }

@@ -74,6 +74,12 @@ type Config struct {
 			Restricted map[string]*regexp.Regexp `fig:"restricted"`
 		}
 
+		Map struct {
+			Value struct {
+				RestrictedTypes []thriftcheck.ThriftType `fig:"restricted"`
+			}
+		}
+
 		Names struct {
 			Reserved []string `fig:"reserved"`
 		}
@@ -225,6 +231,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1 << uint(thriftcheck.Error))
 	}
+
 	if len(includes) > 0 {
 		cfg.Includes = includes
 	}
@@ -243,6 +250,7 @@ func main() {
 		checks.CheckIncludeRestricted(cfg.Checks.Include.Restricted),
 		checks.CheckInteger64bit(),
 		checks.CheckMapKeyType(),
+		checks.CheckMapValueType(cfg.Checks.Map.Value.RestrictedTypes),
 		checks.CheckNamesReserved(cfg.Checks.Names.Reserved),
 		checks.CheckNamespacePattern(cfg.Checks.Namespace.Patterns),
 		checks.CheckSetValueType(),

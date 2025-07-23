@@ -22,7 +22,7 @@ import (
 )
 
 // CheckInteger64bit warns when an integer constant exceeds the 32-bit number range.
-func CheckInteger64bit() *thriftcheck.Check {
+func CheckInteger64bit() thriftcheck.Check {
 	return thriftcheck.NewCheck("int.64bit", func(c *thriftcheck.C, i ast.ConstantInteger) {
 		if i < math.MinInt32 || i > math.MaxInt32 {
 			c.Warningf(i, "64-bit integer constant %d may not work in all languages", i)
