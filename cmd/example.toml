@@ -28,12 +28,12 @@ error = 1000
 
 [checks.map]
 [checks.map.value]
-# Restrict specific types as map values to enforce coding standards
+# Disallow specific types as map values to enforce coding standards
 # Common examples:
 # - ["map"] to disallow nested maps
 # - ["union"] to prevent unions as map values
-# - ["union", "map"] to restrict both
-restricted = [
+# - ["union", "map"] to disallow both
+disallowed = [
     "union",  # Disallow unions as map values
     "map",    # Disallow nested maps
     "string", # Disallow string as map values
@@ -47,3 +47,6 @@ reserved = [
 [checks.namespace]
 [[checks.namespace.patterns]]
 py = "^idl\\."
+
+[checks.types]
+disallowed = []
