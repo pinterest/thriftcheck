@@ -89,7 +89,7 @@ type Config struct {
 		}
 
 		Types struct {
-			Disallowed []string `fig:"disallowed"`
+			Disallowed []thriftcheck.ThriftType `fig:"disallowed"`
 		}
 	}
 }
@@ -155,15 +155,6 @@ func loadConfig(cfg *Config) error {
 	return nil
 }
 
-func validateConfig(cfg Config) error {
-	for _, t := range cfg.Checks.Types.Disallowed {
-		if _, ok := checks.TypeToTypeCheckerFunc[t]; !ok {
-			return fmt.Errorf("configuration validation failed: unsupported disallowed type (%s)", t)
-		}
-	}
-	return nil
-}
-
 func lint(l *thriftcheck.Linter, paths []string) (thriftcheck.Messages, error) {
 	if len(paths) == 1 && paths[0] == "-" {
 		return l.Lint(os.Stdin, *stdinFilename)
@@ -224,10 +215,6 @@ func main() {
 	// Load the (optional) configuration file
 	var cfg Config
 	if err := loadConfig(&cfg); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1 << uint(thriftcheck.Error))
-	}
-	if err := validateConfig(cfg); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1 << uint(thriftcheck.Error))
 	}

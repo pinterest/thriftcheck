@@ -17,14 +17,34 @@ package checks_test
 import (
 	"testing"
 
+	"github.com/pinterest/thriftcheck"
 	"github.com/pinterest/thriftcheck/checks"
 	"go.uber.org/thriftrw/ast"
 )
 
 func TestCheckTypesDisallowed(t *testing.T) {
+	var unionType thriftcheck.ThriftType
+	if err := unionType.UnmarshalString("union"); err != nil {
+		t.Fatalf("Failed to unmarshall union type: %v", err)
+	}
+	var mapType thriftcheck.ThriftType
+	if err := mapType.UnmarshalString("map"); err != nil {
+		t.Fatalf("Failed to unmarshall map type: %v", err)
+	}
+
+	// Tests with a single disallowed type (union).
 	tests := []Test{
 		{
 			node: &ast.Struct{Type: ast.UnionType},
+			want: []string{
+				`t.thrift:0:1: error: a disallowed type (union) was used (types.disallowed)`,
+			},
+		},
+		{
+			prog: &ast.Program{Definitions: []ast.Definition{
+				&ast.Struct{Name: "MyUnion", Type: ast.UnionType},
+			}},
+			node: ast.TypeReference{Name: "MyUnion"},
 			want: []string{
 				`t.thrift:0:1: error: a disallowed type (union) was used (types.disallowed)`,
 			},
@@ -39,6 +59,57 @@ func TestCheckTypesDisallowed(t *testing.T) {
 		},
 	}
 
-	check := checks.CheckTypesDisallowed([]string{"union"})
+	check := checks.CheckTypesDisallowed([]thriftcheck.ThriftType{unionType})
+	RunTests(t, &check, tests)
+
+	// Tests with multiple disallowed types (union and map).
+	tests = []Test{
+		{
+			node: &ast.Struct{Type: ast.UnionType},
+			want: []string{
+				`t.thrift:0:1: error: a disallowed type (union) was used (types.disallowed)`,
+			},
+		},
+		{
+			node: ast.MapType{
+				KeyType:   ast.BaseType{ID: ast.I16TypeID},
+				ValueType: ast.BaseType{ID: ast.StringTypeID}},
+			want: []string{
+				`t.thrift:0:1: error: a disallowed type (map) was used (types.disallowed)`,
+			},
+		},
+		{
+			node: &ast.Struct{Type: ast.ExceptionType},
+			want: []string{},
+		},
+	}
+
+	check = checks.CheckTypesDisallowed([]thriftcheck.ThriftType{unionType, mapType})
+	RunTests(t, &check, tests)
+
+	// Tests with no disallowed types.
+	tests = []Test{
+		{
+			node: &ast.Struct{Type: ast.UnionType},
+			want: []string{},
+		},
+		{
+			prog: &ast.Program{Definitions: []ast.Definition{
+				&ast.Struct{Name: "MyUnion", Type: ast.UnionType},
+			}},
+			node: ast.TypeReference{Name: "MyUnion"},
+			want: []string{},
+		},
+		{
+			node: &ast.Struct{Type: ast.StructType},
+			want: []string{},
+		},
+		{
+			node: ast.ConstantInteger(0),
+			want: []string{},
+		},
+	}
+
+	check = checks.CheckTypesDisallowed([]thriftcheck.ThriftType{})
 	RunTests(t, &check, tests)
 }

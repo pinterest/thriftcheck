@@ -177,12 +177,7 @@ restricted = [
 ]
 ```
 
-Supported type names include:
-- **Primitives**: `bool`, `i8`, `i16`, `i32`, `i64`, `double`, `string`, `binary`
-- **Collections**: `map`, `list`, `set`
-- **Structures**: `union`, `struct`, `exception`
-
-The check performs semantic type matching, including resolving `typedef`s to their underlying types, so it works correctly with typedefs and other indirect type references.
+See the [full list of supported types](#supported-type-names). Types are [matched semantically](#semantic-type-matching).
 
 ### `names.reserved`
 
@@ -211,6 +206,34 @@ py = "^idl\\."
 ### `set.value.type`
 
 This check ensures that only primitive types are used for `set<>` values.
+
+### `types.disallowed`
+
+This check allows you to disallow specific types from being used.
+
+```toml
+[checks.types]
+disallowed = [
+    "union",
+]
+```
+
+See the [full list of available types](#supported-type-names). Types are [matched semantically](#semantic-type-matching).
+
+## Supported type names
+
+There are multiple checks which can be configured by specifying the types they act upon. These checks are:
+- [`map.value.restricted`](#mapvaluerestricted)
+- [`types.disallowed`](#typesdisallowed)
+
+The supported type names include:
+- **Primitives**: `bool`, `i8`, `i16`, `i32`, `i64`, `double`, `string`, `binary`
+- **Collections**: `map`, `list`, `set`
+- **Structures**: `union`, `struct`, `exception`
+
+### Semantic type matching
+
+Types are matched semantically, including resolving `typedef`s to their underlying types, so `typedef`s and other indirect type references are properly handled.
 
 ## Custom Checks
 
