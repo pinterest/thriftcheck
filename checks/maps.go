@@ -19,10 +19,31 @@ import (
 	"go.uber.org/thriftrw/ast"
 )
 
-// CheckMapKeyType returns a thriftcheck.Check that ensures that only primitive
-// types are used for `map<>` keys.
-func CheckMapKeyType() thriftcheck.Check {
+func CheckMapKeyType(allowedTypes []thriftcheck.ThriftType, disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
 	return thriftcheck.NewCheck("map.key.type", func(c *thriftcheck.C, mt ast.MapType) {
+		for _, matcher := range disallowedTypes {
+			if matcher.Matches(c, mt.KeyType) {
+				c.Errorf(mt, "map key type %s is disallowed", matcher)
+				return
+			}
+		}
+
+		if len(allowedTypes) == 0 {
+			return
+		}
+		for _, matcher := range allowedTypes {
+			if matcher.Matches(c, mt.KeyType) {
+				return
+			}
+		}
+		c.Errorf(mt, "map key type is not in the 'allowed' list")
+	})
+}
+
+// CheckMapKeyTypePrimitive returns a thriftcheck.Check that ensures that only primitive
+// types are used for `map<>` keys.
+func CheckMapKeyTypePrimitive() thriftcheck.Check {
+	return thriftcheck.NewCheck("map.key.type.primitive", func(c *thriftcheck.C, mt ast.MapType) {
 		switch t := mt.KeyType.(type) {
 		case ast.BaseType:
 			break

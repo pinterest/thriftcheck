@@ -61,8 +61,9 @@ func TestParseTypes(t *testing.T) {
 				"map", "list", "set",
 				"bool", "i8", "i16", "i32", "i64", "double", "string", "binary",
 				"union", "struct", "exception",
+				"enum",
 			},
-			expectedCount: 14,
+			expectedCount: 15,
 		},
 		{
 			name:        "invalid type",
@@ -131,6 +132,9 @@ func TestTypeMatchers_Functionality(t *testing.T) {
 		{"union doesn't match Struct", "union", &ast.Struct{Type: ast.StructType}, false},
 		{"struct doesn't match Union", "struct", &ast.Struct{Type: ast.UnionType}, false},
 		{"exception doesn't match Union", "exception", &ast.Struct{Type: ast.UnionType}, false},
+
+		// Other
+		{"enum matches Enum", "enum", &ast.Enum{}, true},
 	}
 
 	for _, tt := range tests {
