@@ -75,6 +75,10 @@ type Config struct {
 		}
 
 		Map struct {
+			Key struct {
+				AllowedTypes    []thriftcheck.ThriftType `fig:"allowed"`
+				DisallowedTypes []thriftcheck.ThriftType `fig:"disallowed"`
+			}
 			Value struct {
 				RestrictedTypes []thriftcheck.ThriftType `fig:"restricted"`
 			}
@@ -232,7 +236,8 @@ func main() {
 		checks.CheckIncludePath(),
 		checks.CheckIncludeRestricted(cfg.Checks.Include.Restricted),
 		checks.CheckInteger64bit(),
-		checks.CheckMapKeyType(),
+		checks.CheckMapKeyType(cfg.Checks.Map.Key.AllowedTypes, cfg.Checks.Map.Key.DisallowedTypes),
+		checks.CheckMapKeyTypePrimitive(),
 		checks.CheckMapValueType(cfg.Checks.Map.Value.RestrictedTypes),
 		checks.CheckNamesReserved(cfg.Checks.Names.Reserved),
 		checks.CheckNamespacePattern(cfg.Checks.Namespace.Patterns),

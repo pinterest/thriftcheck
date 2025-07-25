@@ -162,6 +162,21 @@ Some languages (e.g. JavaScript) don't support 64-bit integers.
 
 ### `map.key.type`
 
+This check can be configured to allow/disallow specific types from being used as `map<>` keys.
+
+```toml
+[checks.map]
+[[checks.map.key]]
+allowed = []
+disallowed = []
+```
+
+For a `map<>` key, if its type is in the `disallowed` list, this check will report it as an error and stop.
+Otherwise, provided that the `allowed` list is not empty, the check will report an error if the
+key type is not part of the `allowed` types.
+
+### `map.key.type.primitive`
+
 This check ensures that only primitive types are used for `map<>` keys.
 
 ### `map.value.restricted`
