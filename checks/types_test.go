@@ -37,7 +37,7 @@ func TestCheckTypesDisallowed(t *testing.T) {
 		{
 			node: &ast.Struct{Type: ast.UnionType},
 			want: []string{
-				`t.thrift:0:1: error: a disallowed type (union) was used (types.disallowed)`,
+				`t.thrift:0:1: error: type "union" is not allowed (types.disallowed)`,
 			},
 		},
 		{
@@ -46,7 +46,7 @@ func TestCheckTypesDisallowed(t *testing.T) {
 			}},
 			node: ast.TypeReference{Name: "MyUnion"},
 			want: []string{
-				`t.thrift:0:1: error: a disallowed type (union) was used (types.disallowed)`,
+				`t.thrift:0:1: error: type "union" is not allowed (types.disallowed)`,
 			},
 		},
 		{
@@ -67,7 +67,7 @@ func TestCheckTypesDisallowed(t *testing.T) {
 		{
 			node: &ast.Struct{Type: ast.UnionType},
 			want: []string{
-				`t.thrift:0:1: error: a disallowed type (union) was used (types.disallowed)`,
+				`t.thrift:0:1: error: type "union" is not allowed (types.disallowed)`,
 			},
 		},
 		{
@@ -75,7 +75,7 @@ func TestCheckTypesDisallowed(t *testing.T) {
 				KeyType:   ast.BaseType{ID: ast.I16TypeID},
 				ValueType: ast.BaseType{ID: ast.StringTypeID}},
 			want: []string{
-				`t.thrift:0:1: error: a disallowed type (map) was used (types.disallowed)`,
+				`t.thrift:0:1: error: type "map" is not allowed (types.disallowed)`,
 			},
 		},
 		{
