@@ -76,7 +76,7 @@ type Config struct {
 
 		Map struct {
 			Value struct {
-				RestrictedTypes []thriftcheck.ThriftType `fig:"restricted"`
+				Disallowed []thriftcheck.ThriftType `fig:"disallowed"`
 			}
 		}
 
@@ -86,6 +86,10 @@ type Config struct {
 
 		Namespace struct {
 			Patterns map[string]*regexp.Regexp `fig:"patterns"`
+		}
+
+		Types struct {
+			Disallowed []thriftcheck.ThriftType `fig:"disallowed"`
 		}
 	}
 }
@@ -233,10 +237,11 @@ func main() {
 		checks.CheckIncludeRestricted(cfg.Checks.Include.Restricted),
 		checks.CheckInteger64bit(),
 		checks.CheckMapKeyType(),
-		checks.CheckMapValueType(cfg.Checks.Map.Value.RestrictedTypes),
+		checks.CheckMapValueType(cfg.Checks.Map.Value.Disallowed),
 		checks.CheckNamesReserved(cfg.Checks.Names.Reserved),
 		checks.CheckNamespacePattern(cfg.Checks.Namespace.Patterns),
 		checks.CheckSetValueType(),
+		checks.CheckTypesDisallowed(cfg.Checks.Types.Disallowed),
 	}
 
 	checks := allChecks
