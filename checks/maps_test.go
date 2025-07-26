@@ -70,7 +70,7 @@ func TestCheckMapKeyType(t *testing.T) {
 			node: ast.MapType{
 				KeyType:   ast.BaseType{ID: ast.I8TypeID},
 				ValueType: ast.BaseType{ID: ast.StringTypeID}},
-			want: []string{`t.thrift:0:1: error: map key type i8 is disallowed (map.key.type)`},
+			want: []string{`t.thrift:0:1: error: map key type "i8" is disallowed (map.key.type)`},
 		},
 		{
 			prog: &ast.Program{Definitions: []ast.Definition{
@@ -79,7 +79,7 @@ func TestCheckMapKeyType(t *testing.T) {
 			node: ast.MapType{
 				KeyType:   ast.TypeReference{Name: "Enum"},
 				ValueType: ast.BaseType{ID: ast.StringTypeID}},
-			want: []string{`t.thrift:0:1: error: map key type enum is disallowed (map.key.type)`},
+			want: []string{`t.thrift:0:1: error: map key type "enum" is disallowed (map.key.type)`},
 		},
 		{
 			node: ast.MapType{
@@ -99,7 +99,7 @@ func TestCheckMapKeyType(t *testing.T) {
 				KeyType:   ast.BaseType{ID: ast.I8TypeID},
 				ValueType: ast.BaseType{ID: ast.StringTypeID}},
 			// Disallowances have precedence over allowances.
-			want: []string{`t.thrift:0:1: error: map key type i8 is disallowed (map.key.type)`},
+			want: []string{`t.thrift:0:1: error: map key type "i8" is disallowed (map.key.type)`},
 		},
 		{
 			prog: &ast.Program{Definitions: []ast.Definition{
@@ -114,7 +114,7 @@ func TestCheckMapKeyType(t *testing.T) {
 			node: ast.MapType{
 				KeyType:   ast.BaseType{ID: ast.StringTypeID},
 				ValueType: ast.BaseType{ID: ast.StringTypeID}},
-			want: []string{`t.thrift:0:1: error: map key type string is disallowed (map.key.type)`},
+			want: []string{`t.thrift:0:1: error: map key type "string" is disallowed (map.key.type)`},
 		},
 	}
 

@@ -23,7 +23,7 @@ func CheckMapKeyType(allowedTypes []thriftcheck.ThriftType, disallowedTypes []th
 	return thriftcheck.NewCheck("map.key.type", func(c *thriftcheck.C, mt ast.MapType) {
 		for _, matcher := range disallowedTypes {
 			if matcher.Matches(c, mt.KeyType) {
-				c.Errorf(mt, "map key type %s is disallowed", matcher)
+				c.Errorf(mt, "map key type %q is disallowed", matcher)
 				return
 			}
 		}
