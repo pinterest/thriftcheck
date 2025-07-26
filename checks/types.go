@@ -24,7 +24,7 @@ func CheckTypesDisallowed(disallowedTypes []thriftcheck.ThriftType) thriftcheck.
 	return thriftcheck.NewCheck("types.disallowed", func(c *thriftcheck.C, n ast.Node) {
 		for _, matcher := range disallowedTypes {
 			if matcher.Matches(c, n) {
-				c.Errorf(n, "a disallowed type (%s) was used", matcher)
+				c.Errorf(n, "type %q is not allowed", matcher)
 				return
 			}
 		}
