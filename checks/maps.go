@@ -44,9 +44,6 @@ func CheckMapKeyType() thriftcheck.Check {
 // Common use cases: disallow nested maps, unions, complex collections, etc.
 func CheckMapValueType(disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
 	return thriftcheck.NewCheck("map.value.disallowed", func(c *thriftcheck.C, mt ast.MapType) {
-		if len(disallowedTypes) == 0 {
-			return
-		}
 		for _, matcher := range disallowedTypes {
 			if matcher.Matches(c, mt.ValueType) {
 				c.Errorf(mt, "map value type %s is disallowed", matcher)
