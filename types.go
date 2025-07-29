@@ -16,7 +16,8 @@ package thriftcheck
 
 import (
 	"fmt"
-	"sort"
+	"maps"
+	"slices"
 	"strings"
 
 	"go.uber.org/thriftrw/ast"
@@ -35,11 +36,7 @@ func (t *ThriftType) UnmarshalString(v string) error {
 	name := strings.ToLower(v)
 	matcher, ok := typeMatchers[name]
 	if !ok {
-		validTypes := make([]string, 0, len(typeMatchers))
-		for k := range typeMatchers {
-			validTypes = append(validTypes, k)
-		}
-		sort.Strings(validTypes)
+		validTypes := slices.Sorted(maps.Keys(typeMatchers))
 		return fmt.Errorf("unknown type: %s, valid types are: %v", v, validTypes)
 	}
 
