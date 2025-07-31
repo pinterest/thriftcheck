@@ -19,6 +19,10 @@ import (
 	"go.uber.org/thriftrw/ast"
 )
 
+// CheckMapKeyType reports an error if a disallowed map key type is used.
+// A type is disallowed if it either:
+//   - Appears in `disallowedTypes`
+//   - Does not appear in a non-empty `allowedTypes`
 func CheckMapKeyType(allowedTypes []thriftcheck.ThriftType, disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
 	return thriftcheck.NewCheck("map.key.type", func(c *thriftcheck.C, mt ast.MapType) {
 		for _, matcher := range disallowedTypes {
