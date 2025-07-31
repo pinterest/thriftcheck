@@ -1,4 +1,4 @@
-// Copyright 2021 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -167,7 +167,7 @@ func TestCheckMapKeyTypePrimitive(t *testing.T) {
 }
 
 func TestCheckMapValueType(t *testing.T) {
-	// Test with no restrictions - should pass all
+	// Test with no disallowed types - should pass all
 	tests := []Test{
 		{
 			node: ast.MapType{
@@ -186,7 +186,7 @@ func TestCheckMapValueType(t *testing.T) {
 	check := checks.CheckMapValueType([]thriftcheck.ThriftType{})
 	RunTests(t, &check, tests)
 
-	// Test with i32 restriction
+	// Test with i32 disallowed
 	testsI32 := []Test{
 		{
 			// Should fail for i32 value
@@ -194,7 +194,7 @@ func TestCheckMapValueType(t *testing.T) {
 				KeyType:   ast.BaseType{ID: ast.StringTypeID},
 				ValueType: ast.BaseType{ID: ast.I32TypeID}},
 			want: []string{
-				`t.thrift:0:1: error: map value type i32 is restricted (map.value.restricted)`,
+				`t.thrift:0:1: error: map value type i32 is disallowed (map.value.disallowed)`,
 			},
 		},
 		{
@@ -213,7 +213,7 @@ func TestCheckMapValueType(t *testing.T) {
 	checkI32 := checks.CheckMapValueType([]thriftcheck.ThriftType{i32Type})
 	RunTests(t, &checkI32, testsI32)
 
-	// Test with map restriction
+	// Test with map disallowed
 	testsMap := []Test{
 		{
 			// Should fail for nested map
@@ -223,7 +223,7 @@ func TestCheckMapValueType(t *testing.T) {
 					KeyType:   ast.BaseType{ID: ast.I64TypeID},
 					ValueType: ast.BaseType{ID: ast.StringTypeID}}},
 			want: []string{
-				`t.thrift:0:1: error: map value type map is restricted (map.value.restricted)`,
+				`t.thrift:0:1: error: map value type map is disallowed (map.value.disallowed)`,
 			},
 		},
 		{
@@ -240,7 +240,7 @@ func TestCheckMapValueType(t *testing.T) {
 				KeyType:   ast.BaseType{ID: ast.StringTypeID},
 				ValueType: ast.TypeReference{Name: "MapType"}},
 			want: []string{
-				`t.thrift:0:1: error: map value type map is restricted (map.value.restricted)`,
+				`t.thrift:0:1: error: map value type map is disallowed (map.value.disallowed)`,
 			},
 		},
 		{
@@ -259,7 +259,7 @@ func TestCheckMapValueType(t *testing.T) {
 	checkMap := checks.CheckMapValueType([]thriftcheck.ThriftType{mapType})
 	RunTests(t, &checkMap, testsMap)
 
-	// Test with union restriction
+	// Test with union disallowed
 	testsUnion := []Test{
 		{
 			// Should fail for union value
@@ -270,7 +270,7 @@ func TestCheckMapValueType(t *testing.T) {
 				KeyType:   ast.BaseType{ID: ast.StringTypeID},
 				ValueType: ast.TypeReference{Name: "TestUnion"}},
 			want: []string{
-				`t.thrift:0:1: error: map value type union is restricted (map.value.restricted)`,
+				`t.thrift:0:1: error: map value type union is disallowed (map.value.disallowed)`,
 			},
 		},
 		{

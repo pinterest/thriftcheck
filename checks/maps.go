@@ -1,4 +1,4 @@
-// Copyright 2021 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,17 +60,14 @@ func CheckMapKeyTypePrimitive() thriftcheck.Check {
 	})
 }
 
-// CheckMapValueType returns a thriftcheck.Check that ensures map values don't use restricted types.
-// The restrictedTypes slice allows configurable type restrictions.
+// CheckMapValueType returns a thriftcheck.Check that ensures map values don't use disallowed types.
+// The disallowedTypes slice allows configurable type disallowances.
 // Common use cases: disallow nested maps, unions, complex collections, etc.
-func CheckMapValueType(restrictedTypes []thriftcheck.ThriftType) thriftcheck.Check {
-	return thriftcheck.NewCheck("map.value.restricted", func(c *thriftcheck.C, mt ast.MapType) {
-		if len(restrictedTypes) == 0 {
-			return
-		}
-		for _, matcher := range restrictedTypes {
+func CheckMapValueType(disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
+	return thriftcheck.NewCheck("map.value.disallowed", func(c *thriftcheck.C, mt ast.MapType) {
+		for _, matcher := range disallowedTypes {
 			if matcher.Matches(c, mt.ValueType) {
-				c.Errorf(mt, "map value type %s is restricted", matcher)
+				c.Errorf(mt, "map value type %s is disallowed", matcher)
 				return
 			}
 		}
