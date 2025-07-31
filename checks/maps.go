@@ -40,26 +40,6 @@ func CheckMapKeyType(allowedTypes []thriftcheck.ThriftType, disallowedTypes []th
 	})
 }
 
-// CheckMapKeyTypePrimitive returns a thriftcheck.Check that ensures that only primitive
-// types are used for `map<>` keys.
-func CheckMapKeyTypePrimitive() thriftcheck.Check {
-	return thriftcheck.NewCheck("map.key.type.primitive", func(c *thriftcheck.C, mt ast.MapType) {
-		switch t := mt.KeyType.(type) {
-		case ast.BaseType:
-			break
-		case ast.TypeReference:
-			switch c.ResolveType(t).(type) {
-			case ast.BaseType, *ast.Enum, *ast.Typedef:
-				break
-			default:
-				c.Errorf(mt, "map key must be a primitive type")
-			}
-		default:
-			c.Errorf(mt, "map key must be a primitive type")
-		}
-	})
-}
-
 // CheckMapValueType returns a thriftcheck.Check that ensures map values don't use disallowed types.
 // The disallowedTypes slice allows configurable type disallowances.
 // Common use cases: disallow nested maps, unions, complex collections, etc.

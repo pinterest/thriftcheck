@@ -177,10 +177,6 @@ key type is not part of the `allowed` types.
 
 See the [full list of supported types](#supported-type-names). Types are [matched semantically](#semantic-type-matching).
 
-### `map.key.type.primitive`
-
-This check ensures that only primitive types are used for `map<>` keys.
-
 ### `map.value.disallowed`
 
 This check allows you to disallow specific types from being used as `map<>` values. This is useful for enforcing coding standards around map usage, such as disallowing nested maps for simplicity or preventing unions as map values for serialization compatibility.

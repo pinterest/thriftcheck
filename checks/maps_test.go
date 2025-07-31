@@ -124,48 +124,6 @@ func TestCheckMapKeyType(t *testing.T) {
 	RunTests(t, &check, tests)
 }
 
-func TestCheckMapKeyTypePrimitive(t *testing.T) {
-	tests := []Test{
-		{
-			node: ast.MapType{
-				KeyType:   ast.BaseType{ID: ast.StringTypeID},
-				ValueType: ast.BaseType{ID: ast.StringTypeID}},
-			want: []string{},
-		},
-		{
-			node: ast.MapType{
-				KeyType: ast.MapType{
-					KeyType:   ast.BaseType{ID: ast.StringTypeID},
-					ValueType: ast.BaseType{ID: ast.StringTypeID}},
-				ValueType: ast.BaseType{ID: ast.StringTypeID}},
-			want: []string{
-				`t.thrift:0:1: error: map key must be a primitive type (map.key.type.primitive)`,
-			},
-		},
-		{
-			prog: &ast.Program{},
-			node: ast.MapType{
-				KeyType:   ast.TypeReference{Name: "Enum"},
-				ValueType: ast.BaseType{ID: ast.StringTypeID}},
-			want: []string{
-				`t.thrift:0:1: error: map key must be a primitive type (map.key.type.primitive)`,
-			},
-		},
-		{
-			prog: &ast.Program{Definitions: []ast.Definition{
-				&ast.Enum{Name: "Enum"},
-			}},
-			node: ast.MapType{
-				KeyType:   ast.TypeReference{Name: "Enum"},
-				ValueType: ast.BaseType{ID: ast.StringTypeID}},
-			want: []string{},
-		},
-	}
-
-	check := checks.CheckMapKeyTypePrimitive()
-	RunTests(t, &check, tests)
-}
-
 func TestCheckMapValueType(t *testing.T) {
 	// Test with no disallowed types - should pass all
 	tests := []Test{
