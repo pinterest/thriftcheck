@@ -175,6 +175,8 @@ For a `map<>` key, if its type is in the `disallowed` list, this check will repo
 Otherwise, provided that the `allowed` list is not empty, the check will report an error if the
 key type is not part of the `allowed` types.
 
+See the [full list of supported types](#supported-type-names). Types are [matched semantically](#semantic-type-matching).
+
 ### `map.key.type.primitive`
 
 This check ensures that only primitive types are used for `map<>` keys.
