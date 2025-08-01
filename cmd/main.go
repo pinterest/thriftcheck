@@ -242,7 +242,7 @@ func main() {
 		checks.CheckIncludePath(),
 		checks.CheckIncludeRestricted(cfg.Checks.Include.Restricted),
 		checks.CheckInteger64bit(),
-		checks.CheckMapKeyType(cfg.Checks.Map.Key.Type.AllowedTypes, cfg.Checks.Map.Key.Type.DisallowedTypes),
+		checks.CheckMapKeyType(cfg.Checks.Map.Key.Type.Allowed, cfg.Checks.Map.Key.Type.Disallowed),
 		checks.CheckMapValueType(cfg.Checks.Map.Value.Disallowed),
 		checks.CheckNamesReserved(cfg.Checks.Names.Reserved),
 		checks.CheckNamespacePattern(cfg.Checks.Namespace.Patterns),
