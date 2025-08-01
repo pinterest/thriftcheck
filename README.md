@@ -166,7 +166,7 @@ This check can be configured to allow/disallow specific types from being used as
 
 ```toml
 [checks.map]
-[[checks.map.key]]
+[checks.map.key.type]
 allowed = []
 disallowed = []
 ```
