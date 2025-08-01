@@ -77,8 +77,8 @@ type Config struct {
 		Map struct {
 			Key struct {
 				Type struct {
-					AllowedTypes    []thriftcheck.ThriftType `fig:"allowed"`
-					DisallowedTypes []thriftcheck.ThriftType `fig:"disallowed"`
+					Allowed    []thriftcheck.ThriftType `fig:"allowed"`
+					Disallowed []thriftcheck.ThriftType `fig:"disallowed"`
 				}
 			}
 			Value struct {
