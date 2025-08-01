@@ -243,6 +243,7 @@ The supported type names include:
 - **Primitives**: `bool`, `i8`, `i16`, `i32`, `i64`, `double`, `string`, `binary`
 - **Collections**: `map`, `list`, `set`
 - **Structures**: `union`, `struct`, `exception`
+- **Enums**: `enum`
 
 ### Semantic type matching
 

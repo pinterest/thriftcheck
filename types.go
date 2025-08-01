@@ -74,7 +74,7 @@ var typeMatchers = map[string]typeMatcher{
 	"struct":    func(c *C, n ast.Node) bool { return matchStructureType(c, n, ast.StructType) },
 	"exception": func(c *C, n ast.Node) bool { return matchStructureType(c, n, ast.ExceptionType) },
 
-	// Other
+	// Enum types
 	"enum": func(c *C, n ast.Node) bool { return matchType[*ast.Enum](c, n) },
 }
 
