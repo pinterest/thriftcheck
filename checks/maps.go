@@ -23,7 +23,7 @@ import (
 // A type is disallowed if it either:
 //   - Appears in `disallowedTypes`
 //   - Does not appear in a non-empty `allowedTypes`
-func CheckMapKeyType(allowedTypes []thriftcheck.ThriftType, disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
+func CheckMapKeyType(allowedTypes, disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
 	return thriftcheck.NewCheck("map.key.type", func(c *thriftcheck.C, mt ast.MapType) {
 		for _, matcher := range disallowedTypes {
 			if matcher.Matches(c, mt.KeyType) {
