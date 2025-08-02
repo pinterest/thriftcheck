@@ -55,3 +55,12 @@ func RunTests(t *testing.T, check *thriftcheck.Check, tests []Test) {
 		}
 	}
 }
+
+func ParseType(t *testing.T, name string) (thriftType thriftcheck.ThriftType) {
+	t.Helper()
+
+	if err := thriftType.UnmarshalString(name); err != nil {
+		t.Fatal(err)
+	}
+	return
+}

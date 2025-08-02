@@ -129,3 +129,29 @@ func TestC(t *testing.T) {
 		t.Errorf("expected %s, got %s", expected, c.Messages)
 	}
 }
+
+func TestCheckType(t *testing.T) {
+	var stringType ThriftType
+	if err := stringType.UnmarshalString("string"); err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		t          ast.Type
+		allowed    []ThriftType
+		disallowed []ThriftType
+		ok         bool
+	}{
+		{ast.BaseType{ID: ast.StringTypeID}, []ThriftType{}, []ThriftType{}, true},
+		{ast.BaseType{ID: ast.StringTypeID}, []ThriftType{stringType}, []ThriftType{}, true},
+		{ast.BaseType{ID: ast.StringTypeID}, []ThriftType{}, []ThriftType{stringType}, false},
+		{ast.BaseType{ID: ast.I32TypeID}, []ThriftType{stringType}, []ThriftType{}, false},
+	}
+
+	c := &C{Filename: "test.thrift", Check: "check"}
+	for _, tt := range tests {
+		if ok, name := c.CheckType(tt.t, tt.allowed, tt.disallowed); ok != tt.ok {
+			t.Errorf("%q (allowed: %v, disallowed: %v), expected %v", name, tt.allowed, tt.disallowed, ok)
+		}
+	}
+}

@@ -224,3 +224,32 @@ func (c *C) ResolveType(ref ast.TypeReference) ast.Node {
 	}
 	return nil
 }
+
+// CheckType checks if a type is allowed.
+//
+// If the type appears in disallowedTypes, it is not allowed.
+// If allowedTypes is not empty, then the type must appear in it.
+func (c *C) CheckType(n ast.Node, allowedTypes, disallowedTypes []ThriftType) (bool, string) {
+	var name = "<node>"
+	if t, ok := n.(ast.Type); ok {
+		name = t.String()
+	}
+
+	for _, matcher := range disallowedTypes {
+		if matcher.Matches(c, n) {
+			return false, matcher.String()
+		}
+	}
+
+	if len(allowedTypes) == 0 {
+		return true, name
+	}
+
+	for _, matcher := range allowedTypes {
+		if matcher.Matches(c, n) {
+			return true, matcher.String()
+		}
+	}
+
+	return false, name
+}

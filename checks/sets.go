@@ -19,22 +19,12 @@ import (
 	"go.uber.org/thriftrw/ast"
 )
 
-// CheckSetValueType returns a thriftcheck.Check that ensures that only primitive
-// types are used for `set<>` values.
-func CheckSetValueType() thriftcheck.Check {
+// CheckSetValueType returns a thriftcheck.Check that checks if a `set<>` value
+// type is allowed.
+func CheckSetValueType(allowedTypes, disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
 	return thriftcheck.NewCheck("set.value.type", func(c *thriftcheck.C, st ast.SetType) {
-		switch t := st.ValueType.(type) {
-		case ast.BaseType:
-			break
-		case ast.TypeReference:
-			switch c.ResolveType(t).(type) {
-			case ast.BaseType, *ast.Enum, *ast.Typedef:
-				break
-			default:
-				c.Errorf(st, "set value must be a primitive type")
-			}
-		default:
-			c.Errorf(st, "set value must be a primitive type")
+		if ok, name := c.CheckType(st.ValueType, allowedTypes, disallowedTypes); !ok {
+			c.Errorf(st, "set value type %q is not allowed", name)
 		}
 	})
 }

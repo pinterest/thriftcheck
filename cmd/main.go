@@ -76,14 +76,18 @@ type Config struct {
 
 		Map struct {
 			Key struct {
-				Type struct {
-					Allowed    []thriftcheck.ThriftType `fig:"allowed"`
-					Disallowed []thriftcheck.ThriftType `fig:"disallowed"`
-				}
+				AllowedTypes    []thriftcheck.ThriftType `fig:"allowedTypes"`
+				DisallowedTypes []thriftcheck.ThriftType `fig:"disallowedTypes"`
 			}
 			Value struct {
-				Disallowed []thriftcheck.ThriftType `fig:"disallowed"`
+				AllowedTypes    []thriftcheck.ThriftType `fig:"allowedTypes"`
+				DisallowedTypes []thriftcheck.ThriftType `fig:"disallowedTypes"`
 			}
+		}
+
+		Set struct {
+			AllowedTypes    []thriftcheck.ThriftType `fig:"allowedTypes"`
+			DisallowedTypes []thriftcheck.ThriftType `fig:"disallowedTypes"`
 		}
 
 		Names struct {
@@ -95,7 +99,8 @@ type Config struct {
 		}
 
 		Types struct {
-			Disallowed []thriftcheck.ThriftType `fig:"disallowed"`
+			AllowedTypes    []thriftcheck.ThriftType `fig:"allowedTypes"`
+			DisallowedTypes []thriftcheck.ThriftType `fig:"disallowedTypes"`
 		}
 	}
 }
@@ -242,12 +247,12 @@ func main() {
 		checks.CheckIncludePath(),
 		checks.CheckIncludeRestricted(cfg.Checks.Include.Restricted),
 		checks.CheckInteger64bit(),
-		checks.CheckMapKeyType(cfg.Checks.Map.Key.Type.Allowed, cfg.Checks.Map.Key.Type.Disallowed),
-		checks.CheckMapValueType(cfg.Checks.Map.Value.Disallowed),
+		checks.CheckMapKeyType(cfg.Checks.Map.Key.AllowedTypes, cfg.Checks.Map.Key.DisallowedTypes),
+		checks.CheckMapValueType(cfg.Checks.Map.Value.AllowedTypes, cfg.Checks.Map.Value.DisallowedTypes),
 		checks.CheckNamesReserved(cfg.Checks.Names.Reserved),
 		checks.CheckNamespacePattern(cfg.Checks.Namespace.Patterns),
-		checks.CheckSetValueType(),
-		checks.CheckTypesDisallowed(cfg.Checks.Types.Disallowed),
+		checks.CheckSetValueType(cfg.Checks.Set.AllowedTypes, cfg.Checks.Set.DisallowedTypes),
+		checks.CheckTypes(cfg.Checks.Types.AllowedTypes, cfg.Checks.Types.DisallowedTypes),
 	}
 
 	checks := allChecks

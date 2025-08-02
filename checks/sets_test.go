@@ -17,11 +17,15 @@ package checks_test
 import (
 	"testing"
 
+	"github.com/pinterest/thriftcheck"
 	"github.com/pinterest/thriftcheck/checks"
 	"go.uber.org/thriftrw/ast"
 )
 
 func TestCheckSetValueType(t *testing.T) {
+	enumType := ParseType(t, "enum")
+	stringType := ParseType(t, "string")
+
 	tests := []Test{
 		{
 			node: ast.SetType{ValueType: ast.BaseType{ID: ast.StringTypeID}},
@@ -30,14 +34,14 @@ func TestCheckSetValueType(t *testing.T) {
 		{
 			node: ast.SetType{ValueType: ast.SetType{ValueType: ast.BaseType{ID: ast.StringTypeID}}},
 			want: []string{
-				`t.thrift:0:1: error: set value must be a primitive type (set.value.type)`,
+				`t.thrift:0:1: error: set value type "set<string>" is not allowed (set.value.type)`,
 			},
 		},
 		{
 			prog: &ast.Program{},
 			node: ast.SetType{ValueType: ast.TypeReference{Name: "Enum"}},
 			want: []string{
-				`t.thrift:0:1: error: set value must be a primitive type (set.value.type)`,
+				`t.thrift:0:1: error: set value type "Enum" is not allowed (set.value.type)`,
 			},
 		},
 		{
@@ -49,6 +53,6 @@ func TestCheckSetValueType(t *testing.T) {
 		},
 	}
 
-	check := checks.CheckSetValueType()
+	check := checks.CheckSetValueType([]thriftcheck.ThriftType{enumType, stringType}, []thriftcheck.ThriftType{})
 	RunTests(t, &check, tests)
 }
