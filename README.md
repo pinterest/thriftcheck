@@ -276,7 +276,7 @@ additional checks.
 
 You can disable one or more checks on a per-node basis using `nolint`
 directives. `nolint` directives apply to the current node and all of its
-descendents. The directives's value can be empty, in which case linting is
+descendants. The directive's value can be empty, in which case linting is
 entirely disabled, or it can be set to a comma-separated list of checks to
 disable.
 
