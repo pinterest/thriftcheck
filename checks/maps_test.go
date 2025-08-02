@@ -57,7 +57,7 @@ func TestCheckMapKeyType(t *testing.T) {
 			node: ast.MapType{
 				KeyType:   ast.BaseType{ID: ast.StringTypeID},
 				ValueType: ast.BaseType{ID: ast.StringTypeID}},
-			want: []string{`t.thrift:0:1: error: map key type is not in the 'allowed' list (map.key.type)`},
+			want: []string{`t.thrift:0:1: error: map key type "string" is not in the 'allowed' list (map.key.type)`},
 		},
 	}
 

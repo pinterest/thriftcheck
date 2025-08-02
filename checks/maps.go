@@ -40,7 +40,7 @@ func CheckMapKeyType(allowedTypes, disallowedTypes []thriftcheck.ThriftType) thr
 				return
 			}
 		}
-		c.Errorf(mt, "map key type is not in the 'allowed' list")
+		c.Errorf(mt, "map key type %q is not in the 'allowed' list", mt.KeyType)
 	})
 }
 
