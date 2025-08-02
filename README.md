@@ -162,7 +162,20 @@ Some languages (e.g. JavaScript) don't support 64-bit integers.
 
 ### `map.key.type`
 
-This check ensures that only primitive types are used for `map<>` keys.
+This check can be configured to allow/disallow specific types from being used as `map<>` keys.
+
+```toml
+[checks.map]
+[checks.map.key.type]
+allowed = []
+disallowed = []
+```
+
+For a `map<>` key, if its type is in the `disallowed` list, this check will report it as an error and stop.
+Otherwise, provided that the `allowed` list is not empty, the check will report an error if the
+key type is not part of the `allowed` types.
+
+See the [full list of supported types](#supported-type-names). Types are [matched semantically](#semantic-type-matching).
 
 ### `map.value.disallowed`
 
@@ -230,6 +243,7 @@ The supported type names include:
 - **Primitives**: `bool`, `i8`, `i16`, `i32`, `i64`, `double`, `string`, `binary`
 - **Collections**: `map`, `list`, `set`
 - **Structures**: `union`, `struct`, `exception`
+- **Enums**: `enum`
 
 ### Semantic type matching
 

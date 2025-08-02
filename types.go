@@ -73,10 +73,13 @@ var typeMatchers = map[string]typeMatcher{
 	"union":     func(c *C, n ast.Node) bool { return matchStructureType(c, n, ast.UnionType) },
 	"struct":    func(c *C, n ast.Node) bool { return matchStructureType(c, n, ast.StructType) },
 	"exception": func(c *C, n ast.Node) bool { return matchStructureType(c, n, ast.ExceptionType) },
+
+	// Enum types
+	"enum": func(c *C, n ast.Node) bool { return matchType[*ast.Enum](c, n) },
 }
 
 // Match a generic type, resolving any type references.
-func matchType[T ast.Type](c *C, n ast.Node) bool {
+func matchType[T ast.Node](c *C, n ast.Node) bool {
 	if ref, ok := n.(ast.TypeReference); ok {
 		if n = c.ResolveType(ref); n == nil {
 			return false

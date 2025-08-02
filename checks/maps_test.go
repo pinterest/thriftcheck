@@ -23,31 +23,26 @@ import (
 )
 
 func TestCheckMapKeyType(t *testing.T) {
+	var i8Type thriftcheck.ThriftType
+	if err := i8Type.UnmarshalString("i8"); err != nil {
+		t.Fatalf("Failed to unmarshal i8 type: %v", err)
+	}
+	var enumType thriftcheck.ThriftType
+	if err := enumType.UnmarshalString("enum"); err != nil {
+		t.Fatalf("Failed to unmarshal enum type: %v", err)
+	}
+	var stringType thriftcheck.ThriftType
+	if err := stringType.UnmarshalString("string"); err != nil {
+		t.Fatalf("Failed to unmarshal string type: %v", err)
+	}
+
+	// Test with only allowed types.
 	tests := []Test{
 		{
 			node: ast.MapType{
-				KeyType:   ast.BaseType{ID: ast.StringTypeID},
+				KeyType:   ast.BaseType{ID: ast.I8TypeID},
 				ValueType: ast.BaseType{ID: ast.StringTypeID}},
 			want: []string{},
-		},
-		{
-			node: ast.MapType{
-				KeyType: ast.MapType{
-					KeyType:   ast.BaseType{ID: ast.StringTypeID},
-					ValueType: ast.BaseType{ID: ast.StringTypeID}},
-				ValueType: ast.BaseType{ID: ast.StringTypeID}},
-			want: []string{
-				`t.thrift:0:1: error: map key must be a primitive type (map.key.type)`,
-			},
-		},
-		{
-			prog: &ast.Program{},
-			node: ast.MapType{
-				KeyType:   ast.TypeReference{Name: "Enum"},
-				ValueType: ast.BaseType{ID: ast.StringTypeID}},
-			want: []string{
-				`t.thrift:0:1: error: map key must be a primitive type (map.key.type)`,
-			},
 		},
 		{
 			prog: &ast.Program{Definitions: []ast.Definition{
@@ -58,9 +53,74 @@ func TestCheckMapKeyType(t *testing.T) {
 				ValueType: ast.BaseType{ID: ast.StringTypeID}},
 			want: []string{},
 		},
+		{
+			node: ast.MapType{
+				KeyType:   ast.BaseType{ID: ast.StringTypeID},
+				ValueType: ast.BaseType{ID: ast.StringTypeID}},
+			want: []string{`t.thrift:0:1: error: map key type "string" is not in the 'allowed' list (map.key.type)`},
+		},
 	}
 
-	check := checks.CheckMapKeyType()
+	check := checks.CheckMapKeyType([]thriftcheck.ThriftType{i8Type, enumType}, []thriftcheck.ThriftType{})
+	RunTests(t, &check, tests)
+
+	// Test with only disallowed types.
+	tests = []Test{
+		{
+			node: ast.MapType{
+				KeyType:   ast.BaseType{ID: ast.I8TypeID},
+				ValueType: ast.BaseType{ID: ast.StringTypeID}},
+			want: []string{`t.thrift:0:1: error: map key type "i8" is disallowed (map.key.type)`},
+		},
+		{
+			prog: &ast.Program{Definitions: []ast.Definition{
+				&ast.Enum{Name: "Enum"},
+			}},
+			node: ast.MapType{
+				KeyType:   ast.TypeReference{Name: "Enum"},
+				ValueType: ast.BaseType{ID: ast.StringTypeID}},
+			want: []string{`t.thrift:0:1: error: map key type "enum" is disallowed (map.key.type)`},
+		},
+		{
+			node: ast.MapType{
+				KeyType:   ast.BaseType{ID: ast.StringTypeID},
+				ValueType: ast.BaseType{ID: ast.StringTypeID}},
+			want: []string{},
+		},
+	}
+
+	check = checks.CheckMapKeyType([]thriftcheck.ThriftType{}, []thriftcheck.ThriftType{i8Type, enumType})
+	RunTests(t, &check, tests)
+
+	// Test with both allowed and disallowed types.
+	tests = []Test{
+		{
+			node: ast.MapType{
+				KeyType:   ast.BaseType{ID: ast.I8TypeID},
+				ValueType: ast.BaseType{ID: ast.StringTypeID}},
+			// Disallowances have precedence over allowances.
+			want: []string{`t.thrift:0:1: error: map key type "i8" is disallowed (map.key.type)`},
+		},
+		{
+			prog: &ast.Program{Definitions: []ast.Definition{
+				&ast.Enum{Name: "Enum"},
+			}},
+			node: ast.MapType{
+				KeyType:   ast.TypeReference{Name: "Enum"},
+				ValueType: ast.BaseType{ID: ast.StringTypeID}},
+			want: []string{},
+		},
+		{
+			node: ast.MapType{
+				KeyType:   ast.BaseType{ID: ast.StringTypeID},
+				ValueType: ast.BaseType{ID: ast.StringTypeID}},
+			want: []string{`t.thrift:0:1: error: map key type "string" is disallowed (map.key.type)`},
+		},
+	}
+
+	check = checks.CheckMapKeyType(
+		[]thriftcheck.ThriftType{i8Type, enumType},
+		[]thriftcheck.ThriftType{i8Type, stringType})
 	RunTests(t, &check, tests)
 }
 

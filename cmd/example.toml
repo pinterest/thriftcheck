@@ -27,6 +27,9 @@ error = 1000
 "*" = "(huge|massive).thrift"
 
 [checks.map]
+[checks.map.key.type]
+allowed = []
+disallowed = []
 [checks.map.value]
 # Disallow specific types as map values to enforce coding standards
 # Common examples:
