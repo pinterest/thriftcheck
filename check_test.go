@@ -129,3 +129,34 @@ func TestC(t *testing.T) {
 		t.Errorf("expected %s, got %s", expected, c.Messages)
 	}
 }
+
+func TestIsTypeAllowed(t *testing.T) {
+	var stringType ThriftType
+	if err := stringType.UnmarshalString("string"); err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		n          ast.Node
+		allowed    []ThriftType
+		disallowed []ThriftType
+		ok         bool
+		name       string
+	}{
+		{ast.BaseType{ID: ast.StringTypeID}, []ThriftType{}, []ThriftType{}, true, "string"},
+		{ast.BaseType{ID: ast.StringTypeID}, []ThriftType{stringType}, []ThriftType{}, true, "string"},
+		{ast.BaseType{ID: ast.StringTypeID}, []ThriftType{}, []ThriftType{stringType}, false, "string"},
+		{ast.BaseType{ID: ast.I32TypeID}, []ThriftType{stringType}, []ThriftType{}, false, "i32"},
+		{&ast.Program{}, []ThriftType{stringType}, []ThriftType{}, false, "<node>"},
+	}
+
+	c := &C{Filename: "test.thrift", Check: "check"}
+	for _, tt := range tests {
+		ok, name := c.IsTypeAllowed(tt.n, tt.allowed, tt.disallowed)
+		if ok != tt.ok {
+			t.Errorf("%q (allowed: %v, disallowed: %v), expected %v", name, tt.allowed, tt.disallowed, ok)
+		} else if name != tt.name {
+			t.Errorf("expected %q, got %q", tt.name, name)
+		}
+	}
+}

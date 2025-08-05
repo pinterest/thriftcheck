@@ -162,35 +162,29 @@ Some languages (e.g. JavaScript) don't support 64-bit integers.
 
 ### `map.key.type`
 
-This check can be configured to allow/disallow specific types from being used as `map<>` keys.
+This check restricts the types that can be used as `map<>` keys. It is
+configured with lists of [allowed and disallowed types](#type-checks).
 
 ```toml
-[checks.map]
-[checks.map.key.type]
-allowed = []
-disallowed = []
+[checks.map.key]
+allowedTypes = [
+    "string", # Only allow string map keys
+]
 ```
 
-For a `map<>` key, if its type is in the `disallowed` list, this check will report it as an error and stop.
-Otherwise, provided that the `allowed` list is not empty, the check will report an error if the
-key type is not part of the `allowed` types.
+### `map.value.type`
 
-See the [full list of supported types](#supported-type-names). Types are [matched semantically](#semantic-type-matching).
-
-### `map.value.disallowed`
-
-This check allows you to disallow specific types from being used as `map<>` values. This is useful for enforcing coding standards around map usage, such as disallowing nested maps for simplicity or preventing unions as map values for serialization compatibility.
+This check restricts the types that can be used as `map<>` values. It is
+configured with lists of [allowed and disallowed types](#type-checks).
 
 ```toml
 [checks.map.value]
-disallowed = [
+disallowedTypes = [
     "union",  # Disallow unions as map values
     "map",    # Disallow nested maps
     "i32",    # Disallow i32 as map values
 ]
 ```
-
-See the [full list of supported types](#supported-type-names). Types are [matched semantically](#semantic-type-matching).
 
 ### `names.reserved`
 
@@ -218,36 +212,47 @@ py = "^idl\\."
 
 ### `set.value.type`
 
-This check ensures that only primitive types are used for `set<>` values.
+This check restricts the types that can be used as `set<>` values. It is
+configured with lists of [allowed and disallowed types](#type-checks).
 
-### `types.disallowed`
+```toml
+[checks.set.value]
+allowedTypes = [
+    "string", # Only allow string set values
+]
+```
 
-This check allows you to disallow specific types from being used.
+### `types`
+
+This check restricts the types that can be used in all contexts. It is
+configured with lists of [allowed and disallowed types](#type-checks).
 
 ```toml
 [checks.types]
-disallowed = [
+disallowedTypes = [
     "union",
 ]
 ```
 
-See the [full list of available types](#supported-type-names). Types are [matched semantically](#semantic-type-matching).
+## Type Checks
 
-## Supported type names
+Some checks are used to restrict the set of types that are allowed in various
+contexts, with the [`types`](#types) check acting globally. All of these checks
+use the same matching and configuration pattern.
 
-There are multiple checks which can be configured by specifying the types they act upon. These checks are:
-- [`map.value.restricted`](#mapvaluerestricted)
-- [`types.disallowed`](#typesdisallowed)
+If the type is in the `disallowedTypes` list, this check will report an error
+stop. Otherwise, if the `allowedTypes` list is not empty, the check will report
+an error if the type is not part of the `allowedTypes` list.
 
 The supported type names include:
+
 - **Primitives**: `bool`, `i8`, `i16`, `i32`, `i64`, `double`, `string`, `binary`
+- **Enumerations**: `enum`
 - **Collections**: `map`, `list`, `set`
 - **Structures**: `union`, `struct`, `exception`
-- **Enums**: `enum`
 
-### Semantic type matching
-
-Types are matched semantically, including resolving `typedef`s to their underlying types, so `typedef`s and other indirect type references are properly handled.
+Types are matched semantically, including resolving type definitions, so
+`typedef`s and other indirect type references are properly handled.
 
 ## Custom Checks
 

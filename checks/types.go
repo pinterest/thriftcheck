@@ -20,13 +20,10 @@ import (
 )
 
 // CheckTypesDisallowed reports an error if a disallowed type is used.
-func CheckTypesDisallowed(disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
-	return thriftcheck.NewCheck("types.disallowed", func(c *thriftcheck.C, n ast.Node) {
-		for _, matcher := range disallowedTypes {
-			if matcher.Matches(c, n) {
-				c.Errorf(n, "type %q is not allowed", matcher)
-				return
-			}
+func CheckTypes(allowedTypes, disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
+	return thriftcheck.NewCheck("types", func(c *thriftcheck.C, n ast.Node) {
+		if ok, name := c.IsTypeAllowed(n, allowedTypes, disallowedTypes); !ok {
+			c.Errorf(n, "type %q is not allowed", name)
 		}
 	})
 }

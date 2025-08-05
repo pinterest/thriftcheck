@@ -23,21 +23,15 @@ import (
 )
 
 func TestCheckTypesDisallowed(t *testing.T) {
-	var unionType thriftcheck.ThriftType
-	if err := unionType.UnmarshalString("union"); err != nil {
-		t.Fatalf("Failed to unmarshall union type: %v", err)
-	}
-	var mapType thriftcheck.ThriftType
-	if err := mapType.UnmarshalString("map"); err != nil {
-		t.Fatalf("Failed to unmarshall map type: %v", err)
-	}
+	unionType := ParseType(t, "union")
+	mapType := ParseType(t, "map")
 
 	// Tests with a single disallowed type (union).
 	tests := []Test{
 		{
 			node: &ast.Struct{Type: ast.UnionType},
 			want: []string{
-				`t.thrift:0:1: error: type "union" is not allowed (types.disallowed)`,
+				`t.thrift:0:1: error: type "union" is not allowed (types)`,
 			},
 		},
 		{
@@ -46,7 +40,7 @@ func TestCheckTypesDisallowed(t *testing.T) {
 			}},
 			node: ast.TypeReference{Name: "MyUnion"},
 			want: []string{
-				`t.thrift:0:1: error: type "union" is not allowed (types.disallowed)`,
+				`t.thrift:0:1: error: type "union" is not allowed (types)`,
 			},
 		},
 		{
@@ -59,7 +53,7 @@ func TestCheckTypesDisallowed(t *testing.T) {
 		},
 	}
 
-	check := checks.CheckTypesDisallowed([]thriftcheck.ThriftType{unionType})
+	check := checks.CheckTypes([]thriftcheck.ThriftType{}, []thriftcheck.ThriftType{unionType})
 	RunTests(t, &check, tests)
 
 	// Tests with multiple disallowed types (union and map).
@@ -67,7 +61,7 @@ func TestCheckTypesDisallowed(t *testing.T) {
 		{
 			node: &ast.Struct{Type: ast.UnionType},
 			want: []string{
-				`t.thrift:0:1: error: type "union" is not allowed (types.disallowed)`,
+				`t.thrift:0:1: error: type "union" is not allowed (types)`,
 			},
 		},
 		{
@@ -75,7 +69,7 @@ func TestCheckTypesDisallowed(t *testing.T) {
 				KeyType:   ast.BaseType{ID: ast.I16TypeID},
 				ValueType: ast.BaseType{ID: ast.StringTypeID}},
 			want: []string{
-				`t.thrift:0:1: error: type "map" is not allowed (types.disallowed)`,
+				`t.thrift:0:1: error: type "map" is not allowed (types)`,
 			},
 		},
 		{
@@ -84,7 +78,7 @@ func TestCheckTypesDisallowed(t *testing.T) {
 		},
 	}
 
-	check = checks.CheckTypesDisallowed([]thriftcheck.ThriftType{unionType, mapType})
+	check = checks.CheckTypes([]thriftcheck.ThriftType{}, []thriftcheck.ThriftType{unionType, mapType})
 	RunTests(t, &check, tests)
 
 	// Tests with no disallowed types.
@@ -110,6 +104,6 @@ func TestCheckTypesDisallowed(t *testing.T) {
 		},
 	}
 
-	check = checks.CheckTypesDisallowed([]thriftcheck.ThriftType{})
+	check = checks.CheckTypes([]thriftcheck.ThriftType{}, []thriftcheck.ThriftType{})
 	RunTests(t, &check, tests)
 }

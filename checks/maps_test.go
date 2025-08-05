@@ -23,18 +23,9 @@ import (
 )
 
 func TestCheckMapKeyType(t *testing.T) {
-	var i8Type thriftcheck.ThriftType
-	if err := i8Type.UnmarshalString("i8"); err != nil {
-		t.Fatalf("Failed to unmarshal i8 type: %v", err)
-	}
-	var enumType thriftcheck.ThriftType
-	if err := enumType.UnmarshalString("enum"); err != nil {
-		t.Fatalf("Failed to unmarshal enum type: %v", err)
-	}
-	var stringType thriftcheck.ThriftType
-	if err := stringType.UnmarshalString("string"); err != nil {
-		t.Fatalf("Failed to unmarshal string type: %v", err)
-	}
+	i8Type := ParseType(t, "i8")
+	enumType := ParseType(t, "enum")
+	stringType := ParseType(t, "string")
 
 	// Test with only allowed types.
 	tests := []Test{
@@ -57,7 +48,7 @@ func TestCheckMapKeyType(t *testing.T) {
 			node: ast.MapType{
 				KeyType:   ast.BaseType{ID: ast.StringTypeID},
 				ValueType: ast.BaseType{ID: ast.StringTypeID}},
-			want: []string{`t.thrift:0:1: error: map key type "string" is not in the 'allowed' list (map.key.type)`},
+			want: []string{`t.thrift:0:1: error: map key type "string" is not allowed (map.key.type)`},
 		},
 	}
 
@@ -70,7 +61,7 @@ func TestCheckMapKeyType(t *testing.T) {
 			node: ast.MapType{
 				KeyType:   ast.BaseType{ID: ast.I8TypeID},
 				ValueType: ast.BaseType{ID: ast.StringTypeID}},
-			want: []string{`t.thrift:0:1: error: map key type "i8" is disallowed (map.key.type)`},
+			want: []string{`t.thrift:0:1: error: map key type "i8" is not allowed (map.key.type)`},
 		},
 		{
 			prog: &ast.Program{Definitions: []ast.Definition{
@@ -79,7 +70,7 @@ func TestCheckMapKeyType(t *testing.T) {
 			node: ast.MapType{
 				KeyType:   ast.TypeReference{Name: "Enum"},
 				ValueType: ast.BaseType{ID: ast.StringTypeID}},
-			want: []string{`t.thrift:0:1: error: map key type "enum" is disallowed (map.key.type)`},
+			want: []string{`t.thrift:0:1: error: map key type "enum" is not allowed (map.key.type)`},
 		},
 		{
 			node: ast.MapType{
@@ -99,7 +90,7 @@ func TestCheckMapKeyType(t *testing.T) {
 				KeyType:   ast.BaseType{ID: ast.I8TypeID},
 				ValueType: ast.BaseType{ID: ast.StringTypeID}},
 			// Disallowances have precedence over allowances.
-			want: []string{`t.thrift:0:1: error: map key type "i8" is disallowed (map.key.type)`},
+			want: []string{`t.thrift:0:1: error: map key type "i8" is not allowed (map.key.type)`},
 		},
 		{
 			prog: &ast.Program{Definitions: []ast.Definition{
@@ -114,7 +105,7 @@ func TestCheckMapKeyType(t *testing.T) {
 			node: ast.MapType{
 				KeyType:   ast.BaseType{ID: ast.StringTypeID},
 				ValueType: ast.BaseType{ID: ast.StringTypeID}},
-			want: []string{`t.thrift:0:1: error: map key type "string" is disallowed (map.key.type)`},
+			want: []string{`t.thrift:0:1: error: map key type "string" is not allowed (map.key.type)`},
 		},
 	}
 
@@ -141,7 +132,7 @@ func TestCheckMapValueType(t *testing.T) {
 		},
 	}
 
-	check := checks.CheckMapValueType([]thriftcheck.ThriftType{})
+	check := checks.CheckMapValueType([]thriftcheck.ThriftType{}, []thriftcheck.ThriftType{})
 	RunTests(t, &check, tests)
 
 	// Test with i32 disallowed
@@ -152,7 +143,7 @@ func TestCheckMapValueType(t *testing.T) {
 				KeyType:   ast.BaseType{ID: ast.StringTypeID},
 				ValueType: ast.BaseType{ID: ast.I32TypeID}},
 			want: []string{
-				`t.thrift:0:1: error: map value type i32 is disallowed (map.value.disallowed)`,
+				`t.thrift:0:1: error: map value type "i32" is not allowed (map.value.type)`,
 			},
 		},
 		{
@@ -164,11 +155,8 @@ func TestCheckMapValueType(t *testing.T) {
 		},
 	}
 
-	var i32Type thriftcheck.ThriftType
-	if err := i32Type.UnmarshalString("i32"); err != nil {
-		t.Fatalf("Failed to unmarshal i32 type: %v", err)
-	}
-	checkI32 := checks.CheckMapValueType([]thriftcheck.ThriftType{i32Type})
+	i32Type := ParseType(t, "i32")
+	checkI32 := checks.CheckMapValueType([]thriftcheck.ThriftType{}, []thriftcheck.ThriftType{i32Type})
 	RunTests(t, &checkI32, testsI32)
 
 	// Test with map disallowed
@@ -181,7 +169,7 @@ func TestCheckMapValueType(t *testing.T) {
 					KeyType:   ast.BaseType{ID: ast.I64TypeID},
 					ValueType: ast.BaseType{ID: ast.StringTypeID}}},
 			want: []string{
-				`t.thrift:0:1: error: map value type map is disallowed (map.value.disallowed)`,
+				`t.thrift:0:1: error: map value type "map" is not allowed (map.value.type)`,
 			},
 		},
 		{
@@ -198,7 +186,7 @@ func TestCheckMapValueType(t *testing.T) {
 				KeyType:   ast.BaseType{ID: ast.StringTypeID},
 				ValueType: ast.TypeReference{Name: "MapType"}},
 			want: []string{
-				`t.thrift:0:1: error: map value type map is disallowed (map.value.disallowed)`,
+				`t.thrift:0:1: error: map value type "map" is not allowed (map.value.type)`,
 			},
 		},
 		{
@@ -210,11 +198,8 @@ func TestCheckMapValueType(t *testing.T) {
 		},
 	}
 
-	var mapType thriftcheck.ThriftType
-	if err := mapType.UnmarshalString("map"); err != nil {
-		t.Fatalf("Failed to unmarshal map type: %v", err)
-	}
-	checkMap := checks.CheckMapValueType([]thriftcheck.ThriftType{mapType})
+	mapType := ParseType(t, "map")
+	checkMap := checks.CheckMapValueType([]thriftcheck.ThriftType{}, []thriftcheck.ThriftType{mapType})
 	RunTests(t, &checkMap, testsMap)
 
 	// Test with union disallowed
@@ -228,7 +213,7 @@ func TestCheckMapValueType(t *testing.T) {
 				KeyType:   ast.BaseType{ID: ast.StringTypeID},
 				ValueType: ast.TypeReference{Name: "TestUnion"}},
 			want: []string{
-				`t.thrift:0:1: error: map value type union is disallowed (map.value.disallowed)`,
+				`t.thrift:0:1: error: map value type "union" is not allowed (map.value.type)`,
 			},
 		},
 		{
@@ -243,10 +228,7 @@ func TestCheckMapValueType(t *testing.T) {
 		},
 	}
 
-	var unionType thriftcheck.ThriftType
-	if err := unionType.UnmarshalString("union"); err != nil {
-		t.Fatalf("Failed to unmarshal union type: %v", err)
-	}
-	checkUnion := checks.CheckMapValueType([]thriftcheck.ThriftType{unionType})
+	unionType := ParseType(t, "union")
+	checkUnion := checks.CheckMapValueType([]thriftcheck.ThriftType{}, []thriftcheck.ThriftType{unionType})
 	RunTests(t, &checkUnion, testsUnion)
 }

@@ -19,41 +19,22 @@ import (
 	"go.uber.org/thriftrw/ast"
 )
 
-// CheckMapKeyType reports an error if a disallowed map key type is used.
-// A type is disallowed if it either:
-//   - Appears in `disallowedTypes`
-//   - Does not appear in a non-empty `allowedTypes`
+// CheckMapKeyType returns a thriftcheck.Check that checks if a `map<>` key
+// type is allowed.
 func CheckMapKeyType(allowedTypes, disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
 	return thriftcheck.NewCheck("map.key.type", func(c *thriftcheck.C, mt ast.MapType) {
-		for _, matcher := range disallowedTypes {
-			if matcher.Matches(c, mt.KeyType) {
-				c.Errorf(mt, "map key type %q is disallowed", matcher)
-				return
-			}
+		if ok, name := c.IsTypeAllowed(mt.KeyType, allowedTypes, disallowedTypes); !ok {
+			c.Errorf(mt, "map key type %q is not allowed", name)
 		}
-
-		if len(allowedTypes) == 0 {
-			return
-		}
-		for _, matcher := range allowedTypes {
-			if matcher.Matches(c, mt.KeyType) {
-				return
-			}
-		}
-		c.Errorf(mt, "map key type %q is not in the 'allowed' list", mt.KeyType)
 	})
 }
 
-// CheckMapValueType returns a thriftcheck.Check that ensures map values don't use disallowed types.
-// The disallowedTypes slice allows configurable type disallowances.
-// Common use cases: disallow nested maps, unions, complex collections, etc.
-func CheckMapValueType(disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
-	return thriftcheck.NewCheck("map.value.disallowed", func(c *thriftcheck.C, mt ast.MapType) {
-		for _, matcher := range disallowedTypes {
-			if matcher.Matches(c, mt.ValueType) {
-				c.Errorf(mt, "map value type %s is disallowed", matcher)
-				return
-			}
+// CheckMapKeyType returns a thriftcheck.Check that checks if a `map<>` value
+// type is allowed.
+func CheckMapValueType(allowedTypes, disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
+	return thriftcheck.NewCheck("map.value.type", func(c *thriftcheck.C, mt ast.MapType) {
+		if ok, name := c.IsTypeAllowed(mt.ValueType, allowedTypes, disallowedTypes); !ok {
+			c.Errorf(mt, "map value type %q is not allowed", name)
 		}
 	})
 }
