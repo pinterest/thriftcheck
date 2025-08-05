@@ -22,7 +22,7 @@ import (
 // CheckTypesDisallowed reports an error if a disallowed type is used.
 func CheckTypes(allowedTypes, disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
 	return thriftcheck.NewCheck("types", func(c *thriftcheck.C, n ast.Node) {
-		if ok, name := c.CheckType(n, allowedTypes, disallowedTypes); !ok {
+		if ok, name := c.IsTypeAllowed(n, allowedTypes, disallowedTypes); !ok {
 			c.Errorf(n, "type %q is not allowed", name)
 		}
 	})

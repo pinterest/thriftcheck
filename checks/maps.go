@@ -23,7 +23,7 @@ import (
 // type is allowed.
 func CheckMapKeyType(allowedTypes, disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
 	return thriftcheck.NewCheck("map.key.type", func(c *thriftcheck.C, mt ast.MapType) {
-		if ok, name := c.CheckType(mt.KeyType, allowedTypes, disallowedTypes); !ok {
+		if ok, name := c.IsTypeAllowed(mt.KeyType, allowedTypes, disallowedTypes); !ok {
 			c.Errorf(mt, "map key type %q is not allowed", name)
 		}
 	})
@@ -33,7 +33,7 @@ func CheckMapKeyType(allowedTypes, disallowedTypes []thriftcheck.ThriftType) thr
 // type is allowed.
 func CheckMapValueType(allowedTypes, disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
 	return thriftcheck.NewCheck("map.value.type", func(c *thriftcheck.C, mt ast.MapType) {
-		if ok, name := c.CheckType(mt.ValueType, allowedTypes, disallowedTypes); !ok {
+		if ok, name := c.IsTypeAllowed(mt.ValueType, allowedTypes, disallowedTypes); !ok {
 			c.Errorf(mt, "map value type %q is not allowed", name)
 		}
 	})

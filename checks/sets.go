@@ -23,7 +23,7 @@ import (
 // type is allowed.
 func CheckSetValueType(allowedTypes, disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
 	return thriftcheck.NewCheck("set.value.type", func(c *thriftcheck.C, st ast.SetType) {
-		if ok, name := c.CheckType(st.ValueType, allowedTypes, disallowedTypes); !ok {
+		if ok, name := c.IsTypeAllowed(st.ValueType, allowedTypes, disallowedTypes); !ok {
 			c.Errorf(st, "set value type %q is not allowed", name)
 		}
 	})
