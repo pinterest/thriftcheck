@@ -163,7 +163,7 @@ Some languages (e.g. JavaScript) don't support 64-bit integers.
 ### `map.key.type`
 
 This check restricts the types that can be used as `map<>` keys. It is
-configured with a lists of allowed and disallowed types.
+configured with lists of [allowed and disallowed types](#type-checks).
 
 ```toml
 [checks.map.key]
@@ -172,14 +172,10 @@ allowedTypes = [
 ]
 ```
 
-If the type is in the `disallowedTypes` list, this check will report an error
-stop. Otherwise, if the `allowedTypes` list is not empty, the check will report
-an error if the type is not part of the `allowedTypes` list.
-
 ### `map.value.type`
 
 This check restricts the types that can be used as `map<>` values. It is
-configured with a lists of allowed and disallowed types.
+configured with lists of [allowed and disallowed types](#type-checks).
 
 ```toml
 [checks.map.value]
@@ -189,10 +185,6 @@ disallowedTypes = [
     "i32",    # Disallow i32 as map values
 ]
 ```
-
-If the type is in the `disallowedTypes` list, this check will report an error
-stop. Otherwise, if the `allowedTypes` list is not empty, the check will report
-an error if the type is not part of the `allowedTypes` list.
 
 ### `names.reserved`
 
@@ -221,7 +213,7 @@ py = "^idl\\."
 ### `set.value.type`
 
 This check restricts the types that can be used as `set<>` values. It is
-configured with a lists of allowed and disallowed types.
+configured with lists of [allowed and disallowed types](#type-checks).
 
 ```toml
 [checks.set.value]
@@ -230,14 +222,10 @@ allowedTypes = [
 ]
 ```
 
-If the type is in the `disallowedTypes` list, this check will report an error
-stop. Otherwise, if the `allowedTypes` list is not empty, the check will report
-an error if the type is not part of the `allowedTypes` list.
-
 ### `types`
 
 This check restricts the types that can be used in all contexts. It is
-configured with a lists of allowed and disallowed types.
+configured with lists of [allowed and disallowed types](#type-checks).
 
 ```toml
 [checks.types]
@@ -246,21 +234,25 @@ disallowedTypes = [
 ]
 ```
 
-See the [full list of available types](#supported-type-names). Types are [matched semantically](#semantic-type-matching).
+## Type Checks
 
-## Supported type names
+Some checks are used to restrict the set of types that are allowed in various
+contexts, with the [`types`][] check acting globally. All of these checks use
+the same matching and configuration pattern.
 
-There are multiple checks which can be configured by specifying the types they act upon.
+If the type is in the `disallowedTypes` list, this check will report an error
+stop. Otherwise, if the `allowedTypes` list is not empty, the check will report
+an error if the type is not part of the `allowedTypes` list.
 
 The supported type names include:
+
 - **Primitives**: `bool`, `i8`, `i16`, `i32`, `i64`, `double`, `string`, `binary`
+- **Enumerations**: `enum`
 - **Collections**: `map`, `list`, `set`
 - **Structures**: `union`, `struct`, `exception`
-- **Enums**: `enum`
 
-### Semantic type matching
-
-Types are matched semantically, including resolving `typedef`s to their underlying types, so `typedef`s and other indirect type references are properly handled.
+Types are matched semantically, including resolving type definitions, so
+`typedef`s and other indirect type references are properly handled.
 
 ## Custom Checks
 
