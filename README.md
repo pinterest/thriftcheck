@@ -237,8 +237,8 @@ disallowedTypes = [
 ## Type Checks
 
 Some checks are used to restrict the set of types that are allowed in various
-contexts, with the [`types`][] check acting globally. All of these checks use
-the same matching and configuration pattern.
+contexts, with the [`types`](#types) check acting globally. All of these checks
+use the same matching and configuration pattern.
 
 If the type is in the `disallowedTypes` list, this check will report an error
 stop. Otherwise, if the `allowedTypes` list is not empty, the check will report
