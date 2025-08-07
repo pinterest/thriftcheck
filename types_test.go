@@ -46,9 +46,9 @@ func TestParseTypes(t *testing.T) {
 			expectedCount: 3,
 		},
 		{
-			name:          "valid primitive types",
-			input:         []string{"bool", "i32", "string"},
-			expectedCount: 3,
+			name:          "valid base types",
+			input:         []string{"base", "bool", "i32", "string"},
+			expectedCount: 4,
 		},
 		{
 			name:          "valid structure types",
@@ -119,11 +119,12 @@ func TestTypeMatchers_Functionality(t *testing.T) {
 		{"set matches SetType", "set", ast.SetType{}, true},
 		{"map doesn't match ListType", "map", ast.ListType{}, false},
 
-		// Primitive types
+		// Base types
 		{"i32 matches I32", "i32", ast.BaseType{ID: ast.I32TypeID}, true},
 		{"string matches String", "string", ast.BaseType{ID: ast.StringTypeID}, true},
 		{"bool matches Bool", "bool", ast.BaseType{ID: ast.BoolTypeID}, true},
 		{"i32 doesn't match String", "i32", ast.BaseType{ID: ast.StringTypeID}, false},
+		{"base matches any base type", "base", ast.BaseType{ID: ast.StringTypeID}, true},
 
 		// Structure types - Direct *ast.Struct
 		{"union matches direct Union struct", "union", &ast.Struct{Type: ast.UnionType}, true},

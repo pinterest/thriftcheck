@@ -244,12 +244,11 @@ If the type is in the `disallowedTypes` list, this check will report an error
 stop. Otherwise, if the `allowedTypes` list is not empty, the check will report
 an error if the type is not part of the `allowedTypes` list.
 
-The supported type names include:
+The supported type names are:
 
-- **Primitives**: `bool`, `i8`, `i16`, `i32`, `i64`, `double`, `string`, `binary`
-- **Enumerations**: `enum`
+- **Base Types**: `base` _(any base type)_, `bool`, `i8`, `i16`, `i32`, `i64`, `double`, `string`, `binary`
 - **Collections**: `map`, `list`, `set`
-- **Structures**: `union`, `struct`, `exception`
+- **Definitions**: `enum`, `union`, `struct`, `exception`
 
 Types are matched semantically, including resolving type definitions, so
 `typedef`s and other indirect type references are properly handled.

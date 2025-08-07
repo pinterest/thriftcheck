@@ -54,12 +54,8 @@ func (t ThriftType) String() string {
 }
 
 var typeMatchers = map[string]typeMatcher{
-	// Collection types
-	"map":  func(c *C, n ast.Node) bool { return matchType[ast.MapType](c, n) },
-	"list": func(c *C, n ast.Node) bool { return matchType[ast.ListType](c, n) },
-	"set":  func(c *C, n ast.Node) bool { return matchType[ast.SetType](c, n) },
-
-	// Primitive types
+	// Base types
+	"base":   func(c *C, n ast.Node) bool { _, ok := n.(ast.BaseType); return ok },
 	"bool":   func(c *C, n ast.Node) bool { return matchBaseType(n, ast.BoolTypeID) },
 	"i8":     func(c *C, n ast.Node) bool { return matchBaseType(n, ast.I8TypeID) },
 	"i16":    func(c *C, n ast.Node) bool { return matchBaseType(n, ast.I16TypeID) },
@@ -69,13 +65,16 @@ var typeMatchers = map[string]typeMatcher{
 	"string": func(c *C, n ast.Node) bool { return matchBaseType(n, ast.StringTypeID) },
 	"binary": func(c *C, n ast.Node) bool { return matchBaseType(n, ast.BinaryTypeID) },
 
-	// Structure types
+	// Collections
+	"map":  func(c *C, n ast.Node) bool { return matchType[ast.MapType](c, n) },
+	"list": func(c *C, n ast.Node) bool { return matchType[ast.ListType](c, n) },
+	"set":  func(c *C, n ast.Node) bool { return matchType[ast.SetType](c, n) },
+
+	// Definitions
+	"enum":      func(c *C, n ast.Node) bool { return matchType[*ast.Enum](c, n) },
 	"union":     func(c *C, n ast.Node) bool { return matchStructureType(c, n, ast.UnionType) },
 	"struct":    func(c *C, n ast.Node) bool { return matchStructureType(c, n, ast.StructType) },
 	"exception": func(c *C, n ast.Node) bool { return matchStructureType(c, n, ast.ExceptionType) },
-
-	// Enum types
-	"enum": func(c *C, n ast.Node) bool { return matchType[*ast.Enum](c, n) },
 }
 
 // Match a generic type, resolving any type references.
