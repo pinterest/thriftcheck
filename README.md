@@ -218,7 +218,7 @@ configured with lists of [allowed and disallowed types](#type-checks).
 ```toml
 [checks.set.value]
 allowedTypes = [
-    "string", # Only allow string set values
+    "base", # Only allow sets of base types
 ]
 ```
 
