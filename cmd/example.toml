@@ -45,7 +45,7 @@ disallowedTypes = [
 
 [checks.set]
 allowedTypes = [
-    "base", # Only allow sets of base types
+    "string", # Only allow sets of strings
 ]
 
 [checks.names]
