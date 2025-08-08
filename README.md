@@ -216,7 +216,7 @@ This check restricts the types that can be used as `set<>` values. It is
 configured with lists of [allowed and disallowed types](#type-checks).
 
 ```toml
-[checks.set.value]
+[checks.set]
 allowedTypes = [
     "base", # Only allow sets of base types
 ]
