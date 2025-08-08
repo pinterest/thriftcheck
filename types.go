@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"maps"
 	"slices"
-	"strings"
 
 	"go.uber.org/thriftrw/ast"
 )
@@ -32,12 +31,11 @@ type ThriftType struct {
 }
 
 // UnmarshalString implements fig.StringUnmarshaler for automatic toml parsing.
-func (t *ThriftType) UnmarshalString(v string) error {
-	name := strings.ToLower(v)
+func (t *ThriftType) UnmarshalString(name string) error {
 	matcher, ok := typeMatchers[name]
 	if !ok {
 		validTypes := slices.Sorted(maps.Keys(typeMatchers))
-		return fmt.Errorf("unknown type: %s, valid types are: %v", v, validTypes)
+		return fmt.Errorf("unknown type: %s, valid types are: %v", name, validTypes)
 	}
 
 	t.name = name
