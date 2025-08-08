@@ -172,6 +172,8 @@ allowedTypes = [
 ]
 ```
 
+If `allowedTypes` is not explicitly configured, it defaults to `["base", "enum"]`.
+
 ### `map.value.type`
 
 This check restricts the types that can be used as `map<>` values. It is
@@ -218,9 +220,11 @@ configured with lists of [allowed and disallowed types](#type-checks).
 ```toml
 [checks.set]
 allowedTypes = [
-    "base", # Only allow sets of base types
+    "string", # Only allow sets of strings
 ]
 ```
+
+If `allowedTypes` is not explicitly configured, it defaults to `["base", "enum"]`.
 
 ### `types`
 
