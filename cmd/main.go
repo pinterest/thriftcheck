@@ -222,6 +222,7 @@ func main() {
 		checks.CheckFieldOptional(),
 		checks.CheckFieldRequiredness(),
 		checks.CheckFieldDocMissing(),
+		checks.CheckIncludeCycle(),
 		checks.CheckIncludePath(),
 		checks.CheckIncludeRestricted(cfg.Checks.Include.Restricted),
 		checks.CheckInteger64bit(),
@@ -229,7 +230,6 @@ func main() {
 		checks.CheckNamesReserved(cfg.Checks.Names.Reserved),
 		checks.CheckNamespacePattern(cfg.Checks.Namespace.Patterns),
 		checks.CheckSetValueType(),
-		checks.CheckCircularIncludes(),
 	}
 
 	checks := allChecks

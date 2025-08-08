@@ -21,7 +21,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 
 	"go.uber.org/thriftrw/ast"
@@ -106,12 +105,6 @@ func (l *Linter) LintFiles(filenames []string) (Messages, error) {
 		}
 
 		msgs = append(msgs, m...)
-	}
-
-	for _, check := range l.checks {
-		if check.isMultiFile {
-			reflect.ValueOf(check.multiFileFn).Call([]reflect.Value{reflect.ValueOf(check.multiFileCtx)})
-		}
 	}
 
 	return msgs, nil
