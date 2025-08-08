@@ -203,7 +203,7 @@ func (c *C) Errorf(node ast.Node, message string, args ...any) {
 
 // Resolve resolves a name.
 func (c *C) Resolve(name string) ast.Node {
-	if n, err := Resolve(name, c.Program, c.Dirs); err == nil {
+	if n, _, err := Resolve(name, c.Program, c.Dirs); err == nil {
 		return n
 	}
 	return nil

@@ -67,7 +67,7 @@ func NewLinter(checks Checks, options ...Option) *Linter {
 
 // Lint lints a single input file.
 func (l *Linter) Lint(r io.Reader, filename string) (Messages, error) {
-	program, info, err := Parse(r)
+	program, info, err := Parse(r, filename)
 	if err != nil {
 		var parseError *idl.ParseError
 		if errors.As(err, &parseError) {
