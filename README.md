@@ -172,7 +172,7 @@ allowedTypes = [
 ]
 ```
 
-If `allowedTypes` is not explicitly configured, it defaults to `["base"]`.
+If `allowedTypes` is not explicitly configured, it defaults to `["base", "enum"]`.
 
 ### `map.value.type`
 
@@ -224,7 +224,7 @@ allowedTypes = [
 ]
 ```
 
-If `allowedTypes` is not explicitly configured, it defaults to `["base"]`.
+If `allowedTypes` is not explicitly configured, it defaults to `["base", "enum"]`.
 
 ### `types`
 

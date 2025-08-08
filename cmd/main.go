@@ -76,7 +76,7 @@ type Config struct {
 
 		Map struct {
 			Key struct {
-				AllowedTypes    []thriftcheck.ThriftType `fig:"allowedTypes" default:"[base]"`
+				AllowedTypes    []thriftcheck.ThriftType `fig:"allowedTypes" default:"[base,enum]"`
 				DisallowedTypes []thriftcheck.ThriftType `fig:"disallowedTypes"`
 			}
 			Value struct {
@@ -86,7 +86,7 @@ type Config struct {
 		}
 
 		Set struct {
-			AllowedTypes    []thriftcheck.ThriftType `fig:"allowedTypes" default:"[base]"`
+			AllowedTypes    []thriftcheck.ThriftType `fig:"allowedTypes" default:"[base,enum]"`
 			DisallowedTypes []thriftcheck.ThriftType `fig:"disallowedTypes"`
 		}
 
