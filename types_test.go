@@ -12,189 +12,97 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package thriftcheck
+package thriftcheck_test
 
 import (
-	"strings"
+	"slices"
 	"testing"
 
+	"github.com/pinterest/thriftcheck"
 	"go.uber.org/thriftrw/ast"
 )
 
-func parseTypes(typeNames []string) ([]ThriftType, error) {
-	types := make([]ThriftType, 0, len(typeNames))
-	for _, name := range typeNames {
-		var thriftType ThriftType
+var allTypesMap = map[string]ast.Node{
+	"bool":      ast.BaseType{ID: ast.BoolTypeID},
+	"i8":        ast.BaseType{ID: ast.I8TypeID},
+	"i16":       ast.BaseType{ID: ast.I16TypeID},
+	"i32":       ast.BaseType{ID: ast.I32TypeID},
+	"i64":       ast.BaseType{ID: ast.I64TypeID},
+	"double":    ast.BaseType{ID: ast.DoubleTypeID},
+	"string":    ast.BaseType{ID: ast.StringTypeID},
+	"binary":    ast.BaseType{ID: ast.BinaryTypeID},
+	"map":       ast.MapType{},
+	"list":      ast.ListType{},
+	"set":       ast.SetType{},
+	"enum":      &ast.Enum{},
+	"union":     &ast.Struct{Type: ast.UnionType},
+	"struct":    &ast.Struct{Type: ast.StructType},
+	"exception": &ast.Struct{Type: ast.ExceptionType},
+}
+
+func TestThriftTypeUnmarshalString(t *testing.T) {
+	for name := range allTypesMap {
+		var thriftType thriftcheck.ThriftType
 		if err := thriftType.UnmarshalString(name); err != nil {
-			return nil, err
+			t.Error(err)
 		}
-		types = append(types, thriftType)
-	}
-	return types, nil
-}
-
-func TestParseTypes(t *testing.T) {
-	tests := []struct {
-		name          string
-		input         []string
-		expectError   bool
-		expectedCount int
-	}{
-		{
-			name:          "valid collection types",
-			input:         []string{"map", "list", "set"},
-			expectedCount: 3,
-		},
-		{
-			name:          "valid base types",
-			input:         []string{"base", "bool", "i32", "string"},
-			expectedCount: 4,
-		},
-		{
-			name:          "valid structure types",
-			input:         []string{"union", "struct", "exception"},
-			expectedCount: 3,
-		},
-		{
-			name: "all valid types",
-			input: []string{
-				"map", "list", "set",
-				"bool", "i8", "i16", "i32", "i64", "double", "string", "binary",
-				"union", "struct", "exception",
-				"enum",
-			},
-			expectedCount: 15,
-		},
-		{
-			name:        "invalid type",
-			input:       []string{"invalid"},
-			expectError: true,
-		},
-		{
-			name:        "mixed valid and invalid",
-			input:       []string{"map", "invalid", "string"},
-			expectError: true,
-		},
-		{
-			name:          "empty input",
-			input:         []string{},
-			expectedCount: 0,
-		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			types, err := parseTypes(tt.input)
-
-			if tt.expectError {
-				if err == nil {
-					t.Errorf("expected error for input %v", tt.input)
-				}
-				return
-			}
-
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
-
-			if len(types) != tt.expectedCount {
-				t.Errorf("expected %d types, got %d", tt.expectedCount, len(types))
-			}
-		})
+	for _, name := range []string{"", "invalid", "BOOL"} {
+		var thriftType thriftcheck.ThriftType
+		if err := thriftType.UnmarshalString(name); err == nil {
+			t.Errorf("%s: expected err, got: %v", name, thriftType)
+		}
 	}
 }
 
-func TestTypeMatchers_Functionality(t *testing.T) {
-	c := &C{}
+func TestTypeMatching(t *testing.T) {
+	c := &thriftcheck.C{}
 
-	tests := []struct {
-		name     string
-		typeName string
-		astType  ast.Node
-		matches  bool
-	}{
-		// Collection types
-		{"map matches MapType", "map", ast.MapType{}, true},
-		{"list matches ListType", "list", ast.ListType{}, true},
-		{"set matches SetType", "set", ast.SetType{}, true},
-		{"map doesn't match ListType", "map", ast.ListType{}, false},
+	for name, node := range allTypesMap {
+		var thriftType thriftcheck.ThriftType
+		if err := thriftType.UnmarshalString(name); err != nil {
+			t.Error(err)
+		}
 
-		// Base types
-		{"i32 matches I32", "i32", ast.BaseType{ID: ast.I32TypeID}, true},
-		{"string matches String", "string", ast.BaseType{ID: ast.StringTypeID}, true},
-		{"bool matches Bool", "bool", ast.BaseType{ID: ast.BoolTypeID}, true},
-		{"i32 doesn't match String", "i32", ast.BaseType{ID: ast.StringTypeID}, false},
-		{"base matches any base type", "base", ast.BaseType{ID: ast.StringTypeID}, true},
+		if !thriftType.Matches(c, node) {
+			t.Errorf("%s: expected to match %v", name, node)
+		}
 
-		// Structure types - Direct *ast.Struct
-		{"union matches direct Union struct", "union", &ast.Struct{Type: ast.UnionType}, true},
-		{"struct matches direct Struct", "struct", &ast.Struct{Type: ast.StructType}, true},
-		{"exception matches direct Exception", "exception", &ast.Struct{Type: ast.ExceptionType}, true},
-		{"union doesn't match Struct", "union", &ast.Struct{Type: ast.StructType}, false},
-		{"struct doesn't match Union", "struct", &ast.Struct{Type: ast.UnionType}, false},
-		{"exception doesn't match Union", "exception", &ast.Struct{Type: ast.UnionType}, false},
-
-		// Other
-		{"enum matches Enum", "enum", &ast.Enum{}, true},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			types, err := parseTypes([]string{tt.typeName})
-			if err != nil {
-				t.Fatal(err)
+		for otherName, otherNode := range allTypesMap {
+			if otherName == name {
+				continue
 			}
-
-			if len(types) != 1 {
-				t.Fatalf("expected 1 matcher, got %d", len(types))
+			if thriftType.Matches(c, otherNode) {
+				t.Errorf("%s: expected to not match %v", name, otherNode)
 			}
-
-			if types[0].Matches(c, tt.astType) != tt.matches {
-				t.Errorf("%s: expected %v", tt.name, tt.matches)
-			}
-		})
+		}
 	}
 }
 
-func TestParseTypes_ErrorMessages(t *testing.T) {
-	tests := []struct {
-		name          string
-		input         []string
-		expectedInMsg []string
-	}{
-		{
-			name:  "invalid type error message",
-			input: []string{"invalid"},
-			expectedInMsg: []string{
-				"unknown type: invalid",
-				"valid types are:",
-				"map",
-				"union",
-			},
-		},
-		{
-			name:  "unknown type error message",
-			input: []string{"unknown"},
-			expectedInMsg: []string{
-				"unknown type: unknown",
-				"valid types are:",
-			},
-		},
+func TestBaseTypeMatchng(t *testing.T) {
+	c := &thriftcheck.C{}
+
+	var baseType thriftcheck.ThriftType
+	if err := baseType.UnmarshalString("base"); err != nil {
+		t.Error(err)
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			_, err := parseTypes(tt.input)
-			if err == nil {
-				t.Fatal("expected error")
-			}
+	baseTypeNames := []string{"bool", "i8", "i16", "i32", "i64", "double", "string", "binary"}
 
-			errMsg := err.Error()
-			for _, expected := range tt.expectedInMsg {
-				if !strings.Contains(errMsg, expected) {
-					t.Errorf("error message should contain %q, got: %s", expected, errMsg)
-				}
+	for _, name := range baseTypeNames {
+		node := allTypesMap[name]
+		if !baseType.Matches(c, node) {
+			t.Errorf("base: expected to match %v", node)
+		}
+
+		for otherName, otherNode := range allTypesMap {
+			if slices.Contains(baseTypeNames, otherName) {
+				continue
 			}
-		})
+			if baseType.Matches(c, otherNode) {
+				t.Errorf("base: expected to not match %v", otherNode)
+			}
+		}
 	}
 }
