@@ -1,4 +1,4 @@
-// Copyright 2021 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -98,6 +98,7 @@ func (l *Linter) LintFiles(filenames []string) (Messages, error) {
 		if err != nil {
 			return msgs, fmt.Errorf("%s: %w", filename, err)
 		}
+		defer f.Close()
 
 		m, err := l.Lint(f, filename)
 		if err != nil {

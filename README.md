@@ -162,7 +162,29 @@ Some languages (e.g. JavaScript) don't support 64-bit integers.
 
 ### `map.key.type`
 
-This check ensures that only primitive types are used for `map<>` keys.
+This check restricts the types that can be used as `map<>` keys. It is
+configured with lists of [allowed and disallowed types](#type-checks).
+
+```toml
+[checks.map.key]
+allowedTypes = [
+    "string", # Only allow string map keys
+]
+```
+
+### `map.value.type`
+
+This check restricts the types that can be used as `map<>` values. It is
+configured with lists of [allowed and disallowed types](#type-checks).
+
+```toml
+[checks.map.value]
+disallowedTypes = [
+    "union",  # Disallow unions as map values
+    "map",    # Disallow nested maps
+    "i32",    # Disallow i32 as map values
+]
+```
 
 ### `names.reserved`
 
@@ -190,7 +212,46 @@ py = "^idl\\."
 
 ### `set.value.type`
 
-This check ensures that only primitive types are used for `set<>` values.
+This check restricts the types that can be used as `set<>` values. It is
+configured with lists of [allowed and disallowed types](#type-checks).
+
+```toml
+[checks.set]
+allowedTypes = [
+    "base", # Only allow sets of base types
+]
+```
+
+### `types`
+
+This check restricts the types that can be used in all contexts. It is
+configured with lists of [allowed and disallowed types](#type-checks).
+
+```toml
+[checks.types]
+disallowedTypes = [
+    "union",
+]
+```
+
+## Type Checks
+
+Some checks are used to restrict the set of types that are allowed in various
+contexts, with the [`types`](#types) check acting globally. All of these checks
+use the same matching and configuration pattern.
+
+If the type is in the `disallowedTypes` list, this check will report an error
+stop. Otherwise, if the `allowedTypes` list is not empty, the check will report
+an error if the type is not part of the `allowedTypes` list.
+
+The supported type names are:
+
+- **Base Types**: `base` _(any base type)_, `bool`, `i8`, `i16`, `i32`, `i64`, `double`, `string`, `binary`
+- **Collections**: `map`, `list`, `set`
+- **Definitions**: `enum`, `union`, `struct`, `exception`
+
+Types are matched semantically, including resolving type definitions, so
+`typedef`s and other indirect type references are properly handled.
 
 ## Custom Checks
 
@@ -219,7 +280,7 @@ additional checks.
 
 You can disable one or more checks on a per-node basis using `nolint`
 directives. `nolint` directives apply to the current node and all of its
-descendents. The directives's value can be empty, in which case linting is
+descendants. The directive's value can be empty, in which case linting is
 entirely disabled, or it can be set to a comma-separated list of checks to
 disable.
 

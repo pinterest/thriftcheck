@@ -1,4 +1,4 @@
-// Copyright 2021 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,22 +19,22 @@ import (
 	"go.uber.org/thriftrw/ast"
 )
 
-// CheckMapKeyType returns a thriftcheck.Check that ensures that only primitive
-// types are used for `map<>` keys.
-func CheckMapKeyType() *thriftcheck.Check {
+// CheckMapKeyType returns a thriftcheck.Check that checks if a `map<>` key
+// type is allowed.
+func CheckMapKeyType(allowedTypes, disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
 	return thriftcheck.NewCheck("map.key.type", func(c *thriftcheck.C, mt ast.MapType) {
-		switch t := mt.KeyType.(type) {
-		case ast.BaseType:
-			break
-		case ast.TypeReference:
-			switch c.ResolveType(t).(type) {
-			case ast.BaseType, *ast.Enum, *ast.Typedef:
-				break
-			default:
-				c.Errorf(mt, "map key must be a primitive type")
-			}
-		default:
-			c.Errorf(mt, "map key must be a primitive type")
+		if ok, name := c.IsTypeAllowed(mt.KeyType, allowedTypes, disallowedTypes); !ok {
+			c.Errorf(mt, "map key type %q is not allowed", name)
+		}
+	})
+}
+
+// CheckMapKeyType returns a thriftcheck.Check that checks if a `map<>` value
+// type is allowed.
+func CheckMapValueType(allowedTypes, disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
+	return thriftcheck.NewCheck("map.value.type", func(c *thriftcheck.C, mt ast.MapType) {
+		if ok, name := c.IsTypeAllowed(mt.ValueType, allowedTypes, disallowedTypes); !ok {
+			c.Errorf(mt, "map value type %q is not allowed", name)
 		}
 	})
 }

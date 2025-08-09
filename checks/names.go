@@ -1,4 +1,4 @@
-// Copyright 2021 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ func nodeName(node ast.Node) string {
 }
 
 // CheckNamesReserved checks if a node's name is in the list of reserved names.
-func CheckNamesReserved(names []string) *thriftcheck.Check {
+func CheckNamesReserved(names []string) thriftcheck.Check {
 	reserved := make(map[string]bool)
 	for _, name := range names {
 		reserved[name] = true

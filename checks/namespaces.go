@@ -1,4 +1,4 @@
-// Copyright 2021 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import (
 // CheckNamespacePattern returns a thriftcheck.Check that ensures that a
 // namespace's name matches a regular expression pattern. The pattern can
 // be configured one a per-language basis.
-func CheckNamespacePattern(patterns map[string]*regexp.Regexp) *thriftcheck.Check {
+func CheckNamespacePattern(patterns map[string]*regexp.Regexp) thriftcheck.Check {
 	return thriftcheck.NewCheck("namespace.patterns", func(c *thriftcheck.C, ns *ast.Namespace) {
 		if re, ok := patterns[ns.Scope]; ok && !re.MatchString(ns.Name) {
 			c.Errorf(ns, "%q namespace must match %q", ns.Scope, re)

@@ -1,4 +1,4 @@
-// Copyright 2021 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,5 +39,5 @@ func TestCheckNamespacePattern(t *testing.T) {
 	check := checks.CheckNamespacePattern(map[string]*regexp.Regexp{
 		"java": regexp.MustCompile(`^com\.pinterest\.idl\.`),
 	})
-	RunTests(t, check, tests)
+	RunTests(t, &check, tests)
 }

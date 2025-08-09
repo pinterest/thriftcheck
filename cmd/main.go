@@ -1,4 +1,4 @@
-// Copyright 2021 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -74,12 +74,33 @@ type Config struct {
 			Restricted map[string]*regexp.Regexp `fig:"restricted"`
 		}
 
+		Map struct {
+			Key struct {
+				AllowedTypes    []thriftcheck.ThriftType `fig:"allowedTypes"`
+				DisallowedTypes []thriftcheck.ThriftType `fig:"disallowedTypes"`
+			}
+			Value struct {
+				AllowedTypes    []thriftcheck.ThriftType `fig:"allowedTypes"`
+				DisallowedTypes []thriftcheck.ThriftType `fig:"disallowedTypes"`
+			}
+		}
+
+		Set struct {
+			AllowedTypes    []thriftcheck.ThriftType `fig:"allowedTypes"`
+			DisallowedTypes []thriftcheck.ThriftType `fig:"disallowedTypes"`
+		}
+
 		Names struct {
 			Reserved []string `fig:"reserved"`
 		}
 
 		Namespace struct {
 			Patterns map[string]*regexp.Regexp `fig:"patterns"`
+		}
+
+		Types struct {
+			AllowedTypes    []thriftcheck.ThriftType `fig:"allowedTypes"`
+			DisallowedTypes []thriftcheck.ThriftType `fig:"disallowedTypes"`
 		}
 	}
 }
@@ -208,6 +229,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1 << uint(thriftcheck.Error))
 	}
+
 	if len(includes) > 0 {
 		cfg.Includes = includes
 	}
@@ -226,10 +248,12 @@ func main() {
 		checks.CheckIncludePath(),
 		checks.CheckIncludeRestricted(cfg.Checks.Include.Restricted),
 		checks.CheckInteger64bit(),
-		checks.CheckMapKeyType(),
+		checks.CheckMapKeyType(cfg.Checks.Map.Key.AllowedTypes, cfg.Checks.Map.Key.DisallowedTypes),
+		checks.CheckMapValueType(cfg.Checks.Map.Value.AllowedTypes, cfg.Checks.Map.Value.DisallowedTypes),
 		checks.CheckNamesReserved(cfg.Checks.Names.Reserved),
 		checks.CheckNamespacePattern(cfg.Checks.Namespace.Patterns),
-		checks.CheckSetValueType(),
+		checks.CheckSetValueType(cfg.Checks.Set.AllowedTypes, cfg.Checks.Set.DisallowedTypes),
+		checks.CheckTypes(cfg.Checks.Types.AllowedTypes, cfg.Checks.Types.DisallowedTypes),
 	}
 
 	checks := allChecks

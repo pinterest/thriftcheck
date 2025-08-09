@@ -1,4 +1,4 @@
-// Copyright 2021 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -245,11 +245,11 @@ func TestNoLint(t *testing.T) {
 }
 
 func TestOverrideableChecksLookup(t *testing.T) {
-	root := &Checks{&Check{Name: "root"}}
+	root := &Checks{Check{Name: "root"}}
 	pnode := &ast.Program{}
 	snode := &ast.Struct{}
 	fnode := &ast.Field{}
-	schecks := &Checks{&Check{Name: "s"}}
+	schecks := &Checks{Check{Name: "s"}}
 
 	checks := overridableChecks{root: root}
 	checks.add(snode, schecks)

@@ -1,4 +1,4 @@
-// Copyright 2021 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import (
 
 // CheckIncludePath returns a thriftcheck.Check that verifies that all of the
 // files `include`'d by a Thrift file can be found in the includes paths.
-func CheckIncludePath() *thriftcheck.Check {
+func CheckIncludePath() thriftcheck.Check {
 	return thriftcheck.NewCheck("include.path", func(c *thriftcheck.C, i *ast.Include) {
 		// If the path is absolute, we don't need to check the include paths.
 		if filepath.IsAbs(i.Path) {
@@ -57,7 +57,7 @@ func CheckIncludePath() *thriftcheck.Check {
 // file name pattern that matches the including filename and the value is a
 // regular expression that matches the included filename. When both match, the
 // `include` is flagged as "restricted" and an error is reported.
-func CheckIncludeRestricted(patterns map[string]*regexp.Regexp) *thriftcheck.Check {
+func CheckIncludeRestricted(patterns map[string]*regexp.Regexp) thriftcheck.Check {
 	return thriftcheck.NewCheck("include.restricted", func(c *thriftcheck.C, i *ast.Include) {
 		for fpat, ire := range patterns {
 			if fnmatch.Match(fpat, c.Filename, fnmatch.FNM_NOESCAPE) && ire.MatchString(i.Path) {
@@ -71,7 +71,7 @@ func CheckIncludeRestricted(patterns map[string]*regexp.Regexp) *thriftcheck.Che
 
 // CheckIncludeCycle returns a thriftcheck.Check that reports an error
 // if there is a circular include.
-func CheckIncludeCycle() *thriftcheck.Check {
+func CheckIncludeCycle() thriftcheck.Check {
 	adjList := make(map[string][]string)
 	edges := make(map[string]map[string]*ast.Include)
 

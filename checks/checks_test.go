@@ -1,4 +1,4 @@
-// Copyright 2021 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -54,4 +54,13 @@ func RunTests(t *testing.T, check *thriftcheck.Check, tests []Test) {
 			}
 		}
 	}
+}
+
+func ParseType(t *testing.T, name string) (thriftType thriftcheck.ThriftType) {
+	t.Helper()
+
+	if err := thriftType.UnmarshalString(name); err != nil {
+		t.Fatal(err)
+	}
+	return
 }

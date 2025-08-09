@@ -1,4 +1,4 @@
-// Copyright 2021 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ func Parse(r io.Reader) (*ast.Program, *idl.Info, error) {
 func ParseFile(filename string, dirs []string) (*ast.Program, *idl.Info, error) {
 	if filepath.IsAbs(filename) {
 		if f, err := os.Open(filename); err == nil {
+			defer f.Close()
 			return Parse(f)
 		}
 		return nil, nil, fmt.Errorf("%s not found", filename)
@@ -48,6 +49,7 @@ func ParseFile(filename string, dirs []string) (*ast.Program, *idl.Info, error) 
 
 	for _, dir := range dirs {
 		if f, err := os.Open(filepath.Join(dir, filename)); err == nil {
+			defer f.Close()
 			return Parse(f)
 		}
 	}

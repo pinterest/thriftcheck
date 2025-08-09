@@ -1,4 +1,4 @@
-// Copyright 2021 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import (
 )
 
 // CheckFieldIDMissing reports an error if a field's ID is missing.
-func CheckFieldIDMissing() *thriftcheck.Check {
+func CheckFieldIDMissing() thriftcheck.Check {
 	return thriftcheck.NewCheck("field.id.missing", func(c *thriftcheck.C, f *ast.Field) {
 		if f.IDUnset {
 			c.Errorf(f, "field ID for %q is missing", f.Name)
@@ -29,7 +29,7 @@ func CheckFieldIDMissing() *thriftcheck.Check {
 }
 
 // CheckFieldIDNegative reports an error if a field's ID is explicitly negative.
-func CheckFieldIDNegative() *thriftcheck.Check {
+func CheckFieldIDNegative() thriftcheck.Check {
 	return thriftcheck.NewCheck("field.id.negative", func(c *thriftcheck.C, f *ast.Field) {
 		if !f.IDUnset && f.ID < 0 {
 			c.Errorf(f, "field ID for %q (%d) is negative", f.Name, f.ID)
@@ -38,7 +38,7 @@ func CheckFieldIDNegative() *thriftcheck.Check {
 }
 
 // CheckFieldIDZero reports an error if a field's ID is explicitly zero.
-func CheckFieldIDZero() *thriftcheck.Check {
+func CheckFieldIDZero() thriftcheck.Check {
 	return thriftcheck.NewCheck("field.id.zero", func(c *thriftcheck.C, f *ast.Field) {
 		if !f.IDUnset && f.ID == 0 {
 			c.Errorf(f, "field ID for %q is zero", f.Name)
@@ -47,7 +47,7 @@ func CheckFieldIDZero() *thriftcheck.Check {
 }
 
 // CheckFieldOptional warns if a field isn't declared as "optional".
-func CheckFieldOptional() *thriftcheck.Check {
+func CheckFieldOptional() thriftcheck.Check {
 	return thriftcheck.NewCheck("field.optional", func(c *thriftcheck.C, f *ast.Field) {
 		if f.Requiredness != ast.Optional {
 			c.Warningf(f, `field %q (%d) should be "optional"`, f.Name, f.ID)
@@ -56,7 +56,7 @@ func CheckFieldOptional() *thriftcheck.Check {
 }
 
 // CheckFieldRequiredness warns if a field isn't explicitly declared as "required" or "optional".
-func CheckFieldRequiredness() *thriftcheck.Check {
+func CheckFieldRequiredness() thriftcheck.Check {
 	return thriftcheck.NewCheck("field.requiredness", func(c *thriftcheck.C, f *ast.Field) {
 		if f.Requiredness == ast.Unspecified {
 			c.Warningf(f, `field %q (%d) should be explicitly "required" or "optional"`, f.Name, f.ID)
@@ -65,7 +65,7 @@ func CheckFieldRequiredness() *thriftcheck.Check {
 }
 
 // CheckFieldDocMissing warns if a field is missing a documentation comment.
-func CheckFieldDocMissing() *thriftcheck.Check {
+func CheckFieldDocMissing() thriftcheck.Check {
 	return thriftcheck.NewCheck("field.doc.missing", func(c *thriftcheck.C, f *ast.Field) {
 		if f.Doc == "" {
 			c.Warningf(f, `field %q (%d) is missing a documentation comment`, f.Name, f.ID)

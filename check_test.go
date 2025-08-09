@@ -1,4 +1,4 @@
-// Copyright 2021 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import (
 
 func TestNewCheck(t *testing.T) {
 	tests := []struct {
-		fn     interface{}
+		fn     any
 		panics bool
 	}{
 		{"", true},
@@ -127,5 +127,36 @@ func TestC(t *testing.T) {
 
 	if !reflect.DeepEqual(expected, c.Messages) {
 		t.Errorf("expected %s, got %s", expected, c.Messages)
+	}
+}
+
+func TestIsTypeAllowed(t *testing.T) {
+	var stringType ThriftType
+	if err := stringType.UnmarshalString("string"); err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		n          ast.Node
+		allowed    []ThriftType
+		disallowed []ThriftType
+		ok         bool
+		name       string
+	}{
+		{ast.BaseType{ID: ast.StringTypeID}, []ThriftType{}, []ThriftType{}, true, "string"},
+		{ast.BaseType{ID: ast.StringTypeID}, []ThriftType{stringType}, []ThriftType{}, true, "string"},
+		{ast.BaseType{ID: ast.StringTypeID}, []ThriftType{}, []ThriftType{stringType}, false, "string"},
+		{ast.BaseType{ID: ast.I32TypeID}, []ThriftType{stringType}, []ThriftType{}, false, "i32"},
+		{&ast.Program{}, []ThriftType{stringType}, []ThriftType{}, false, "<node>"},
+	}
+
+	c := &C{Filename: "test.thrift", Check: "check"}
+	for _, tt := range tests {
+		ok, name := c.IsTypeAllowed(tt.n, tt.allowed, tt.disallowed)
+		if ok != tt.ok {
+			t.Errorf("%q (allowed: %v, disallowed: %v), expected %v", name, tt.allowed, tt.disallowed, ok)
+		} else if name != tt.name {
+			t.Errorf("expected %q, got %q", tt.name, name)
+		}
 	}
 }

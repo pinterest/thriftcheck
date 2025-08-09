@@ -1,4 +1,4 @@
-// Copyright 2022 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -52,5 +52,5 @@ func TestCheckConstantRef(t *testing.T) {
 	}
 
 	check := checks.CheckConstantRef()
-	RunTests(t, check, tests)
+	RunTests(t, &check, tests)
 }

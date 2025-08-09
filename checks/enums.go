@@ -1,4 +1,4 @@
-// Copyright 2021 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import (
 
 // CheckEnumSize returns a thriftcheck.Check that warns or errors if an
 // enumeration's element size grows beyond a limit.
-func CheckEnumSize(warningLimit, errorLimit int) *thriftcheck.Check {
+func CheckEnumSize(warningLimit, errorLimit int) thriftcheck.Check {
 	return thriftcheck.NewCheck("enum.size", func(c *thriftcheck.C, e *ast.Enum) {
 		size := len(e.Items)
 		if errorLimit > 0 && size > errorLimit {

@@ -1,4 +1,4 @@
-// Copyright 2022 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import (
 
 // CheckConstantRef returns a thriftcheck.Check that ensures that a constant
 // reference's target can be resolved.
-func CheckConstantRef() *thriftcheck.Check {
+func CheckConstantRef() thriftcheck.Check {
 	return thriftcheck.NewCheck("constant.ref", func(c *thriftcheck.C, ref ast.ConstantReference) {
 		if c.ResolveConstant(ref) == nil {
 			c.Errorf(ref, "unable to find a constant or enum value named %q", ref.Name)

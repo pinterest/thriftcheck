@@ -15,17 +15,15 @@
 package checks
 
 import (
-	"math"
-
 	"github.com/pinterest/thriftcheck"
 	"go.uber.org/thriftrw/ast"
 )
 
-// CheckInteger64bit warns when an integer constant exceeds the 32-bit number range.
-func CheckInteger64bit() thriftcheck.Check {
-	return thriftcheck.NewCheck("int.64bit", func(c *thriftcheck.C, i ast.ConstantInteger) {
-		if i < math.MinInt32 || i > math.MaxInt32 {
-			c.Warningf(i, "64-bit integer constant %d may not work in all languages", i)
+// CheckTypesDisallowed reports an error if a disallowed type is used.
+func CheckTypes(allowedTypes, disallowedTypes []thriftcheck.ThriftType) thriftcheck.Check {
+	return thriftcheck.NewCheck("types", func(c *thriftcheck.C, n ast.Node) {
+		if ok, name := c.IsTypeAllowed(n, allowedTypes, disallowedTypes); !ok {
+			c.Errorf(n, "type %q is not allowed", name)
 		}
 	})
 }

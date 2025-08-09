@@ -1,4 +1,4 @@
-// Copyright 2021 Pinterest
+// Copyright 2025 Pinterest
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,14 +28,14 @@ import (
 // Check is a named check function.
 type Check struct {
 	Name string
-	fn   interface{}
+	fn   any
 }
 
 // Checks is a list of checks.
-type Checks []*Check
+type Checks []Check
 
 // NewCheck creates a new Check.
-func NewCheck(name string, fn interface{}) *Check {
+func NewCheck(name string, fn any) Check {
 	if fn == nil {
 		panic("check function must be a Func; got nil")
 	}
@@ -56,7 +56,7 @@ func NewCheck(name string, fn interface{}) *Check {
 		}
 	}
 
-	return &Check{Name: name, fn: fn}
+	return Check{Name: name, fn: fn}
 }
 
 // Call the check function if its arguments end with the current node in the
@@ -183,20 +183,20 @@ func (c *C) pos(n ast.Node) ast.Position {
 }
 
 // Logf prints a formatted message to the verbose output logger.
-func (c *C) Logf(message string, args ...interface{}) {
+func (c *C) Logf(message string, args ...any) {
 	if c.logger != nil {
 		c.logger.Printf(message, args...)
 	}
 }
 
 // Warningf records a new message for the given node with Warning severity.
-func (c *C) Warningf(node ast.Node, message string, args ...interface{}) {
+func (c *C) Warningf(node ast.Node, message string, args ...any) {
 	m := Message{Filename: c.Filename, Pos: c.pos(node), Node: node, Check: c.Check, Severity: Warning, Message: fmt.Sprintf(message, args...)}
 	c.Messages = append(c.Messages, m)
 }
 
 // Errorf records a new message for the given node with Error severity.
-func (c *C) Errorf(node ast.Node, message string, args ...interface{}) {
+func (c *C) Errorf(node ast.Node, message string, args ...any) {
 	m := Message{Filename: c.Filename, Pos: c.pos(node), Node: node, Check: c.Check, Severity: Error, Message: fmt.Sprintf(message, args...)}
 	c.Messages = append(c.Messages, m)
 }
@@ -223,4 +223,33 @@ func (c *C) ResolveType(ref ast.TypeReference) ast.Node {
 		return n
 	}
 	return nil
+}
+
+// IsTypeAllowed checks if a type is allowed.
+//
+// If the type appears in disallowedTypes, it is not allowed.
+// If allowedTypes is not empty, then the type must appear in it.
+func (c *C) IsTypeAllowed(n ast.Node, allowedTypes, disallowedTypes []ThriftType) (bool, string) {
+	var name = "<node>"
+	if t, ok := n.(ast.Type); ok {
+		name = t.String()
+	}
+
+	for _, matcher := range disallowedTypes {
+		if matcher.Matches(c, n) {
+			return false, matcher.String()
+		}
+	}
+
+	if len(allowedTypes) == 0 {
+		return true, name
+	}
+
+	for _, matcher := range allowedTypes {
+		if matcher.Matches(c, n) {
+			return true, matcher.String()
+		}
+	}
+
+	return false, name
 }
