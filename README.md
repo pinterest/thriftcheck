@@ -251,7 +251,7 @@ an error if the type is not part of the `allowedTypes` list.
 The supported type names are:
 
 - **Base Types**: `base` _(any base type)_, `bool`, `i8`, `i16`, `i32`, `i64`, `double`, `string`, `binary`
-- **Collections**: `map`, `list`, `set`
+- **Collections**: `list`, `map`, `set`
 - **Definitions**: `enum`, `union`, `struct`, `exception`
 
 Types are matched semantically, including resolving type definitions, so

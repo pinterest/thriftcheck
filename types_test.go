@@ -31,8 +31,8 @@ var allTypesMap = map[string]ast.Node{
 	"double":    ast.BaseType{ID: ast.DoubleTypeID},
 	"string":    ast.BaseType{ID: ast.StringTypeID},
 	"binary":    ast.BaseType{ID: ast.BinaryTypeID},
-	"map":       ast.MapType{},
 	"list":      ast.ListType{},
+	"map":       ast.MapType{},
 	"set":       ast.SetType{},
 	"enum":      &ast.Enum{},
 	"union":     &ast.Struct{Type: ast.UnionType},
@@ -56,7 +56,7 @@ func TestThriftTypeUnmarshalString(t *testing.T) {
 	}
 }
 
-func TestTypeMatching(t *testing.T) {
+func TestMatchTypes(t *testing.T) {
 	c := &thriftcheck.C{}
 
 	for name, node := range allTypesMap {
@@ -80,7 +80,7 @@ func TestTypeMatching(t *testing.T) {
 	}
 }
 
-func TestBaseTypeMatchng(t *testing.T) {
+func TestMatchBaseTypes(t *testing.T) {
 	c := &thriftcheck.C{}
 
 	var baseType thriftcheck.ThriftType
@@ -103,6 +103,31 @@ func TestBaseTypeMatchng(t *testing.T) {
 			if baseType.Matches(c, otherNode) {
 				t.Errorf("base: expected to not match %v", otherNode)
 			}
+		}
+	}
+}
+
+func TestMatchTypeReferences(t *testing.T) {
+	tests := []struct {
+		name string
+		def  ast.Definition
+	}{
+		{name: "enum", def: &ast.Enum{Name: "Enum"}},
+		{name: "struct", def: &ast.Struct{Name: "Struct", Type: ast.StructType}},
+		{name: "string", def: &ast.Typedef{Name: "String", Type: ast.BaseType{ID: ast.StringTypeID}}},
+	}
+
+	for _, tt := range tests {
+		var thriftType thriftcheck.ThriftType
+		if err := thriftType.UnmarshalString(tt.name); err != nil {
+			t.Error(err)
+		}
+
+		c := &thriftcheck.C{Program: &ast.Program{Definitions: []ast.Definition{tt.def}}}
+		n := ast.TypeReference{Name: tt.def.Info().Name}
+
+		if !thriftType.Matches(c, n) {
+			t.Errorf("%s: expected to match %v", tt.name, n)
 		}
 	}
 }
