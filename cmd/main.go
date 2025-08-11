@@ -244,6 +244,7 @@ func main() {
 		checks.CheckFieldOptional(),
 		checks.CheckFieldRequiredness(),
 		checks.CheckFieldDocMissing(),
+		checks.CheckIncludeCycle(),
 		checks.CheckIncludePath(),
 		checks.CheckIncludeRestricted(cfg.Checks.Include.Restricted),
 		checks.CheckInteger64bit(),
