@@ -22,7 +22,7 @@ import (
 	"go.uber.org/thriftrw/ast"
 )
 
-type typeMatcher func(c *C, n ast.Node) bool
+type typeMatcher func(ast.Node) bool
 
 // ThriftType implements fig StringUnmarshaler for automatic toml parsing.
 type ThriftType struct {
@@ -43,8 +43,15 @@ func (t *ThriftType) UnmarshalString(name string) error {
 	return nil
 }
 
+// Matches tests whether the given [ast.Node] matches this Thrift type.
+// Type references will be resolved.
 func (t ThriftType) Matches(c *C, n ast.Node) bool {
-	return t.matcher(c, n)
+	if ref, ok := n.(ast.TypeReference); ok {
+		if n = c.ResolveType(ref); n == nil {
+			return false
+		}
+	}
+	return t.matcher(n)
 }
 
 func (t ThriftType) String() string {
@@ -53,48 +60,29 @@ func (t ThriftType) String() string {
 
 var typeMatchers = map[string]typeMatcher{
 	// Base types
-	"base":   func(c *C, n ast.Node) bool { _, ok := n.(ast.BaseType); return ok },
-	"bool":   func(c *C, n ast.Node) bool { return matchBaseType(n, ast.BoolTypeID) },
-	"i8":     func(c *C, n ast.Node) bool { return matchBaseType(n, ast.I8TypeID) },
-	"i16":    func(c *C, n ast.Node) bool { return matchBaseType(n, ast.I16TypeID) },
-	"i32":    func(c *C, n ast.Node) bool { return matchBaseType(n, ast.I32TypeID) },
-	"i64":    func(c *C, n ast.Node) bool { return matchBaseType(n, ast.I64TypeID) },
-	"double": func(c *C, n ast.Node) bool { return matchBaseType(n, ast.DoubleTypeID) },
-	"string": func(c *C, n ast.Node) bool { return matchBaseType(n, ast.StringTypeID) },
-	"binary": func(c *C, n ast.Node) bool { return matchBaseType(n, ast.BinaryTypeID) },
+	"base":   func(n ast.Node) bool { _, ok := n.(ast.BaseType); return ok },
+	"bool":   func(n ast.Node) bool { return matchBaseType(n, ast.BoolTypeID) },
+	"i8":     func(n ast.Node) bool { return matchBaseType(n, ast.I8TypeID) },
+	"i16":    func(n ast.Node) bool { return matchBaseType(n, ast.I16TypeID) },
+	"i32":    func(n ast.Node) bool { return matchBaseType(n, ast.I32TypeID) },
+	"i64":    func(n ast.Node) bool { return matchBaseType(n, ast.I64TypeID) },
+	"double": func(n ast.Node) bool { return matchBaseType(n, ast.DoubleTypeID) },
+	"string": func(n ast.Node) bool { return matchBaseType(n, ast.StringTypeID) },
+	"binary": func(n ast.Node) bool { return matchBaseType(n, ast.BinaryTypeID) },
 
 	// Collections
-	"map":  func(c *C, n ast.Node) bool { return matchType[ast.MapType](c, n) },
-	"list": func(c *C, n ast.Node) bool { return matchType[ast.ListType](c, n) },
-	"set":  func(c *C, n ast.Node) bool { return matchType[ast.SetType](c, n) },
+	"list": func(n ast.Node) bool { _, ok := n.(ast.ListType); return ok },
+	"map":  func(n ast.Node) bool { _, ok := n.(ast.MapType); return ok },
+	"set":  func(n ast.Node) bool { _, ok := n.(ast.SetType); return ok },
 
 	// Definitions
-	"enum":      func(c *C, n ast.Node) bool { return matchType[*ast.Enum](c, n) },
-	"union":     func(c *C, n ast.Node) bool { return matchStructureType(c, n, ast.UnionType) },
-	"struct":    func(c *C, n ast.Node) bool { return matchStructureType(c, n, ast.StructType) },
-	"exception": func(c *C, n ast.Node) bool { return matchStructureType(c, n, ast.ExceptionType) },
+	"enum":      func(n ast.Node) bool { _, ok := n.(*ast.Enum); return ok },
+	"union":     func(n ast.Node) bool { return matchStructureType(n, ast.UnionType) },
+	"struct":    func(n ast.Node) bool { return matchStructureType(n, ast.StructType) },
+	"exception": func(n ast.Node) bool { return matchStructureType(n, ast.ExceptionType) },
 }
 
-// Match a generic type, resolving any type references.
-func matchType[T ast.Node](c *C, n ast.Node) bool {
-	if ref, ok := n.(ast.TypeReference); ok {
-		if n = c.ResolveType(ref); n == nil {
-			return false
-		}
-	}
-
-	_, ok := n.(T)
-	return ok
-}
-
-// Match a structure type, resolving any type references.
-func matchStructureType(c *C, n ast.Node, t ast.StructureType) bool {
-	if ref, ok := n.(ast.TypeReference); ok {
-		if n = c.ResolveType(ref); n == nil {
-			return false
-		}
-	}
-
+func matchStructureType(n ast.Node, t ast.StructureType) bool {
 	if s, ok := n.(*ast.Struct); ok {
 		return s.Type == t
 	}
@@ -102,7 +90,6 @@ func matchStructureType(c *C, n ast.Node, t ast.StructureType) bool {
 	return false
 }
 
-// Match a BaseType.
 func matchBaseType(n ast.Node, expectedID ast.BaseTypeID) bool {
 	if baseType, ok := n.(ast.BaseType); ok {
 		return baseType.ID == expectedID
