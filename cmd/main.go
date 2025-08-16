@@ -63,6 +63,11 @@ type Config struct {
 		Enabled  []string `fig:"enabled"`
 		Disabled []string `fix:"disabled"`
 
+		Depth struct {
+			Max         int  `fig:"max"`
+			AllowCycles bool `fig:"allow_cycles"`
+		}
+
 		Enum struct {
 			Size struct {
 				Warning int `fig:"warning"`
@@ -237,6 +242,7 @@ func main() {
 	// Build the set of checks we'll use for the linter
 	allChecks := thriftcheck.Checks{
 		checks.CheckConstantRef(),
+		checks.CheckDepth(cfg.Checks.Depth.Max, cfg.Checks.Depth.AllowCycles),
 		checks.CheckEnumSize(cfg.Checks.Enum.Size.Warning, cfg.Checks.Enum.Size.Error),
 		checks.CheckFieldIDMissing(),
 		checks.CheckFieldIDNegative(),
