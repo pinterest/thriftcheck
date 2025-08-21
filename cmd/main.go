@@ -190,12 +190,12 @@ func expandPaths(paths []string) ([]string, error) {
 			continue
 		}
 
-		err = filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		err = filepath.WalkDir(path, func(path string, d os.DirEntry, err error) error {
 			if err != nil {
 				return err
 			}
 
-			if !info.IsDir() && filepath.Ext(path) == ".thrift" {
+			if !d.IsDir() && filepath.Ext(path) == ".thrift" {
 				filenames = append(filenames, path)
 			}
 
