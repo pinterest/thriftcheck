@@ -15,9 +15,11 @@
 package checks
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/danwakefield/fnmatch"
 	"github.com/pinterest/thriftcheck"
@@ -65,4 +67,98 @@ func CheckIncludeRestricted(patterns map[string]*regexp.Regexp) thriftcheck.Chec
 			}
 		}
 	})
+}
+
+// CheckIncludeCycle returns a thriftcheck.Check that reports an error
+// if there is a circular include.
+func CheckIncludeCycle() thriftcheck.Check {
+	adjList := make(map[string][]string)
+	edges := make(map[string]map[string]*ast.Include)
+
+	wd, wdErr := os.Getwd()
+	addedErr := false
+
+	return thriftcheck.NewCheck("include.cycle", func(c *thriftcheck.C, p *ast.Program) {
+		if wdErr != nil {
+			if !addedErr {
+				c.Errorf(p, "could not get the current working directory, so the include.cycle check will not perform any checks")
+				addedErr = true
+			}
+			return
+		}
+
+		// a `include`s b
+		var a, b string
+
+		a, err := getRelativePath(c.Filename, wd)
+		if err != nil {
+			c.Warningf(p, "could not get path relative to working directory for %s, skipping this include", c.Filename)
+			return
+		}
+
+		for _, h := range p.Headers {
+			i, ok := h.(*ast.Include)
+			if !ok {
+				continue
+			}
+
+			b, err = getRelativePath(i.Path, wd)
+			if err != nil {
+				c.Warningf(i, "could not get path relative to working directory for %s, skipping this include", i.Path)
+				return
+			}
+
+			adjList[a] = append(adjList[a], b)
+
+			if _, exists := edges[a]; !exists {
+				edges[a] = make(map[string]*ast.Include)
+			}
+
+			edges[a][b] = i
+		}
+
+		cycle := lookForCycle(a, a, make(map[string]bool), []string{}, adjList)
+
+		if len(cycle) > 0 {
+			m := []string{}
+			for i, f := range cycle {
+				include := edges[f][cycle[(i+1)%len(cycle)]]
+				m = append(m, fmt.Sprintf(
+					"\t%s -> %s\n\t\tIncluded as: %s\n\t\tAt: %s:%d:%d\n",
+					filepath.Base(f), filepath.Base(include.Path), include.Path, a, include.Line, include.Column))
+			}
+			c.Errorf(p, "Cycle detected:\n%s", strings.Join(m, "\n"))
+		}
+	})
+}
+
+func getRelativePath(filename string, wd string) (string, error) {
+	a, err := filepath.Abs(filename)
+
+	if err != nil {
+		return "", fmt.Errorf("could not get absolute path for %s", filename)
+	}
+
+	return filepath.Rel(wd, a)
+}
+
+// looksForCycle tries to find a cycle that leads back to the start node (filename).
+// If found, it returns the nodes in the cycle. Otherwise returns nil.
+func lookForCycle(cur, start string, vis map[string]bool, path []string, adjList map[string][]string) []string {
+	if vis[cur] {
+		if cur == start {
+			return path
+		}
+		return nil
+	}
+
+	vis[cur] = true
+
+	for _, c := range adjList[cur] {
+		if cycle := lookForCycle(c, start, vis, append(path, cur), adjList); cycle != nil {
+			return cycle
+		}
+	}
+
+	return nil
 }
