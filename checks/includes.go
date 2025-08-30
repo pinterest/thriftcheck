@@ -15,9 +15,11 @@
 package checks
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/danwakefield/fnmatch"
 	"github.com/pinterest/thriftcheck"
@@ -65,4 +67,78 @@ func CheckIncludeRestricted(patterns map[string]*regexp.Regexp) thriftcheck.Chec
 			}
 		}
 	})
+}
+
+type includeEdge struct {
+	name    string
+	include *ast.Include
+}
+
+// CheckIncludeCycle returns a thriftcheck.Check that reports an error
+// if there is a circular include.
+func CheckIncludeCycle() thriftcheck.Check {
+	adjList := make(map[string][]string)
+	edges := make(map[string]map[string]includeEdge)
+
+	return thriftcheck.NewCheck("include.cycle", func(c *thriftcheck.C, p *ast.Program) {
+		// a `include`s b
+		var a, b string
+
+		a, err := filepath.Abs(c.Filename)
+		if err != nil {
+			c.Warningf(p, "could not get absolute path for %s, skipping this file", c.Filename)
+			return
+		}
+
+		for _, h := range p.Headers {
+			i, ok := h.(*ast.Include)
+			if !ok {
+				continue
+			}
+
+			b = filepath.Join(filepath.Dir(a), i.Path)
+
+			adjList[a] = append(adjList[a], b)
+
+			if _, exists := edges[a]; !exists {
+				edges[a] = make(map[string]includeEdge)
+			}
+
+			edges[a][b] = includeEdge{name: c.Filename, include: i}
+		}
+
+		cycle := lookForCycle(a, a, make(map[string]bool), []string{}, adjList)
+
+		if len(cycle) > 0 {
+			m := []string{}
+			for i, f := range cycle {
+				e := edges[f][cycle[(i+1)%len(cycle)]]
+				m = append(m, fmt.Sprintf(
+					"\t%s -> %s\n\t\tIncluded as: %s\n\t\tAt: %s:%d:%d\n",
+					filepath.Base(f), filepath.Base(e.include.Path), e.include.Path, e.name, e.include.Line, e.include.Column))
+			}
+			c.Errorf(p, "Cycle detected:\n%s", strings.Join(m, "\n"))
+		}
+	})
+}
+
+// looksForCycle tries to find a cycle that leads back to the start node (filename).
+// If found, it returns the nodes in the cycle. Otherwise returns nil.
+func lookForCycle(cur, start string, vis map[string]bool, path []string, adjList map[string][]string) []string {
+	if vis[cur] {
+		if cur == start {
+			return path
+		}
+		return nil
+	}
+
+	vis[cur] = true
+
+	for _, c := range adjList[cur] {
+		if cycle := lookForCycle(c, start, vis, append(path, cur), adjList); cycle != nil {
+			return cycle
+		}
+	}
+
+	return nil
 }
