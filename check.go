@@ -165,13 +165,14 @@ next:
 
 // C is a type passed to all check functions to provide context.
 type C struct {
-	Filename  string
-	Dirs      []string
-	Program   *ast.Program
-	Check     string
-	Messages  Messages
-	logger    *log.Logger
-	parseInfo *idl.Info
+	Filename   string
+	Dirs       []string
+	Program    *ast.Program
+	Check      string
+	Messages   Messages
+	logger     *log.Logger
+	parseInfo  *idl.Info
+	ParseCache map[string]*ParseRes
 }
 
 func (c *C) pos(n ast.Node) ast.Position {
@@ -203,7 +204,7 @@ func (c *C) Errorf(node ast.Node, message string, args ...any) {
 
 // Resolve resolves a name.
 func (c *C) Resolve(name string) ast.Node {
-	if n, _, err := Resolve(name, c.Program, c.Dirs); err == nil {
+	if n, _, err := Resolve(name, c.Program, c.Dirs, c.ParseCache); err == nil {
 		return n
 	}
 	return nil
@@ -211,7 +212,7 @@ func (c *C) Resolve(name string) ast.Node {
 
 // ResolveConstant resolves a constant reference to its target.
 func (c *C) ResolveConstant(ref ast.ConstantReference) ast.Node {
-	if n, err := ResolveConstant(ref, c.Program, c.Dirs); err == nil {
+	if n, err := ResolveConstant(ref, c.Program, c.Dirs, c.ParseCache); err == nil {
 		return n
 	}
 	return nil
@@ -219,7 +220,7 @@ func (c *C) ResolveConstant(ref ast.ConstantReference) ast.Node {
 
 // ResolveType resolves a type reference to its target type.
 func (c *C) ResolveType(ref ast.TypeReference) ast.Node {
-	if n, err := ResolveType(ref, c.Program, c.Dirs); err == nil {
+	if n, err := ResolveType(ref, c.Program, c.Dirs, c.ParseCache); err == nil {
 		return n
 	}
 	return nil

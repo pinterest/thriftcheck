@@ -29,9 +29,10 @@ import (
 
 // Linter is a configured Thrift linter.
 type Linter struct {
-	checks   Checks
-	logger   *log.Logger
-	includes []string
+	checks     Checks
+	logger     *log.Logger
+	includes   []string
+	ParseCache map[string]*ParseRes
 }
 
 // Option represents a Linter option.
@@ -54,8 +55,9 @@ func WithIncludes(includes []string) Option {
 // NewLinter creates a new Linter configured with the given checks and options.
 func NewLinter(checks Checks, options ...Option) *Linter {
 	l := &Linter{
-		checks: checks,
-		logger: log.New(io.Discard, "", 0),
+		checks:     checks,
+		logger:     log.New(io.Discard, "", 0),
+		ParseCache: make(map[string]*ParseRes),
 	}
 	for _, option := range options {
 		option(l)
@@ -67,7 +69,7 @@ func NewLinter(checks Checks, options ...Option) *Linter {
 
 // Lint lints a single input file.
 func (l *Linter) Lint(r io.Reader, filename string) (Messages, error) {
-	program, info, err := Parse(r, filename)
+	program, info, err := Parse(r, filename, l.ParseCache)
 	if err != nil {
 		var parseError *idl.ParseError
 		if errors.As(err, &parseError) {
@@ -115,11 +117,12 @@ func (l *Linter) lint(program *ast.Program, filename string, parseInfo *idl.Info
 	l.logger.Printf("linting %s\n", filename)
 
 	ctx := &C{
-		Filename:  filename,
-		Dirs:      append([]string{filepath.Dir(filename)}, l.includes...),
-		Program:   program,
-		logger:    l.logger,
-		parseInfo: parseInfo,
+		Filename:   filename,
+		Dirs:       append([]string{filepath.Dir(filename)}, l.includes...),
+		Program:    program,
+		logger:     l.logger,
+		parseInfo:  parseInfo,
+		ParseCache: l.ParseCache,
 	}
 	activeChecks := overridableChecks{root: &l.checks}
 

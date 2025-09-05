@@ -34,9 +34,10 @@ func RunTests(t *testing.T, check *thriftcheck.Check, tests []Test) {
 
 	for _, tt := range tests {
 		c := &thriftcheck.C{
-			Filename: tt.name,
-			Program:  tt.prog,
-			Check:    check.Name,
+			Filename:   tt.name,
+			Program:    tt.prog,
+			Check:      check.Name,
+			ParseCache: make(map[string]*thriftcheck.ParseRes),
 		}
 		if c.Filename == "" {
 			c.Filename = "t.thrift"

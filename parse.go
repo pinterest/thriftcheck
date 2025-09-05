@@ -25,17 +25,15 @@ import (
 )
 
 type ParseRes struct {
-	program *ast.Program
+	Program *ast.Program
 	info    *idl.Info
 	err     error
 }
 
-var filenameToParseRes = make(map[string]*ParseRes)
-
 // Parse parses Thrift document content.
-func Parse(r io.Reader, filename string) (*ast.Program, *idl.Info, error) {
-	if res, ok := filenameToParseRes[filename]; ok {
-		return res.program, res.info, res.err
+func Parse(r io.Reader, filename string, parseCache map[string]*ParseRes) (*ast.Program, *idl.Info, error) {
+	if res, ok := parseCache[filename]; ok {
+		return res.Program, res.info, res.err
 	}
 
 	b, err := io.ReadAll(r)
@@ -46,18 +44,18 @@ func Parse(r io.Reader, filename string) (*ast.Program, *idl.Info, error) {
 	cfg := idl.Config{Info: &idl.Info{}}
 	prog, err := cfg.Parse(b)
 
-	filenameToParseRes[filename] = &ParseRes{program: prog, info: cfg.Info, err: err}
+	parseCache[filename] = &ParseRes{Program: prog, info: cfg.Info, err: err}
 
 	return prog, cfg.Info, err
 }
 
 // ParseFile parses a Thrift file. The filename must appear in one of the
 // given directories. If found, it also returns the opened file's `Name()`.
-func ParseFile(filename string, dirs []string) (*ast.Program, *idl.Info, string, error) {
+func ParseFile(filename string, dirs []string, parseCache map[string]*ParseRes) (*ast.Program, *idl.Info, string, error) {
 	if filepath.IsAbs(filename) {
 		if f, err := os.Open(filename); err == nil {
 			defer f.Close()
-			program, info, err := Parse(f, f.Name())
+			program, info, err := Parse(f, f.Name(), parseCache)
 			return program, info, f.Name(), err
 		}
 		return nil, nil, "", fmt.Errorf("%s not found", filename)
@@ -66,7 +64,7 @@ func ParseFile(filename string, dirs []string) (*ast.Program, *idl.Info, string,
 	for _, dir := range dirs {
 		if f, err := os.Open(filepath.Join(dir, filename)); err == nil {
 			defer f.Close()
-			program, info, err := Parse(f, f.Name())
+			program, info, err := Parse(f, f.Name(), parseCache)
 			return program, info, f.Name(), err
 		}
 	}

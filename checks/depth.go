@@ -165,7 +165,7 @@ func expandType(t ast.Type, depth int, src *source, vis map[string]bool, deepest
 			&typeNode{isBaseType: true}, deepestTypes)
 	case ast.TypeReference:
 		name := v.String()
-		n, rInfo, err := thriftcheck.Resolve(name, src.program, []string{filepath.Dir(src.filename)})
+		n, rInfo, err := thriftcheck.Resolve(name, src.program, []string{filepath.Dir(src.filename)}, c.ParseCache)
 		if err != nil {
 			return
 		}
