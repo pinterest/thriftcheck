@@ -63,10 +63,12 @@ func NewStructNode(s *ast.Struct, f string, p *ast.Program) structNode {
 
 // CheckDepth returns a thriftcheck.Check that reports an error
 // if a Struct, Union, or Exception exceeds a specified depth.
-func CheckDepth(maxDepth int, allowCycles bool) thriftcheck.Check {
+func CheckDepth(maxAllowedDepth int, allowCycles bool) thriftcheck.Check {
 	structIdToTypes := make(map[string]map[string]*typeNode)
 
 	return thriftcheck.NewCheck("depth", func(c *thriftcheck.C, s *ast.Struct) {
+		maxDepth := maxAllowedDepth
+
 		for _, a := range s.Annotations {
 			if a.Name == "maxDepth" {
 				i, err := strconv.Atoi(a.Value)
