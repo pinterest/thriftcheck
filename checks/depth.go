@@ -139,16 +139,12 @@ func getDepth(
 	// This is helpful to avoid flaky tests, but it makes the check slower.
 	for _, key := range slices.Sorted(maps.Keys(structIdToTypes[s.id])) {
 		t := structIdToTypes[s.id][key]
-		if t.isBaseType {
-			if newD := curD + t.ref.depth; !cfg.maxDepthUnset && newD > cfg.maxDepth {
-				return newD, cycle, append(path, t)
-			}
-			continue
-		}
 
 		d, c, path := getDepth(t.sourceNode, curD+t.ref.depth, maxD, vis, append(path, t), structIdToTypes, cfg, c)
+
 		cycle = cycle || c
 		maxD = max(maxD, d)
+
 		if (!cfg.maxDepthUnset && maxD > cfg.maxDepth) || (cycle && !cfg.allowCycles) {
 			return maxD, cycle, path
 		}
