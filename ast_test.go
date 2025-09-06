@@ -74,7 +74,7 @@ func TestResolveConstant(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		n, err := ResolveConstant(tt.ref, tt.prog, nil)
+		n, err := ResolveConstant(tt.ref, tt.prog, nil, make(map[string]*ParseRes))
 		if tt.err {
 			if err == nil {
 				t.Errorf("expected an error, got %s", n)

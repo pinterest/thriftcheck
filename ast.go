@@ -48,14 +48,22 @@ func Doc(node ast.Node) string {
 	return ""
 }
 
+type ResolutionInfo struct {
+	Filename string
+	Program  *ast.Program
+}
+
 // Resolve resolves a named reference to its target node.
+// For `include`d names, it also returns the filename and *ast.Program
+// where the node was found.
 //
 // The target can either be in the current program's scope or it can refer to
 // an included file using dot notation. Included files must exist in one of the
 // given search directories.
-func Resolve(name string, program *ast.Program, dirs []string) (ast.Node, error) {
+func Resolve(name string, program *ast.Program, dirs []string, parseCache map[string]*ParseRes) (ast.Node, *ResolutionInfo, error) {
 	defs := program.Definitions
 
+	var rInfo *ResolutionInfo
 	if strings.Contains(name, ".") {
 		parts := strings.SplitN(name, ".", 2)
 		fname := parts[0] + ".thrift"
@@ -70,12 +78,13 @@ func Resolve(name string, program *ast.Program, dirs []string) (ast.Node, error)
 			}
 		}
 		if ipath == "" {
-			return nil, fmt.Errorf("missing \"include\" for type reference %q", name)
+			return nil, nil, fmt.Errorf("missing \"include\" for type reference %q", name)
 		}
 
-		program, _, err := ParseFile(ipath, dirs)
+		program, _, f, err := ParseFile(ipath, dirs, parseCache)
+		rInfo = &ResolutionInfo{Filename: f, Program: program}
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		defs = program.Definitions
@@ -84,11 +93,11 @@ func Resolve(name string, program *ast.Program, dirs []string) (ast.Node, error)
 
 	for _, def := range defs {
 		if def.Info().Name == name {
-			return def, nil
+			return def, rInfo, nil
 		}
 	}
 
-	return nil, fmt.Errorf("%q could not be resolved", name)
+	return nil, nil, fmt.Errorf("%q could not be resolved", name)
 }
 
 // ResolveConstant resolves an [ast.ConstantReference] to its target node.
@@ -98,12 +107,12 @@ func Resolve(name string, program *ast.Program, dirs []string) (ast.Node, error)
 //   - "Enum.Value" (ast.EnumItem)
 //   - "include.Constant" (ast.Constant)
 //   - "include.Enum.Value" (ast.EnumItem)
-func ResolveConstant(ref ast.ConstantReference, program *ast.Program, dirs []string) (ast.Node, error) {
+func ResolveConstant(ref ast.ConstantReference, program *ast.Program, dirs []string, parseCache map[string]*ParseRes) (ast.Node, error) {
 	parts := strings.SplitN(ref.Name, ".", 3)
 
-	n, err := Resolve(parts[0], program, dirs)
+	n, _, err := Resolve(parts[0], program, dirs, parseCache)
 	if err != nil && len(parts) > 1 {
-		n, err = Resolve(parts[0]+"."+parts[1], program, dirs)
+		n, _, err = Resolve(parts[0]+"."+parts[1], program, dirs, parseCache)
 	}
 	if err != nil {
 		return n, fmt.Errorf("%q could not be resolved", ref.Name)
@@ -125,8 +134,8 @@ func ResolveConstant(ref ast.ConstantReference, program *ast.Program, dirs []str
 // resolve the target node's own type. This is useful when the reference
 // points to an [ast.Typedef] or [ast.Constant], for example, and the caller
 // is primarily intererested in the target's ast.Type.
-func ResolveType(ref ast.TypeReference, program *ast.Program, dirs []string) (ast.Node, error) {
-	n, err := Resolve(ref.Name, program, dirs)
+func ResolveType(ref ast.TypeReference, program *ast.Program, dirs []string, parseCache map[string]*ParseRes) (ast.Node, error) {
+	n, _, err := Resolve(ref.Name, program, dirs, parseCache)
 	if err != nil {
 		return nil, err
 	}
