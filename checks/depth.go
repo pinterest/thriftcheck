@@ -16,7 +16,9 @@ package checks
 
 import (
 	"fmt"
+	"maps"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -129,7 +131,12 @@ func getDepth(
 	expandStructFields(s, structIdToTypes, c)
 
 	var cycle bool
-	for _, t := range structIdToTypes[s.id] {
+	// We sort the keys to make the results deterministic.
+	// If a struct has multiple paths that exceed the max depth,
+	// the reported path should always be the same one.
+	// This is helpful to avoid flaky tests, but it makes the check slower.
+	for _, key := range slices.Sorted(maps.Keys(structIdToTypes[s.id])) {
+		t := structIdToTypes[s.id][key]
 		if t.isBaseType {
 			if newD := curD + t.ref.depth; !cfg.maxDepthUnset && newD > cfg.maxDepth {
 				return newD, cycle, append(path, t)
