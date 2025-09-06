@@ -65,7 +65,7 @@ type Config struct {
 
 		Depth struct {
 			Max         int  `fig:"max"`
-			AllowCycles bool `fig:"allow_cycles"`
+			AllowCycles bool `fig:"allowCycles"`
 		}
 
 		Enum struct {
