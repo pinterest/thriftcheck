@@ -25,8 +25,9 @@ import (
 )
 
 type config struct {
-	maxDepth    int
-	allowCycles bool
+	maxDepth      int
+	maxDepthUnset bool
+	allowCycles   bool
 }
 
 type structNode struct {
@@ -80,16 +81,18 @@ func CheckDepth(maxDepth int, allowCycles bool) thriftcheck.Check {
 			}
 		}
 
-		// Invalid or no max depth given
-		if maxDepth == 0 {
+		maxDepthUnset := maxDepth == 0
+
+		if maxDepthUnset && allowCycles {
 			return
 		}
 
 		depth, cycle, path := getDepth(
 			NewStructNode(s, c.Filename, c.Program), 1, 1,
-			make(map[string]bool), []*typeNode{}, structIdToTypes, config{maxDepth: maxDepth, allowCycles: allowCycles}, c)
+			make(map[string]bool), []*typeNode{}, structIdToTypes,
+			config{maxDepth: maxDepth, maxDepthUnset: maxDepthUnset, allowCycles: allowCycles}, c)
 
-		if (depth > maxDepth) || (cycle && !allowCycles) {
+		if (!maxDepthUnset && depth > maxDepth) || (cycle && !allowCycles) {
 			pathDetails := []string{}
 			accD := 1
 			for _, e := range path {
@@ -119,7 +122,7 @@ func getDepth(
 	vis[s.id] = true
 
 	maxD = max(maxD, curD)
-	if maxD > cfg.maxDepth {
+	if !cfg.maxDepthUnset && maxD > cfg.maxDepth {
 		return maxD, false, path
 	}
 
@@ -128,7 +131,7 @@ func getDepth(
 	var cycle bool
 	for _, t := range structIdToTypes[s.id] {
 		if t.isBaseType {
-			if newD := curD + t.ref.depth; newD > cfg.maxDepth {
+			if newD := curD + t.ref.depth; !cfg.maxDepthUnset && newD > cfg.maxDepth {
 				return newD, cycle, append(path, t)
 			}
 			continue
@@ -137,7 +140,7 @@ func getDepth(
 		d, c, path := getDepth(t.sourceNode, curD+t.ref.depth, maxD, vis, append(path, t), structIdToTypes, cfg, c)
 		cycle = cycle || c
 		maxD = max(maxD, d)
-		if (maxD > cfg.maxDepth) || (cycle && !cfg.allowCycles) {
+		if (!cfg.maxDepthUnset && maxD > cfg.maxDepth) || (cycle && !cfg.allowCycles) {
 			return maxD, cycle, path
 		}
 	}
