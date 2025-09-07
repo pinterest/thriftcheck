@@ -226,7 +226,7 @@ func main() {
 	// Load the (optional) configuration file
 	var cfg Config
 	if err := loadConfig(&cfg); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(flag.CommandLine.Output(), err)
 		os.Exit(1 << uint(thriftcheck.Error))
 	}
 
@@ -296,7 +296,7 @@ func main() {
 	linter := thriftcheck.NewLinter(checks, options...)
 	messages, err := lint(linter, paths)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(flag.CommandLine.Output(), err)
 		os.Exit(1 << uint(thriftcheck.Error))
 	}
 
