@@ -9,14 +9,11 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        go: ["1.25"]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-go@v6
         with:
-          go-version: ${{ matrix.go }}
+          go-version: 'stable'
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v8
         with:
