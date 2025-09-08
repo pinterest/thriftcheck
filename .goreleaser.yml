@@ -20,13 +20,13 @@ builds:
       - "-s -w -X main.version={{ .Version }} -X main.revision={{ .ShortCommit }}"
 
 archives:
-  - format: tar.gz
+  - formats: ['tar.gz']
     format_overrides:
       - goos: windows
-        format: zip
+        formats: ['zip']
 
 snapshot:
-  name_template: "{{ .Version }}-dev"
+  version_template: "{{ .Version }}-dev"
 
 release:
   github:
