@@ -51,7 +51,7 @@ func CheckIncludePath() thriftcheck.Check {
 }
 
 // CheckIncludeRestricted returns a thriftcheck.Check that restricts some files
-// from being imported by other  files using a map of patterns: the key is a
+// from being imported by other files using a map of patterns: the key is a
 // file name pattern that matches the including filename and the value is a
 // regular expression that matches the included filename. When both match, the
 // `include` is flagged as "restricted" and an error is reported.
