@@ -7,6 +7,35 @@ on:
     branches: [main]
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      goreleaser: ${{ steps.filter.outputs.goreleaser }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            goreleaser:
+              - '.goreleaser.yml'
+
+  goreleaser:
+    needs: changes
+    if: ${{ needs.changes.outputs.goreleaser == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version: 'stable'
+      - name: check
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          args: check
+
   lint:
     runs-on: ubuntu-latest
     steps:
