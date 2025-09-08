@@ -101,6 +101,7 @@ func TestParseError(t *testing.T) {
 
 	linter := NewLinter(Checks{})
 	for _, tt := range tests {
+		clear(linter.ParseCache)
 		msgs, err := linter.Lint(strings.NewReader(tt.s), "t.thrift")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
