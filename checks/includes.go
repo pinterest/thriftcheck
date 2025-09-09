@@ -110,7 +110,7 @@ func CheckIncludeCycle() thriftcheck.Check {
 					"\t%s -> %s\n\t\tIncluded as: %s\n\t\tAt: %s:%d:%d\n",
 					filepath.Base(e.originalFrom), filepath.Base(e.include.Path), e.include.Path, e.originalFrom, e.include.Line, e.include.Column))
 			}
-			c.Errorf(p, "Cycle detected:\n%s", strings.Join(m, "\n"))
+			c.Errorf(cycle[0].include, "Cycle detected:\n%s", strings.Join(m, "\n"))
 		}
 	})
 }
