@@ -104,15 +104,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			name: "b.thrift",
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "a.thrift"}}},
-			want: []string{`b.thrift:0:1: error: Cycle detected:
-	b.thrift -> a.thrift
-		Included as: a.thrift
-		At: b.thrift:0:0
-
-	a.thrift -> b.thrift
-		Included as: b.thrift
-		At: a.thrift:0:0
- (include.cycle)`},
+			want: []string{`b.thrift:0:1: error: Cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
 		},
 	}
 
@@ -131,15 +123,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			name: "/home/b.thrift",
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "a.thrift"}}},
-			want: []string{`/home/b.thrift:0:1: error: Cycle detected:
-	b.thrift -> a.thrift
-		Included as: a.thrift
-		At: /home/b.thrift:0:0
-
-	a.thrift -> b.thrift
-		Included as: b.thrift
-		At: /home/a.thrift:0:0
- (include.cycle)`},
+			want: []string{`/home/b.thrift:0:1: error: Cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
 		},
 	}
 
@@ -160,15 +144,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			name: "b.thrift",
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "a.thrift"}}},
-			want: []string{fmt.Sprintf(`b.thrift:0:1: error: Cycle detected:
-	b.thrift -> a.thrift
-		Included as: a.thrift
-		At: b.thrift:0:0
-
-	a.thrift -> b.thrift
-		Included as: b.thrift
-		At: %s/a.thrift:0:0
- (include.cycle)`, wd)},
+			want: []string{`b.thrift:0:1: error: Cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
 		},
 	}
 
@@ -187,15 +163,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			name: "something/b.thrift",
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "../a.thrift"}}},
-			want: []string{`something/b.thrift:0:1: error: Cycle detected:
-	b.thrift -> a.thrift
-		Included as: ../a.thrift
-		At: something/b.thrift:0:0
-
-	a.thrift -> b.thrift
-		Included as: something/b.thrift
-		At: a.thrift:0:0
- (include.cycle)`},
+			want: []string{`something/b.thrift:0:1: error: Cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
 		},
 	}
 
@@ -214,15 +182,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			name: "some/dir/b.thrift",
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "a.thrift"}}},
-			want: []string{`some/dir/b.thrift:0:1: error: Cycle detected:
-	b.thrift -> a.thrift
-		Included as: a.thrift
-		At: some/dir/b.thrift:0:0
-
-	a.thrift -> b.thrift
-		Included as: b.thrift
-		At: some/dir/a.thrift:0:0
- (include.cycle)`},
+			want: []string{`some/dir/b.thrift:0:1: error: Cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
 		},
 	}
 
@@ -247,19 +207,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			name: "d2/c.thrift",
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "../d1/d11/d111/a.thrift"}}},
-			want: []string{`d2/c.thrift:0:1: error: Cycle detected:
-	c.thrift -> a.thrift
-		Included as: ../d1/d11/d111/a.thrift
-		At: d2/c.thrift:0:0
-
-	a.thrift -> b.thrift
-		Included as: ../../d12/d121/b.thrift
-		At: d1/d11/d111/a.thrift:0:0
-
-	b.thrift -> c.thrift
-		Included as: ../../../d2/c.thrift
-		At: d1/d12/d121/b.thrift:0:0
- (include.cycle)`},
+			want: []string{`d2/c.thrift:0:1: error: Cycle detected: -> a.thrift -> b.thrift -> c.thrift (include.cycle)`},
 		},
 	}
 
@@ -272,11 +220,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			name: "a.thrift",
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "a.thrift"}}},
-			want: []string{`a.thrift:0:1: error: Cycle detected:
-	a.thrift -> a.thrift
-		Included as: a.thrift
-		At: a.thrift:0:0
- (include.cycle)`},
+			want: []string{`a.thrift:0:1: error: Cycle detected: -> a.thrift (include.cycle)`},
 		},
 	}
 
@@ -308,19 +252,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "b.thrift"},
 				&ast.Include{Path: "g.thrift"}}},
-			want: []string{`d.thrift:0:1: error: Cycle detected:
-	d.thrift -> b.thrift
-		Included as: b.thrift
-		At: d.thrift:0:0
-
-	b.thrift -> c.thrift
-		Included as: c.thrift
-		At: b.thrift:0:0
-
-	c.thrift -> d.thrift
-		Included as: d.thrift
-		At: c.thrift:0:0
- (include.cycle)`},
+			want: []string{`d.thrift:0:1: error: Cycle detected: -> b.thrift -> c.thrift -> d.thrift (include.cycle)`},
 		},
 		{
 			name: "g.thrift",
@@ -357,19 +289,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 				&ast.Include{Path: "other3.thrift"},
 				&ast.Include{Path: "a.thrift"},
 				&ast.Include{Path: "other4.thrift"}}},
-			want: []string{`c.thrift:0:1: error: Cycle detected:
-	c.thrift -> a.thrift
-		Included as: a.thrift
-		At: c.thrift:0:0
-
-	a.thrift -> b.thrift
-		Included as: b.thrift
-		At: a.thrift:0:0
-
-	b.thrift -> c.thrift
-		Included as: c.thrift
-		At: b.thrift:0:0
- (include.cycle)`},
+			want: []string{`c.thrift:0:1: error: Cycle detected: -> a.thrift -> b.thrift -> c.thrift (include.cycle)`},
 		},
 	}
 
@@ -388,15 +308,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			name: "b.thrift",
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "a.thrift"}}},
-			want: []string{`b.thrift:0:1: error: Cycle detected:
-	b.thrift -> a.thrift
-		Included as: a.thrift
-		At: b.thrift:0:0
-
-	a.thrift -> b.thrift
-		Included as: ../checks/b.thrift
-		At: a.thrift:0:0
- (include.cycle)`},
+			want: []string{`b.thrift:0:1: error: Cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
 		},
 	}
 
@@ -422,15 +334,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "a.thrift"},
 				&ast.Include{Path: "b.thrift"}}},
-			want: []string{`c.thrift:0:1: error: Cycle detected:
-	c.thrift -> a.thrift
-		Included as: a.thrift
-		At: c.thrift:0:0
-
-	a.thrift -> c.thrift
-		Included as: c.thrift
-		At: a.thrift:0:0
- (include.cycle)`},
+			want: []string{`c.thrift:0:1: error: Cycle detected: -> a.thrift -> c.thrift (include.cycle)`},
 		},
 	}
 

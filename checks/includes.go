@@ -104,13 +104,19 @@ func CheckIncludeCycle() thriftcheck.Check {
 		cycle := lookForCycle(a, a, make(map[string]bool), []includeEdge{}, edgeList)
 
 		if len(cycle) > 0 {
+			cycleFiles := []string{}
+			for _, e := range cycle {
+				cycleFiles = append(cycleFiles, filepath.Base(e.to))
+			}
+			c.Errorf(cycle[0].include, "Cycle detected: -> %s", strings.Join(cycleFiles, " -> "))
+
 			m := []string{}
 			for _, e := range cycle {
 				m = append(m, fmt.Sprintf(
 					"\t%s -> %s\n\t\tIncluded as: %s\n\t\tAt: %s:%d:%d\n",
 					filepath.Base(e.originalFrom), filepath.Base(e.include.Path), e.include.Path, e.originalFrom, e.include.Line, e.include.Column))
 			}
-			c.Errorf(cycle[0].include, "Cycle detected:\n%s", strings.Join(m, "\n"))
+			c.Logf("Cycle detected at %s:\n%s", c.Filename, strings.Join(m, "\n"))
 		}
 	})
 }
