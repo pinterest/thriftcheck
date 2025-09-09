@@ -70,15 +70,15 @@ func CheckIncludeRestricted(patterns map[string]*regexp.Regexp) thriftcheck.Chec
 }
 
 type includeEdge struct {
-	name    string
-	include *ast.Include
+	originalFrom string
+	to           string
+	include      *ast.Include
 }
 
 // CheckIncludeCycle returns a thriftcheck.Check that reports an error
 // if there is a circular include.
 func CheckIncludeCycle() thriftcheck.Check {
-	adjList := make(map[string][]string)
-	edges := make(map[string]map[string]includeEdge)
+	edgeList := make(map[string][]includeEdge)
 
 	return thriftcheck.NewCheck("include.cycle", func(c *thriftcheck.C, p *ast.Program) {
 		// a `include`s b
@@ -98,24 +98,17 @@ func CheckIncludeCycle() thriftcheck.Check {
 
 			b = filepath.Join(filepath.Dir(a), i.Path)
 
-			adjList[a] = append(adjList[a], b)
-
-			if _, exists := edges[a]; !exists {
-				edges[a] = make(map[string]includeEdge)
-			}
-
-			edges[a][b] = includeEdge{name: c.Filename, include: i}
+			edgeList[a] = append(edgeList[a], includeEdge{originalFrom: c.Filename, to: b, include: i})
 		}
 
-		cycle := lookForCycle(a, a, make(map[string]bool), []string{}, adjList)
+		cycle := lookForCycle(a, a, make(map[string]bool), []includeEdge{}, edgeList)
 
 		if len(cycle) > 0 {
 			m := []string{}
-			for i, f := range cycle {
-				e := edges[f][cycle[(i+1)%len(cycle)]]
+			for _, e := range cycle {
 				m = append(m, fmt.Sprintf(
 					"\t%s -> %s\n\t\tIncluded as: %s\n\t\tAt: %s:%d:%d\n",
-					filepath.Base(f), filepath.Base(e.include.Path), e.include.Path, e.name, e.include.Line, e.include.Column))
+					filepath.Base(e.originalFrom), filepath.Base(e.include.Path), e.include.Path, e.originalFrom, e.include.Line, e.include.Column))
 			}
 			c.Errorf(p, "Cycle detected:\n%s", strings.Join(m, "\n"))
 		}
@@ -123,8 +116,8 @@ func CheckIncludeCycle() thriftcheck.Check {
 }
 
 // looksForCycle tries to find a cycle that leads back to the start node (filename).
-// If found, it returns the nodes in the cycle. Otherwise returns nil.
-func lookForCycle(cur, start string, vis map[string]bool, path []string, adjList map[string][]string) []string {
+// If found, it returns the edges in the cycle. Otherwise returns nil.
+func lookForCycle(cur, start string, vis map[string]bool, path []includeEdge, edgeList map[string][]includeEdge) []includeEdge {
 	if vis[cur] {
 		if cur == start {
 			return path
@@ -134,8 +127,8 @@ func lookForCycle(cur, start string, vis map[string]bool, path []string, adjList
 
 	vis[cur] = true
 
-	for _, c := range adjList[cur] {
-		if cycle := lookForCycle(c, start, vis, append(path, cur), adjList); cycle != nil {
+	for _, e := range edgeList[cur] {
+		if cycle := lookForCycle(e.to, start, vis, append(path, e), edgeList); cycle != nil {
 			return cycle
 		}
 	}
