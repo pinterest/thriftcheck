@@ -117,18 +117,18 @@ func CheckIncludeCycle() thriftcheck.Check {
 
 // looksForCycle tries to find a cycle that leads back to the start node (filename).
 // If found, it returns the edges in the cycle. Otherwise returns nil.
-func lookForCycle(cur, start string, vis map[string]bool, path []includeEdge, edgeList map[string][]includeEdge) []includeEdge {
-	if vis[cur] {
+func lookForCycle(cur, start string, visited map[string]bool, path []includeEdge, edgeList map[string][]includeEdge) []includeEdge {
+	if visited[cur] {
 		if cur == start {
 			return path
 		}
 		return nil
 	}
 
-	vis[cur] = true
+	visited[cur] = true
 
 	for _, e := range edgeList[cur] {
-		if cycle := lookForCycle(e.to, start, vis, append(path, e), edgeList); cycle != nil {
+		if cycle := lookForCycle(e.to, start, visited, append(path, e), edgeList); cycle != nil {
 			return cycle
 		}
 	}
