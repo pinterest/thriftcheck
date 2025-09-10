@@ -96,9 +96,17 @@ func CheckIncludeCycle() thriftcheck.Check {
 				continue
 			}
 
-			b = filepath.Join(filepath.Dir(a), i.Path)
+			for _, dir := range c.Dirs {
+				absDir, err := filepath.Abs(dir)
+				if err != nil {
+					c.Warningf(p, "could not get absolute path for %s, skipping joining %s with this dir", dir, i.Path)
+					continue
+				}
 
-			edgeList[a] = append(edgeList[a], includeEdge{originalFrom: c.Filename, to: b, include: i})
+				b = filepath.Join(absDir, i.Path)
+
+				edgeList[a] = append(edgeList[a], includeEdge{originalFrom: c.Filename, to: b, include: i})
+			}
 		}
 
 		cycle := lookForCycle(a, a, make(map[string]bool), []includeEdge{}, edgeList)
