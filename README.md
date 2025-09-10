@@ -44,6 +44,11 @@ Use `--stdin-name` to customize the filename used in output messages.
 $ thriftlint --stdin-name filename.thrift - < filename.thrift
 ```
 
+Include paths specified via `-I` or in the configuration file are normalized
+using lexical path cleaning, which removes trailing slashes, resolves `.` and
+`..` elements, and eliminates redundant separators. This means `includes/`,
+`includes`, and `./includes/` are treated identically.
+
 Messages are reported to standard output using a familiar parseable format:
 
 ```
