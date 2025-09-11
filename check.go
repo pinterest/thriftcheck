@@ -170,6 +170,7 @@ type C struct {
 	Program   *ast.Program
 	Check     string
 	Messages  Messages
+	Verbose   bool
 	logger    *log.Logger
 	parseInfo *idl.Info
 }
