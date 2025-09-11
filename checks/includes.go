@@ -116,7 +116,7 @@ func CheckIncludeCycle() thriftcheck.Check {
 			for _, e := range cycle {
 				cycleFiles = append(cycleFiles, filepath.Base(e.to))
 			}
-			c.Errorf(cycle[0].include, "Cycle detected: -> %s", strings.Join(cycleFiles, " -> "))
+			c.Errorf(cycle[0].include, "cycle detected: -> %s", strings.Join(cycleFiles, " -> "))
 
 			m := []string{}
 			for _, e := range cycle {

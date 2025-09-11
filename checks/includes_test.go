@@ -106,7 +106,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			dirs: []string{"."},
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "a.thrift"}}},
-			want: []string{`b.thrift:0:1: error: Cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
+			want: []string{`b.thrift:0:1: error: cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
 		},
 	}
 
@@ -127,7 +127,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			dirs: []string{"/home"},
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "a.thrift"}}},
-			want: []string{`/home/b.thrift:0:1: error: Cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
+			want: []string{`/home/b.thrift:0:1: error: cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
 		},
 	}
 
@@ -150,7 +150,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			dirs: []string{"."},
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "a.thrift"}}},
-			want: []string{`b.thrift:0:1: error: Cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
+			want: []string{`b.thrift:0:1: error: cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
 		},
 	}
 
@@ -171,7 +171,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			dirs: []string{"something"},
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "../a.thrift"}}},
-			want: []string{`something/b.thrift:0:1: error: Cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
+			want: []string{`something/b.thrift:0:1: error: cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
 		},
 	}
 
@@ -192,7 +192,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			dirs: []string{"some/dir"},
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "a.thrift"}}},
-			want: []string{`some/dir/b.thrift:0:1: error: Cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
+			want: []string{`some/dir/b.thrift:0:1: error: cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
 		},
 	}
 
@@ -220,7 +220,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			dirs: []string{"d2"},
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "../d1/d11/d111/a.thrift"}}},
-			want: []string{`d2/c.thrift:0:1: error: Cycle detected: -> a.thrift -> b.thrift -> c.thrift (include.cycle)`},
+			want: []string{`d2/c.thrift:0:1: error: cycle detected: -> a.thrift -> b.thrift -> c.thrift (include.cycle)`},
 		},
 	}
 
@@ -234,7 +234,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			dirs: []string{"."},
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "a.thrift"}}},
-			want: []string{`a.thrift:0:1: error: Cycle detected: -> a.thrift (include.cycle)`},
+			want: []string{`a.thrift:0:1: error: cycle detected: -> a.thrift (include.cycle)`},
 		},
 	}
 
@@ -270,7 +270,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "b.thrift"},
 				&ast.Include{Path: "g.thrift"}}},
-			want: []string{`d.thrift:0:1: error: Cycle detected: -> b.thrift -> c.thrift -> d.thrift (include.cycle)`},
+			want: []string{`d.thrift:0:1: error: cycle detected: -> b.thrift -> c.thrift -> d.thrift (include.cycle)`},
 		},
 		{
 			name: "g.thrift",
@@ -311,7 +311,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 				&ast.Include{Path: "other3.thrift"},
 				&ast.Include{Path: "a.thrift"},
 				&ast.Include{Path: "other4.thrift"}}},
-			want: []string{`c.thrift:0:1: error: Cycle detected: -> a.thrift -> b.thrift -> c.thrift (include.cycle)`},
+			want: []string{`c.thrift:0:1: error: cycle detected: -> a.thrift -> b.thrift -> c.thrift (include.cycle)`},
 		},
 	}
 
@@ -332,7 +332,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			dirs: []string{"."},
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "a.thrift"}}},
-			want: []string{`b.thrift:0:1: error: Cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
+			want: []string{`b.thrift:0:1: error: cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
 		},
 	}
 
@@ -361,7 +361,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "a.thrift"},
 				&ast.Include{Path: "b.thrift"}}},
-			want: []string{`c.thrift:0:1: error: Cycle detected: -> a.thrift -> c.thrift (include.cycle)`},
+			want: []string{`c.thrift:0:1: error: cycle detected: -> a.thrift -> c.thrift (include.cycle)`},
 		},
 	}
 
@@ -441,7 +441,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			dirs: []string{"shared", included_dir},
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "../something/a.thrift"}}},
-			want: []string{`shared/b.thrift:0:1: error: Cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
+			want: []string{`shared/b.thrift:0:1: error: cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
 		},
 	}
 
@@ -465,7 +465,7 @@ func TestCheckIncludeCycle(t *testing.T) {
 			dirs: append([]string{"other/shared"}, included_dirs...),
 			node: &ast.Program{Headers: []ast.Header{
 				&ast.Include{Path: "../../a.thrift"}}},
-			want: []string{`other/shared/b.thrift:0:1: error: Cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
+			want: []string{`other/shared/b.thrift:0:1: error: cycle detected: -> a.thrift -> b.thrift (include.cycle)`},
 		},
 	}
 
