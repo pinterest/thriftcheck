@@ -24,6 +24,7 @@ import (
 
 type Test struct {
 	name string
+	dirs []string
 	prog *ast.Program
 	node ast.Node
 	want []string
@@ -35,6 +36,7 @@ func RunTests(t *testing.T, check *thriftcheck.Check, tests []Test) {
 	for _, tt := range tests {
 		c := &thriftcheck.C{
 			Filename: tt.name,
+			Dirs:     tt.dirs,
 			Program:  tt.prog,
 			Check:    check.Name,
 		}

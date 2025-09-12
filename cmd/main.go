@@ -244,6 +244,7 @@ func main() {
 		checks.CheckFieldOptional(),
 		checks.CheckFieldRequiredness(),
 		checks.CheckFieldDocMissing(),
+		checks.CheckIncludeCycle(),
 		checks.CheckIncludePath(),
 		checks.CheckIncludeRestricted(cfg.Checks.Include.Restricted),
 		checks.CheckInteger64bit(),
@@ -283,7 +284,10 @@ func main() {
 	}
 	if *verboseFlag {
 		logger := log.New(os.Stderr, "", log.Ltime|log.Lmicroseconds|log.Lshortfile)
-		options = append(options, thriftcheck.WithLogger(logger))
+		options = append(options, []thriftcheck.Option{
+			thriftcheck.WithVerboseFlag(),
+			thriftcheck.WithLogger(logger),
+		}...)
 	}
 
 	paths := flag.Args()

@@ -31,6 +31,7 @@ import (
 type Linter struct {
 	checks   Checks
 	logger   *log.Logger
+	verbose  bool
 	includes []string
 }
 
@@ -41,6 +42,13 @@ type Option func(*Linter)
 func WithLogger(logger *log.Logger) Option {
 	return func(l *Linter) {
 		l.logger = logger
+	}
+}
+
+// WithLogger is an Option that sets the linter's 'verbose' field to true.
+func WithVerboseFlag() Option {
+	return func(l *Linter) {
+		l.verbose = true
 	}
 }
 
@@ -118,6 +126,7 @@ func (l *Linter) lint(program *ast.Program, filename string, parseInfo *idl.Info
 		Filename:  filename,
 		Dirs:      append([]string{filepath.Dir(filename)}, l.includes...),
 		Program:   program,
+		Verbose:   l.verbose,
 		logger:    l.logger,
 		parseInfo: parseInfo,
 	}
