@@ -36,23 +36,61 @@ func Parse(r io.Reader) (*ast.Program, *idl.Info, error) {
 	return prog, cfg.Info, err
 }
 
-// ParseFile parses a Thrift file. The filename must appear in one of the
-// given directories.
-func ParseFile(filename string, dirs []string) (*ast.Program, *idl.Info, error) {
+type parsedFile struct {
+	prog *ast.Program
+	info *idl.Info
+}
+
+type FileParser struct {
+	cache map[string]parsedFile
+	dirs  []string
+}
+
+// NewParser returns a new Parser with a list of directories that will be
+// searched for files.
+func NewFileParser(dirs []string) *FileParser {
+	return &FileParser{
+		cache: make(map[string]parsedFile),
+		dirs:  dirs,
+	}
+}
+
+// Parse parses Thrift document content with the given filename.
+func (p *FileParser) Parse(r io.Reader, filename string) (*ast.Program, *idl.Info, error) {
+	filename, err := filepath.Abs(filename)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if cached, ok := p.cache[filename]; ok {
+		return cached.prog, cached.info, nil
+	}
+
+	prog, info, err := Parse(r)
+	if err == nil {
+		p.cache[filename] = parsedFile{prog: prog, info: info}
+	}
+
+	return prog, info, err
+}
+
+// ParseFile parses a Thrift file from its filename.
+func (p *FileParser) ParseFile(filename string) (*ast.Program, *idl.Info, error) {
 	if filepath.IsAbs(filename) {
 		if f, err := os.Open(filename); err == nil {
 			defer f.Close()
-			return Parse(f)
+			return p.Parse(f, filename)
 		}
 		return nil, nil, fmt.Errorf("%s not found", filename)
 	}
 
+	dirs := append([]string{filepath.Dir(filename)}, p.dirs...)
 	for _, dir := range dirs {
 		if f, err := os.Open(filepath.Join(dir, filename)); err == nil {
 			defer f.Close()
-			return Parse(f)
+			return p.Parse(f, f.Name())
 		}
 	}
 
-	return nil, nil, fmt.Errorf("%s not found in %s", filename, dirs)
+	return nil, nil, fmt.Errorf("%s not found in %s", filename, p.dirs)
 }
