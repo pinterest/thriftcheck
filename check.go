@@ -171,6 +171,7 @@ type C struct {
 	Check     string
 	Messages  Messages
 	logger    *log.Logger
+	parser    *FileParser
 	parseInfo *idl.Info
 }
 
@@ -203,7 +204,7 @@ func (c *C) Errorf(node ast.Node, message string, args ...any) {
 
 // Resolve resolves a name.
 func (c *C) Resolve(name string) ast.Node {
-	if n, err := Resolve(name, c.Program, c.Dirs); err == nil {
+	if n, err := Resolve(name, c.Program, c.parser); err == nil {
 		return n
 	}
 	return nil
@@ -211,7 +212,7 @@ func (c *C) Resolve(name string) ast.Node {
 
 // ResolveConstant resolves a constant reference to its target.
 func (c *C) ResolveConstant(ref ast.ConstantReference) ast.Node {
-	if n, err := ResolveConstant(ref, c.Program, c.Dirs); err == nil {
+	if n, err := ResolveConstant(ref, c.Program, c.parser); err == nil {
 		return n
 	}
 	return nil
@@ -219,7 +220,7 @@ func (c *C) ResolveConstant(ref ast.ConstantReference) ast.Node {
 
 // ResolveType resolves a type reference to its target type.
 func (c *C) ResolveType(ref ast.TypeReference) ast.Node {
-	if n, err := ResolveType(ref, c.Program, c.Dirs); err == nil {
+	if n, err := ResolveType(ref, c.Program, c.parser); err == nil {
 		return n
 	}
 	return nil

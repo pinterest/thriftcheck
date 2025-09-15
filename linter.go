@@ -30,6 +30,7 @@ import (
 // Linter is a configured Thrift linter.
 type Linter struct {
 	checks   Checks
+	parser   *FileParser
 	logger   *log.Logger
 	includes []string
 }
@@ -60,6 +61,7 @@ func NewLinter(checks Checks, options ...Option) *Linter {
 	for _, option := range options {
 		option(l)
 	}
+	l.parser = NewFileParser(l.includes)
 	l.logger.Printf("checks: %s\n", checks)
 	l.logger.Printf("includes: %s\n", strings.Join(l.includes, " "))
 	return l
@@ -67,7 +69,7 @@ func NewLinter(checks Checks, options ...Option) *Linter {
 
 // Lint lints a single input file.
 func (l *Linter) Lint(r io.Reader, filename string) (Messages, error) {
-	program, info, err := Parse(r)
+	program, info, err := l.parser.Parse(r, filename)
 	if err != nil {
 		var parseError *idl.ParseError
 		if errors.As(err, &parseError) {
@@ -119,6 +121,7 @@ func (l *Linter) lint(program *ast.Program, filename string, parseInfo *idl.Info
 		Dirs:      append([]string{filepath.Dir(filename)}, l.includes...),
 		Program:   program,
 		logger:    l.logger,
+		parser:    l.parser,
 		parseInfo: parseInfo,
 	}
 	activeChecks := overridableChecks{root: &l.checks}
