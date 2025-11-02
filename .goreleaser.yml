@@ -36,8 +36,5 @@ release:
   name_template: '{{ .Version }}'
 
 changelog:
+  use: github
   sort: asc
-  filters:
-    exclude:
-      - '^.github:'
-      - README.md
