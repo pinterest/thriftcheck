@@ -48,7 +48,9 @@ func WithLogger(logger *log.Logger) Option {
 // WithIncludes is an Option that adds Thrift include paths to the linter.
 func WithIncludes(includes []string) Option {
 	return func(l *Linter) {
-		l.includes = includes
+		for _, dir := range includes {
+			l.includes = append(l.includes, filepath.Clean(dir))
+		}
 	}
 }
 

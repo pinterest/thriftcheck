@@ -33,10 +33,11 @@ func TestWithLogger(t *testing.T) {
 }
 
 func TestWithIncludes(t *testing.T) {
-	includes := []string{"a", "b"}
+	includes := []string{"a", "b/", "../c/..", "/d", "./e", ""}
+	expected := []string{"a", "b", "..", "/d", "e", "."}
 	linter := NewLinter(Checks{}, WithIncludes(includes))
-	if !reflect.DeepEqual(linter.includes, includes) {
-		t.Errorf("expected includes to be %v, got %v", includes, linter.includes)
+	if !reflect.DeepEqual(linter.includes, expected) {
+		t.Errorf("expected includes to be %v, got %v", expected, linter.includes)
 	}
 }
 
