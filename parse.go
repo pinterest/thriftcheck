@@ -19,6 +19,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"go.uber.org/thriftrw/ast"
 	"go.uber.org/thriftrw/idl"
@@ -41,7 +42,10 @@ type parsedFile struct {
 	info *idl.Info
 }
 
+// FileParser caches parsed Thrift files to avoid re-parsing included files.
+// It is safe for concurrent use by multiple goroutines.
 type FileParser struct {
+	mu    sync.RWMutex
 	cache map[string]parsedFile
 	dirs  []string
 }
@@ -62,13 +66,19 @@ func (p *FileParser) Parse(r io.Reader, filename string) (*ast.Program, *idl.Inf
 		return nil, nil, err
 	}
 
-	if cached, ok := p.cache[filename]; ok {
+	p.mu.RLock()
+	cached, ok := p.cache[filename]
+	p.mu.RUnlock()
+
+	if ok {
 		return cached.prog, cached.info, nil
 	}
 
 	prog, info, err := Parse(r)
 	if err == nil {
+		p.mu.Lock()
 		p.cache[filename] = parsedFile{prog: prog, info: info}
+		p.mu.Unlock()
 	}
 
 	return prog, info, err
