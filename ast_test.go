@@ -51,7 +51,7 @@ func TestResolveConstant(t *testing.T) {
 			&ast.Program{Definitions: []ast.Definition{
 				&ast.Constant{Name: "Constant"},
 			}},
-			reflect.TypeOf((*ast.Constant)(nil)),
+			reflect.TypeFor[*ast.Constant](),
 			false,
 		},
 		{
@@ -62,7 +62,7 @@ func TestResolveConstant(t *testing.T) {
 						{Name: "Value"},
 					},
 				},
-			}}, reflect.TypeOf((*ast.EnumItem)(nil)),
+			}}, reflect.TypeFor[*ast.EnumItem](),
 			false,
 		},
 		{
