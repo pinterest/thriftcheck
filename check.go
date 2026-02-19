@@ -47,7 +47,7 @@ func NewCheck(name string, fn any) Check {
 	if f.NumIn() < 2 {
 		panic("check function receive at least two arguments")
 	}
-	if f.In(0) != reflect.TypeOf(&C{}) {
+	if f.In(0) != reflect.TypeFor[*C]() {
 		panic("check function must receive C as its first argument")
 	}
 	for i := 1; i < f.NumIn(); i++ {

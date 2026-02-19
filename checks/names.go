@@ -23,7 +23,7 @@ import (
 
 // Name returns an ast.Node's Name string.
 func nodeName(node ast.Node) string {
-	if v := reflect.ValueOf(node); v.Kind() == reflect.Ptr {
+	if v := reflect.ValueOf(node); v.Kind() == reflect.Pointer {
 		if f := v.Elem().FieldByName("Name"); f.IsValid() {
 			return f.Interface().(string)
 		}

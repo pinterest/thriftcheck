@@ -23,7 +23,7 @@ import (
 	"go.uber.org/thriftrw/ast"
 )
 
-var nodeInterface = reflect.TypeOf((*ast.Node)(nil)).Elem()
+var nodeInterface = reflect.TypeFor[ast.Node]()
 
 // VisitorFunc adapts a function to the [ast.Visitor] interface. This differs
 // from [ast.VisitorFunc] in that it supports an ast.Visitor-compatible return
