@@ -15,9 +15,11 @@
 package checks
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/danwakefield/fnmatch"
 	"github.com/pinterest/thriftcheck"
@@ -65,4 +67,87 @@ func CheckIncludeRestricted(patterns map[string]*regexp.Regexp) thriftcheck.Chec
 			}
 		}
 	})
+}
+
+type includeEdge struct {
+	originalFrom string
+	to           string
+	include      *ast.Include
+}
+
+// CheckIncludeCycle returns a thriftcheck.Check that reports an error
+// if there is a circular include.
+func CheckIncludeCycle() thriftcheck.Check {
+	edgeList := make(map[string][]includeEdge)
+
+	return thriftcheck.NewCheck("include.cycle", func(c *thriftcheck.C, p *ast.Program) {
+		// a `include`s b
+		var a, b string
+
+		a, err := filepath.Abs(c.Filename)
+		if err != nil {
+			c.Warningf(p, "could not get absolute path for %s, skipping this file", c.Filename)
+			return
+		}
+
+		for _, h := range p.Headers {
+			i, ok := h.(*ast.Include)
+			if !ok {
+				continue
+			}
+
+			for _, dir := range c.Dirs {
+				absDir, err := filepath.Abs(dir)
+				if err != nil {
+					c.Warningf(p, "could not get absolute path for %s, skipping joining %s with this dir", dir, i.Path)
+					continue
+				}
+
+				b = filepath.Join(absDir, i.Path)
+
+				edgeList[a] = append(edgeList[a], includeEdge{originalFrom: c.Filename, to: b, include: i})
+			}
+		}
+
+		cycle := lookForCycle(a, a, make(map[string]bool), []includeEdge{}, edgeList)
+
+		if len(cycle) > 0 {
+			cycleFiles := []string{}
+			for _, e := range cycle {
+				cycleFiles = append(cycleFiles, filepath.Base(e.to))
+			}
+			c.Errorf(cycle[0].include, "cycle detected: -> %s", strings.Join(cycleFiles, " -> "))
+
+			if c.Verbose {
+				m := []string{}
+				for _, e := range cycle {
+					m = append(m, fmt.Sprintf(
+						"\t%s -> %s\n\t\tIncluded as: %s\n\t\tAt: %s:%d:%d\n",
+						filepath.Base(e.originalFrom), filepath.Base(e.include.Path), e.include.Path, e.originalFrom, e.include.Line, e.include.Column))
+				}
+				c.Logf("Cycle detected at %s:\n%s", c.Filename, strings.Join(m, "\n"))
+			}
+		}
+	})
+}
+
+// looksForCycle tries to find a cycle that leads back to the start node (filename).
+// If found, it returns the edges in the cycle. Otherwise returns nil.
+func lookForCycle(cur, start string, visited map[string]bool, path []includeEdge, edgeList map[string][]includeEdge) []includeEdge {
+	if visited[cur] {
+		if cur == start {
+			return path
+		}
+		return nil
+	}
+
+	visited[cur] = true
+
+	for _, e := range edgeList[cur] {
+		if cycle := lookForCycle(e.to, start, visited, append(path, e), edgeList); cycle != nil {
+			return cycle
+		}
+	}
+
+	return nil
 }
